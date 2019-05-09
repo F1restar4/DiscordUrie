@@ -1,0 +1,5 @@
+bin/*
+.vscode/*
+obj/*
+token.txt
+config.json
