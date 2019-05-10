@@ -19,19 +19,6 @@ namespace DiscordUrie_DSharpPlus
 	public partial class Commands : BaseCommandModule
 	{
 
-		[Command("vkick")]
-		public async Task VKick(CommandContext ctx, DiscordMember member)
-		{
-			if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
-			{
-				await ctx.Message.DeleteAsync();
-				return;
-			}
-			await member.ModifyAsync(e => e.VoiceChannel = null);
-			await ctx.Message.DeleteAsync();
-		}
-
-
 		[Command("lookup")]
 		[Description("Looks up info about a user")]
 		public async Task LookupUserAsync(CommandContext ctx, [Description("The user to lookup, can be an ID")]DiscordUser InputUser = null)

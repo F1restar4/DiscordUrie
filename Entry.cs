@@ -72,10 +72,7 @@ namespace DiscordUrie_DSharpPlus
 			DiscordConfiguration config = new DiscordConfiguration
 			{
 				Token = token,
-				AutoReconnect = true,
-				LogLevel = LogLevel.Info,
 				UseInternalLogHandler = true,
-
 			};
 
 			Client = new DiscordClient(config);
