@@ -19,7 +19,7 @@ namespace DiscordUrie_DSharpPlus
 
 			public class MethodShit
 			{
-				public static async Task<bool> RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel, bool SilentMode = false, bool Override = false)
+				public static async Task<bool> RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel, bool Override = false)
 				{
 					DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(server);
 

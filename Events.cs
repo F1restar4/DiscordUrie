@@ -58,7 +58,7 @@ namespace DiscordUrie_DSharpPlus
 		{
 			DiscordBan UserBan = await e.Guild.GetBanAsync(e.Member);
 
-			await Commands.ColoringStuffGroup.MethodShit.RemoveColor(e.Member, e.Guild, e.Guild.GetDefaultChannel(), Override: true);
+			await Commands.ColoringStuffGroup.MethodShit.RemoveColor(e.Member, e.Guild, e.Guild.GetDefaultChannel(), true);
 			if (UserBan != null)
 			{
 				await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was banned from the discord with the reason `{UserBan.Reason}`");
