@@ -36,6 +36,24 @@ namespace DiscordUrie_DSharpPlus
 			return Task.CompletedTask;
 		}
 
+		public static Task GuildAvailable(GuildCreateEventArgs e)
+		{
+			if (!Settings.GuildSettings.Any(xr => xr.ServerId == e.Guild.Id))
+				 Settings.AddGuild(e.Guild);
+			
+			return Task.CompletedTask;
+		}
+
+		public static Task GuildUnavailable(GuildDeleteEventArgs e)
+		{
+			if (!e.Unavailable)
+			{
+				Settings.RemoveGuild(e.Guild.Id);
+				e.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscordUrie", $"Removed from {e.Guild.Id}", DateTime.Now);
+			}
+			return Task.CompletedTask;
+		}
+
 		public static async Task Client_Ready(ReadyEventArgs e)
 		{
 			if (Settings.IsEmpty())
@@ -56,6 +74,8 @@ namespace DiscordUrie_DSharpPlus
 
 		public static async Task UserLeaveGuild(GuildMemberRemoveEventArgs e)
 		{
+			if (e.Member.IsCurrent) return;
+			
 			DiscordBan UserBan = await e.Guild.GetBanAsync(e.Member);
 
 			await Commands.ColoringStuffGroup.MethodShit.RemoveColor(e.Member, e.Guild, e.Guild.GetDefaultChannel(), true);
