@@ -106,6 +106,23 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
+			public bool RemoveGuild(ulong guildid)
+			{
+				bool result = GuildSettings.Remove(GuildSettings.First(xr => xr.ServerId == guildid));
+				this.SaveSettings();
+				return result;
+			}
+
+			public bool AddGuild(DiscordGuild guild)
+			{
+				if (GuildSettings.Any(xr => xr.ServerId == guild.Id))
+					return false;
+
+				GuildSettings.Add(CreateGuildDefaultSettings(guild));
+				this.SaveSettings();
+				return true;
+			}
+
 			public DiscordUrieGuild FindGuildSettings(DiscordGuild SearchForGuild)
 			{
 				if (GuildSettings.Any(xr => xr.ServerId == SearchForGuild.Id))
@@ -122,6 +139,7 @@ namespace DiscordUrie_DSharpPlus
 					return NewDefaultServer;
 				}
 			}
+
 			public List<ulong> GetChatBanIdList(DiscordGuild Guild)
 			{
 

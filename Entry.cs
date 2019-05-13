@@ -92,6 +92,8 @@ namespace DiscordUrie_DSharpPlus
 			Client.Ready += Events.Client_Ready;
 			Client.ClientErrored += Events.ErrorHandler;
 			Client.GuildMemberRemoved += Events.UserLeaveGuild;
+			Client.GuildAvailable += Events.GuildAvailable;
+			Client.GuildUnavailable += Events.GuildUnavailable;
 
 			Client.MessageCreated += async e =>
 			{
