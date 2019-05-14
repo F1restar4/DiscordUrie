@@ -52,6 +52,7 @@ namespace DiscordUrie_DSharpPlus
 				token = Console.ReadLine();
 
 				File.WriteAllText("token.txt", token);
+				Console.Clear();
 			}
 			else
 			{
@@ -61,7 +62,6 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			Console.Clear();
 
 			InitSettings = DiscordUrieSettings.LoadSettings();
 
@@ -93,7 +93,7 @@ namespace DiscordUrie_DSharpPlus
 			Client.ClientErrored += Events.ErrorHandler;
 			Client.GuildMemberRemoved += Events.UserLeaveGuild;
 			Client.GuildAvailable += Events.GuildAvailable;
-			Client.GuildUnavailable += Events.GuildUnavailable;
+			Client.GuildDeleted += Events.GuildDeleted;
 
 			Client.MessageCreated += async e =>
 			{

@@ -44,12 +44,12 @@ namespace DiscordUrie_DSharpPlus
 			return Task.CompletedTask;
 		}
 
-		public static Task GuildUnavailable(GuildDeleteEventArgs e)
+		public static Task GuildDeleted(GuildDeleteEventArgs e)
 		{
 			if (!e.Unavailable)
 			{
 				Settings.RemoveGuild(e.Guild.Id);
-				e.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscordUrie", $"Removed from {e.Guild.Id}", DateTime.Now);
+				e.Client.DebugLogger.LogMessage(LogLevel.Info, "DicordUrie", $"Removed from guild: {e.Guild.Name}", DateTime.Now);
 			}
 			return Task.CompletedTask;
 		}
