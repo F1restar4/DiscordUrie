@@ -21,7 +21,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				public static async Task<bool> RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel, bool Override = false)
 				{
-					DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(server);
+					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(server);
 
 					if (!Override)
 					{
@@ -70,7 +70,7 @@ namespace DiscordUrie_DSharpPlus
 
 				public static async Task<bool> SetColor(DiscordMember user, DiscordGuild server, DiscordChannel channel, DiscordColor color)
 				{
-					DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(server);
+					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(server);
 
 					if (!GuildSettings.CSettings.Enabled)
 					{
@@ -124,10 +124,10 @@ namespace DiscordUrie_DSharpPlus
 
 				}
 
-				public static DiscordColor? GetColor(DiscordMember user, DiscordGuild server)
+				public static async Task<DiscordColor?> GetColor(DiscordMember user, DiscordGuild server)
 				{
 
-					DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(server);
+					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(server);
 
 					if (!GuildSettings.CSettings.Enabled)
 						return null;
@@ -151,7 +151,7 @@ namespace DiscordUrie_DSharpPlus
 				try
 				{
 
-					if (user != ctx.Member && !Util.UserAuth(ctx.Member.Id, ctx.Guild))
+					if (user != ctx.Member && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 					{
 						await ctx.RespondAsync("You don't have the correct permissions for this!");
 						return;
@@ -226,7 +226,7 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Sets a givin user's color `only works if you're super cool`")]
 			public async Task SetTargetColor(CommandContext ctx, [Description("The ID or mention of the target user")] DiscordMember user, [Description("The color to set to, can be in hex, rgb or keyword format (Must be a single string)")]string Color)
 			{
-				if (Util.UserAuth(ctx.User.Id, ctx.Guild))
+				if (await Util.UserAuth(ctx.User.Id, ctx.Guild))
 				{
 					try
 					{
@@ -289,7 +289,7 @@ namespace DiscordUrie_DSharpPlus
 				try
 				{
 
-					DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(ctx.Guild);
+					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
 					if (!GuildSettings.CSettings.Enabled)
 					{
@@ -298,7 +298,7 @@ namespace DiscordUrie_DSharpPlus
 					}
 
 
-					DiscordColor? UserColor = MethodShit.GetColor(User, ctx.Guild);
+					DiscordColor? UserColor = await MethodShit.GetColor(User, ctx.Guild);
 
 					if (UserColor != null)
 						await ctx.RespondAsync($"{User.Username}'s current color is {UserColor} or {UserColor.Value.R}, {UserColor.Value.G}, {UserColor.Value.B}");

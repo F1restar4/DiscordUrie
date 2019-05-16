@@ -63,7 +63,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 
-			InitSettings = DiscordUrieSettings.LoadSettings();
+			InitSettings = await DiscordUrieSettings.LoadSettings();
 
 			if (InitSettings != null)
 				Settings = InitSettings.Value;

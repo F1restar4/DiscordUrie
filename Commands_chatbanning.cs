@@ -22,7 +22,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task Enable(CommandContext ctx)
 			{
 
-				if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				{
 					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
 					await Task.Delay(2070);
@@ -31,7 +31,7 @@ namespace DiscordUrie_DSharpPlus
 					return;
 				}
 
-				DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(ctx.Guild);
+				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
 				if (GuildSettings.CBSettings.Enabled)
 				{
@@ -49,7 +49,7 @@ namespace DiscordUrie_DSharpPlus
 						Enabled = true,
 					};
 					Entry.Settings.GuildSettings.Add(GuildSettings);
-					Entry.Settings.SaveSettings();
+					await Entry.Settings.SaveSettings();
 
 					DiscordMessage woaaah = await ctx.RespondAsync("Chat bans enabled...");
 					await Task.Delay(2070);
@@ -64,7 +64,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task Disable(CommandContext ctx)
 			{
 
-				if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				{
 					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
 					await Task.Delay(2070);
@@ -72,7 +72,7 @@ namespace DiscordUrie_DSharpPlus
 					await a.DeleteAsync("Command auto deletion.");
 					return;
 				}
-				DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(ctx.Guild);
+				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
 				if (GuildSettings.CBSettings.Enabled)
 				{
@@ -83,7 +83,7 @@ namespace DiscordUrie_DSharpPlus
 						Enabled = false,
 					};
 					Entry.Settings.GuildSettings.Add(GuildSettings);
-					Entry.Settings.SaveSettings();
+					await Entry.Settings.SaveSettings();
 
 					DiscordMessage ImSoTired = await ctx.RespondAsync("Chat bans disabled...");
 					await Task.Delay(2070);
@@ -105,7 +105,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task AddBan(CommandContext ctx, [Description("The user id to add")] DiscordMember user)
 			{
 
-				if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				{
 					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
 					await Task.Delay(2070);
@@ -114,16 +114,7 @@ namespace DiscordUrie_DSharpPlus
 					return;
 				}
 
-				bool success = Util.AddBan(ctx.Client, user.Id, ctx.Guild, out Exception ex);
-
-				if (ex != null)
-				{
-					DiscordMessage OhThanksYes = await ctx.RespondAsync($"Something went wrong! {ex.Message}");
-					await Task.Delay(2070);
-					await ctx.Message.DeleteAsync("Command auto deletion.");
-					await OhThanksYes.DeleteAsync("Command auto deletion.");
-				}
-
+				bool success = await Util.AddBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)
 				{
@@ -146,7 +137,7 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Removes a user from the ban list `only works if you're super cool`")]
 			public async Task RemoveBan(CommandContext ctx, [Description("The user id to remove")] DiscordMember user)
 			{
-				if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				{
 					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
 					await Task.Delay(2070);
@@ -156,15 +147,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 
 
-				bool success = Util.RemoveBan(ctx.Client, user.Id, ctx.Guild, out Exception ex);
-				if (ex != null)
-				{
-					DiscordMessage OhThanksYes = await ctx.RespondAsync($"Something went wrong! {ex.Message}");
-					await Task.Delay(2070);
-					await ctx.Message.DeleteAsync("Command auto deletion.");
-					await OhThanksYes.DeleteAsync("Command auto deletion.");
-					return;
-				}
+				bool success = await Util.RemoveBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)
 				{
@@ -187,7 +170,7 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Displays all the currently chat banned users")]
 			public async Task BanCheck(CommandContext ctx)
 			{
-				List<ulong> idlist = Entry.Settings.GetChatBanIdList(ctx.Guild);
+				List<ulong> idlist = await Entry.Settings.GetChatBanIdList(ctx.Guild);
 				string CurMessage = "The users that are currently in the chat bans list are: ";
 				int IHateMyLife = 0;
 

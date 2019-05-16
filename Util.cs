@@ -12,10 +12,10 @@ namespace DiscordUrie_DSharpPlus
 	public static class Util
 	{
 
-		public static string Truncate(this string value, int maxLength)
+		public static Task<string> Truncate(this string value, int maxLength)
 		{
-			if (string.IsNullOrEmpty(value)) return value;
-			return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+			if (string.IsNullOrEmpty(value)) return Task.FromResult(value);
+			return Task.FromResult(value.Length <= maxLength ? value : value.Substring(0, maxLength));
 		}
 
 		public static async Task<DiscordBan> GetBanAsync(this DiscordGuild guild, DiscordUser user)
@@ -24,36 +24,34 @@ namespace DiscordUrie_DSharpPlus
 			return GuildBans.FirstOrDefault(xr => xr.User == user);
 		}
 
-		public static string ToDuration(this TimeSpan span)
+		public static Task<string> ToDuration(this TimeSpan span)
 		{
             if (span.TotalHours >= 1)
-                return span.ToString(@"h\:mm\:ss");
-			return span.ToString(@"m\:ss");
+                return Task.FromResult(span.ToString(@"h\:mm\:ss"));
+			return Task.FromResult(span.ToString(@"m\:ss"));
 		}
 
-		public static bool UserAuthHigh(ulong inputID, DiscordGuild Guild)
+		public static Task<bool> UserAuthHigh(ulong inputID, DiscordGuild Guild)
 		{
 			if (Guild.Owner.Id == inputID)
-				return true;
+				return Task.FromResult(true);
 
 			ulong[] SuperDuperCoolPeople = { 105076116942811136, 161658438869450752, 197757126611959808 };
 
 			if (SuperDuperCoolPeople.Any(xr => xr == inputID))
-				return true;
+				return Task.FromResult(true);
 
-			return false;
-
-
+			return Task.FromResult(false);
 		}
 
-		public static bool UserAuth(ulong inputId, DiscordGuild Guild)
+		public static async Task<bool> UserAuth(ulong inputId, DiscordGuild Guild)
 		{
 
-			if (UserAuthHigh(inputId, Guild))
+			if (await UserAuthHigh(inputId, Guild))
 				return true;
 
 			List<ulong> ServerAdmins = new List<ulong>();
-			DiscordUrieSettings.DiscordUrieGuild GuildSettings = Settings.FindGuildSettings(Guild);
+			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
 
 			ServerAdmins.AddRange(GuildSettings.ASettings.Admins);
 
@@ -64,19 +62,19 @@ namespace DiscordUrie_DSharpPlus
 
 		}
 
-		internal static bool RemoveBan(DiscordClient Client, ulong id, DiscordGuild Guild, out Exception ex)
+		internal static async Task<bool> RemoveBan(DiscordClient Client, ulong id, DiscordGuild Guild)
 		{
 			try
 			{
 
-				List<ulong> BannedIds = Settings.GetChatBanIdList(Guild);
+				List<ulong> BannedIds = await Settings.GetChatBanIdList(Guild);
 
 				bool removed = BannedIds.Remove(id);
 
 
 				if (removed)
 				{
-					DiscordUrieSettings.DiscordUrieGuild GuildSettings = Settings.FindGuildSettings(Guild);
+					DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
 					Settings.GuildSettings.Remove(GuildSettings);
 					GuildSettings.CBSettings = new DiscordUrieSettings.ChatBanSettings()
 					{
@@ -84,38 +82,32 @@ namespace DiscordUrie_DSharpPlus
 						BannedIds = BannedIds,
 					};
 					Settings.GuildSettings.Add(GuildSettings);
-					Settings.SaveSettings();
-					ex = null;
+					await Settings.SaveSettings();
 					return true;
 				}
 				else
 				{
-					ex = null;
 					return false;
 				}
 			}
 			catch (Exception exc)
 			{
 				Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error removing chat ban. {exc.Message}", DateTime.Now);
-				ex = exc;
-				return false;
+				throw exc;
 			}
 		}
 
-		internal static bool AddBan(DiscordClient Client, ulong id, DiscordGuild Guild, out Exception ex)
+		internal static async Task<bool> AddBan(DiscordClient Client, ulong id, DiscordGuild Guild)
 		{
 			try
 			{
-				List<ulong> BannedIds = Settings.GetChatBanIdList(Guild);
+				List<ulong> BannedIds = await Settings.GetChatBanIdList(Guild);
 
 				if (BannedIds.Any(xr => xr == id))
-				{
-					ex = null;
 					return false;
-				}
 
 				BannedIds.Add(id);
-				DiscordUrieSettings.DiscordUrieGuild GuildSettings = Settings.FindGuildSettings(Guild);
+				DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
 				Settings.GuildSettings.Remove(GuildSettings);
 				GuildSettings.CBSettings = new DiscordUrieSettings.ChatBanSettings()
 				{
@@ -123,17 +115,15 @@ namespace DiscordUrie_DSharpPlus
 					BannedIds = BannedIds,
 				};
 				Settings.GuildSettings.Add(GuildSettings);
-				Settings.SaveSettings();
+				await Settings.SaveSettings();
 
-				ex = null;
 				return true;
 
 			}
 			catch (Exception exc)
 			{
-				Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error adding ban to list. {exc.Message}", DateTime.Now);
-				ex = exc;
-				return false;
+				Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", "Error adding ban to list.", DateTime.Now, exc);
+				throw exc;
 			}
 
 		}
