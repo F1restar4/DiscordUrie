@@ -12,23 +12,23 @@ namespace DiscordUrie_DSharpPlus
 	public class DiscordUrieSettings
 	{
 
-		public static DiscordUrieConfig CreateAllDefaultSettings(BaseDiscordClient client)
+		public static async Task<DiscordUrieConfig> CreateAllDefaultSettings(BaseDiscordClient client)
 		{
 			DiscordUrieConfig OutputConfig = new DiscordUrieConfig
 			{
 
 				StartupActivity = new DiscordActivity("the voices in my head", ActivityType.ListeningTo),
 
-				GuildSettings = CreateGuildDefaultSettings(client.Guilds.Values)
+				GuildSettings = await CreateGuildDefaultSettings(client.Guilds.Values)
 			};
 
 
 			return OutputConfig;
 		}
 
-		public static DiscordUrieGuild CreateGuildDefaultSettings(DiscordGuild Guild)
+		public static Task<DiscordUrieGuild> CreateGuildDefaultSettings(DiscordGuild Guild)
 		{
-			return new DiscordUrieGuild()
+			return Task.FromResult(new DiscordUrieGuild()
 			{
 				ServerId = Guild.Id,
 				CSettings = new ColorSettings()
@@ -49,47 +49,43 @@ namespace DiscordUrie_DSharpPlus
 				{
 					Admins = new List<ulong>()
 				}
-			};
+			});
 		}
 
-		public static List<DiscordUrieGuild> CreateGuildDefaultSettings(IEnumerable<DiscordGuild> GuildList)
+		public static async Task<List<DiscordUrieGuild>> CreateGuildDefaultSettings(IEnumerable<DiscordGuild> GuildList)
 		{
 			List<DiscordUrieGuild> OutputGuildList = new List<DiscordUrieGuild>();
 
 			foreach (DiscordGuild cur in GuildList)
 			{
-				OutputGuildList.Add(CreateGuildDefaultSettings(cur));
+				OutputGuildList.Add(await CreateGuildDefaultSettings(cur));
 			}
 
 
 			return OutputGuildList;
 		}
 
-		public static DiscordUrieConfig? LoadSettings()
+		public static async Task<DiscordUrieConfig?> LoadSettings()
 		{
 			JsonSerializerSettings serializerSettings = new JsonSerializerSettings
 			{
 				NullValueHandling = NullValueHandling.Ignore
 			};
-			return JsonConvert.DeserializeObject<DiscordUrieConfig?>(File.ReadAllText("config.json"), serializerSettings);
+			return JsonConvert.DeserializeObject<DiscordUrieConfig?>(await File.ReadAllTextAsync("config.json"), serializerSettings);
 		}
 
 		public struct DiscordUrieConfig
 		{
-			public bool IsEmpty()
+			public Task<bool> IsEmpty()
 			{
-				if (GuildSettings == null)
+				if (GuildSettings == null || StartupActivity == null)
 				{
-					return true;
+					return Task.FromResult(true);
 				}
-				if (StartupActivity == null)
-				{
-					return true;
-				}
-				return false;
+				return Task.FromResult(false);
 			}
 
-			public bool SaveSettings()
+			public async Task<bool> SaveSettings()
 			{
 				try
 				{
@@ -97,7 +93,7 @@ namespace DiscordUrie_DSharpPlus
 					{
 						NullValueHandling = NullValueHandling.Ignore
 					};
-					File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented, serializerSettings));
+					await File.WriteAllTextAsync("config.json", JsonConvert.SerializeObject(this, Formatting.Indented, serializerSettings));
 					return true;
 				}
 				catch
@@ -106,24 +102,24 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			public bool RemoveGuild(ulong guildid)
+			public async Task<bool> RemoveGuild(ulong guildid)
 			{
 				bool result = GuildSettings.Remove(GuildSettings.First(xr => xr.ServerId == guildid));
-				this.SaveSettings();
+				await this.SaveSettings();
 				return result;
 			}
 
-			public bool AddGuild(DiscordGuild guild)
+			public async Task<bool> AddGuild(DiscordGuild guild)
 			{
 				if (GuildSettings.Any(xr => xr.ServerId == guild.Id))
 					return false;
 
-				GuildSettings.Add(CreateGuildDefaultSettings(guild));
-				this.SaveSettings();
+				GuildSettings.Add(await CreateGuildDefaultSettings(guild));
+				await this.SaveSettings();
 				return true;
 			}
 
-			public DiscordUrieGuild FindGuildSettings(DiscordGuild SearchForGuild)
+			public async Task<DiscordUrieGuild> FindGuildSettings(DiscordGuild SearchForGuild)
 			{
 				if (GuildSettings.Any(xr => xr.ServerId == SearchForGuild.Id))
 				{
@@ -131,19 +127,19 @@ namespace DiscordUrie_DSharpPlus
 				}
 				else
 				{
-					DiscordUrieGuild NewDefaultServer = CreateGuildDefaultSettings(SearchForGuild);
+					DiscordUrieGuild NewDefaultServer = await CreateGuildDefaultSettings(SearchForGuild);
 
 
 					GuildSettings.Add(NewDefaultServer);
-					SaveSettings();
+					await SaveSettings();
 					return NewDefaultServer;
 				}
 			}
 
-			public List<ulong> GetChatBanIdList(DiscordGuild Guild)
+			public async Task<List<ulong>> GetChatBanIdList(DiscordGuild Guild)
 			{
 
-				DiscordUrieSettings.DiscordUrieGuild GuildSettings = FindGuildSettings(Guild);
+				DiscordUrieSettings.DiscordUrieGuild GuildSettings = await FindGuildSettings(Guild);
 
 				return GuildSettings.CBSettings.BannedIds;
 			}

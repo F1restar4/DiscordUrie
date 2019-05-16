@@ -67,7 +67,7 @@ namespace DiscordUrie_DSharpPlus
 			[Command("add")]
 			public async Task SpamAddAsync(CommandContext ctx, string Yes, int Count)
 			{
-				if (Util.UserAuth(ctx.Member.Id, ctx.Guild))
+				if (await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				{
 					await ctx.Message.DeleteAsync();
 
@@ -84,7 +84,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task SpamRemoveAsync(CommandContext ctx, [Description("The key to search for.")] string key, [Description("A specific user to search for, this param is optional")] DiscordMember ByUser = null)
 			{
 
-				if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				{
 					await ctx.RespondAsync("You're not super special cool enough to use this command");
 					return;
@@ -143,7 +143,7 @@ namespace DiscordUrie_DSharpPlus
 		{
 			class OtherHelpfullMethods
 			{
-				public static ulong? Convert32IdTo64(string ThirtyTwoBitId)
+				public static Task<ulong?> Convert32IdTo64(string ThirtyTwoBitId)
 				{
 					string[] SplitInput = ThirtyTwoBitId.Split(':');
 
@@ -162,10 +162,10 @@ namespace DiscordUrie_DSharpPlus
 						Converted += 76561197960265728;
 						Converted += Convert.ToUInt64(Woah);
 
-						return Converted;
+						return Task.FromResult<ulong?>(Converted);
 					}
 
-					return null;
+					return Task.FromResult<ulong?>(null);
 				}
 			}
 
@@ -175,7 +175,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task ProfileInfoAsync(CommandContext ctx, string Userid)
 			{
 				DiscordMessage LoadingMessage = await ctx.RespondAsync("Retrieving info...");
-				ulong? ConvertedId = OtherHelpfullMethods.Convert32IdTo64(Userid);
+				ulong? ConvertedId = await OtherHelpfullMethods.Convert32IdTo64(Userid);
 
 				if (ConvertedId == null)
 				{
@@ -207,7 +207,7 @@ namespace DiscordUrie_DSharpPlus
 
 				if (PlayerLevelStr.Length > 2)
 				{
-					PlayerLevelStr.Truncate(2);
+					await PlayerLevelStr.Truncate(2);
 				}
 
 				uint.TryParse(PlayerLevelStr, out uint CutPlayerLevel);
@@ -316,7 +316,7 @@ namespace DiscordUrie_DSharpPlus
 					Description = "These are the current settings for this guild.\n----------------------------------"
 				};
 
-				DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(ctx.Guild);
+				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
 				string CurMessage = "";
 
@@ -336,7 +336,7 @@ namespace DiscordUrie_DSharpPlus
 								$"Blacklist Mode: {GuildSettings.CSettings.BlacklistMode}\n" +
 								$"Blacklist: {CurMessage}\n");
 
-				List<ulong> idlist = Entry.Settings.GetChatBanIdList(ctx.Guild);
+				List<ulong> idlist = await Entry.Settings.GetChatBanIdList(ctx.Guild);
 				int yes = 0;
 				CurMessage = "";
 				foreach (ulong cur in idlist)
@@ -386,7 +386,7 @@ namespace DiscordUrie_DSharpPlus
 			[Hidden]
 			public async Task UpdateSettingsAsync(CommandContext ctx)
 			{
-				DiscordUrieConfig? Settings = LoadSettings();
+				DiscordUrieConfig? Settings = await LoadSettings();
 				if (Settings != null)
 				{
 					Entry.Settings = Settings.Value;
@@ -423,17 +423,17 @@ namespace DiscordUrie_DSharpPlus
 				[Description("Setting to determine if coloring is enabled on this server")]
 				public async Task EnabledAsync(CommandContext ctx, bool Enabled, [Description("Set to disable changing this setting unless you're the server owner [only works if you are the owner (or are cool enough)]")] bool? Lock = null)
 				{
-					if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+					if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 					{
 						await ctx.RespondAsync("Incorrect permissions to edit setting.");
 						return;
 					}
 
-					DiscordUrieGuild GuildSettings = Entry.Settings.FindGuildSettings(ctx.Guild);
+					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 					bool locked = GuildSettings.CSettings.Locked;
 					bool LockChanged = false;
 
-					if (GuildSettings.CSettings.Locked && !Util.UserAuth(ctx.Member.Id, ctx.Guild))
+					if (GuildSettings.CSettings.Locked && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 					{
 						await ctx.RespondAsync("This setting is locked. You do not have the correct permissions to edit it...");
 					}
@@ -443,7 +443,7 @@ namespace DiscordUrie_DSharpPlus
 						{
 							await ctx.RespondAsync($"This setting is already set to {Enabled}");
 						}
-						if (Lock.HasValue && Util.UserAuth(ctx.Member.Id, ctx.Guild))
+						if (Lock.HasValue && await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 						{
 							if (Lock != locked)
 							{
@@ -462,7 +462,7 @@ namespace DiscordUrie_DSharpPlus
 						};
 
 						Entry.Settings.GuildSettings.Add(GuildSettings);
-						Entry.Settings.SaveSettings();
+						await Entry.Settings.SaveSettings();
 						if (Enabled)
 						{
 							if (LockChanged)
@@ -510,7 +510,7 @@ namespace DiscordUrie_DSharpPlus
 		[Hidden]
 		public async Task SetGameMsgAsync(CommandContext ctx, string name, ActivityType type)
 		{
-			if (!Util.UserAuth(ctx.Member.Id, ctx.Guild))
+			if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 				return;
 			await ctx.Client.UpdateStatusAsync(new DiscordActivity(name, type), UserStatus.Online);
 			await ctx.Message.DeleteAsync(reason: "Command auto deletion.");
@@ -520,7 +520,7 @@ namespace DiscordUrie_DSharpPlus
 		[Hidden]
 		public async Task ShutdownAsync(CommandContext ctx)
 		{
-			if (!Util.UserAuthHigh(ctx.Member.Id, ctx.Guild))
+			if (!await Util.UserAuthHigh(ctx.Member.Id, ctx.Guild))
 				return;
 			DiscordMessage HelpThanks = await ctx.RespondAsync("Shutting down...");
 			await Task.Delay(3000);

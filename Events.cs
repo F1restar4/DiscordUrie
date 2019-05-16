@@ -15,13 +15,13 @@ namespace DiscordUrie_DSharpPlus
 		public static async Task ChatBansEventCall(MessageCreateEventArgs e)
 		{
 
-			DiscordUrieSettings.DiscordUrieGuild GuildSettings = Settings.FindGuildSettings(e.Guild);
+			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(e.Guild);
 
 			if (!e.Message.Author.IsBot && GuildSettings.CBSettings.Enabled)
 			{
 
 				ulong id = e.Author.Id;
-				List<ulong> bans = Settings.GetChatBanIdList(e.Guild);
+				List<ulong> bans = await Settings.GetChatBanIdList(e.Guild);
 
 				if (bans.Any(xr => xr == id))
 					await e.Message.DeleteAsync("Chat ban deletion");
@@ -36,35 +36,32 @@ namespace DiscordUrie_DSharpPlus
 			return Task.CompletedTask;
 		}
 
-		public static Task GuildAvailable(GuildCreateEventArgs e)
+		public static async Task GuildAvailable(GuildCreateEventArgs e)
 		{
 			if (!Settings.GuildSettings.Any(xr => xr.ServerId == e.Guild.Id))
-				 Settings.AddGuild(e.Guild);
-			
-			return Task.CompletedTask;
+				 await Settings.AddGuild(e.Guild);
 		}
 
-		public static Task GuildDeleted(GuildDeleteEventArgs e)
+		public static async Task GuildDeleted(GuildDeleteEventArgs e)
 		{
 			if (!e.Unavailable)
 			{
-				Settings.RemoveGuild(e.Guild.Id);
+				await Settings.RemoveGuild(e.Guild.Id);
 				e.Client.DebugLogger.LogMessage(LogLevel.Info, "DicordUrie", $"Removed from guild: {e.Guild.Name}", DateTime.Now);
 			}
-			return Task.CompletedTask;
 		}
 
 		public static async Task Client_Ready(ReadyEventArgs e)
 		{
-			if (Settings.IsEmpty())
+			if (await Settings.IsEmpty())
 			{
 
 				List<DiscordGuild> Yes = new List<DiscordGuild>();
 
 				Yes.AddRange(e.Client.Guilds.Values);
 
-				Settings = DiscordUrieSettings.CreateAllDefaultSettings(e.Client);
-				Settings.SaveSettings();
+				Settings = await DiscordUrieSettings.CreateAllDefaultSettings(e.Client);
+				await Settings.SaveSettings();
 
 			}
 
