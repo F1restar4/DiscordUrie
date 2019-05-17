@@ -4,16 +4,18 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00600"/>
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00600"/>
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00600"/>
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00600"/>
-    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-nightly-00600"/>
-    <PackageReference Include="Emzi0767.Microsoft.DependencyInjection" Version="2.0.0"/>
-    <PackageReference Include="Emzi0767.Microsoft.DependencyInjection.Abstractions" Version="2.0.0"/>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2"/>
-    <PackageReference Include="Steam.Models" Version="3.0.8"/>
-    <PackageReference Include="SteamWebAPI2" Version="4.0.8"/>
-    <PackageReference Include="System.Drawing.Common" Version="4.5.0"/>
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00600" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00600" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00600" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00600" />
+    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-nightly-00600" />
+    <PackageReference Include="Emzi0767.Microsoft.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Emzi0767.Microsoft.DependencyInjection.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Steam.Models" Version="3.0.8" />
+    <PackageReference Include="SteamWebAPI2" Version="4.0.8" />
+    <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
   </ItemGroup>
 </Project>
