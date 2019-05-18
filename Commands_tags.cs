@@ -26,15 +26,15 @@ namespace DiscordUrie_DSharpPlus
             {
                 DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
-                tag = Regex.Escape(tag);
+                tag = Regex.Escape(tag).ToLower();
 
-                if (GuildSettings.Tags.Any(xr => xr.Tag == tag))
+                if (GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
                 {
-                    await ctx.RespondAsync(Regex.Unescape(GuildSettings.Tags.First(xr => xr.Tag == tag).Output));
+                    await ctx.RespondAsync(Regex.Unescape(GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag).Output));
                     return;
                 }
 
-                var Contained = GuildSettings.Tags.FindAll(xr => xr.Tag.Contains(tag));
+                var Contained = GuildSettings.Tags.FindAll(xr => xr.Tag.ToLower().Contains(tag));
                 if (Contained.Count <= 0)
                 {
                     await ctx.RespondAsync("Tag not found.");
@@ -56,13 +56,11 @@ namespace DiscordUrie_DSharpPlus
             {
                 try
                 {
-
-            
                     DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
                 
                     tag = Regex.Escape(tag);
                     Output = Regex.Escape(Output);
-                    if (GuildSettings.Tags.Any(xr => xr.Tag == tag))
+                    if (GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag.ToLower()))
                     {
                         await ctx.RespondAsync("This tag already exists!");
                         return;
@@ -91,15 +89,16 @@ namespace DiscordUrie_DSharpPlus
             {
                 try
                 {
-                    tag = Regex.Escape(tag);
+                    tag = Regex.Escape(tag).ToLower();
                     DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
-                    if(!GuildSettings.Tags.Any(xr => xr.Tag == tag))
+
+                    if(!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
                     {
                         await ctx.RespondAsync("Tag doesn't exist!");
                         return;
                     }
-                    DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag == tag);
+                    DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
                     if(Target.Owner != ctx.Member.Id && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
                     {
                         await ctx.RespondAsync("You do not have the permissions to do this!");
