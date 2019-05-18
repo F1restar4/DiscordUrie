@@ -48,7 +48,9 @@ namespace DiscordUrie_DSharpPlus
 				ASettings = new AdminSettings()
 				{
 					Admins = new List<ulong>()
-				}
+				},
+
+				Tags = new List<DiscordUrieTag>()
 			});
 		}
 
@@ -144,6 +146,14 @@ namespace DiscordUrie_DSharpPlus
 				return GuildSettings.CBSettings.BannedIds;
 			}
 
+			public async Task<List<DiscordUrieTag>> GetTags(DiscordGuild guild)
+			{
+				DiscordUrieGuild GuildSettings = await FindGuildSettings(guild);
+				return GuildSettings.Tags;
+			}
+
+
+
 			public DiscordActivity StartupActivity { get; set; }
 
 			public List<DiscordUrieGuild> GuildSettings { get; set; }
@@ -175,12 +185,21 @@ namespace DiscordUrie_DSharpPlus
 			public List<ulong> Admins { get; set; }
 		}
 
+		public struct DiscordUrieTag
+		{
+			public string Tag {get; set;}
+			public string Output {get; set;}
+			public ulong Owner {get; set;}
+		}
+
 		public struct DiscordUrieGuild
 		{
 			public ulong ServerId { get; set; }
 			public ColorSettings CSettings { get; set; }
 			public ChatBanSettings CBSettings { get; set; }
 			public AdminSettings ASettings { get; set; }
+			
+			public List<DiscordUrieTag> Tags { get; set;}
 		}
 
 	}
