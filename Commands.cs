@@ -323,7 +323,7 @@ namespace DiscordUrie_DSharpPlus
 
 				string CurMessage = "";
 
-				foreach (ulong cur in GuildSettings.CSettings.Blacklist)
+				foreach (ulong cur in GuildSettings.ColorBlacklist)
 				{
 					CurMessage += $"{cur} ";
 				}
@@ -333,10 +333,10 @@ namespace DiscordUrie_DSharpPlus
 					CurMessage = "`NONE`";
 				}
 
-				EBuilder.AddField("Server Id", GuildSettings.ServerId.ToString());
-				EBuilder.AddField("Color Settings", $"Enabled: {GuildSettings.CSettings.Enabled}\n" +
-								$"Locked: {GuildSettings.CSettings.Locked}\n" +
-								$"Blacklist Mode: {GuildSettings.CSettings.BlacklistMode}\n" +
+				EBuilder.AddField("Server Id", GuildSettings.Id.ToString());
+				EBuilder.AddField("Color Settings", $"Enabled: {GuildSettings.ColorEnabled}\n" +
+								$"Locked: {GuildSettings.ColorLocked}\n" +
+								$"Blacklist Mode: {GuildSettings.ColorBlacklistMode}\n" +
 								$"Blacklist: {CurMessage}\n");
 
 				List<ulong> idlist = await Entry.Settings.GetChatBanIdList(ctx.Guild);
@@ -378,7 +378,7 @@ namespace DiscordUrie_DSharpPlus
 					CurMessage = "`NONE`";
 				}
 
-				EBuilder.AddField("Chat Ban Settings", $"Enabled: {GuildSettings.CBSettings.Enabled}\n" +
+				EBuilder.AddField("Chat Ban Settings", $"Enabled: {GuildSettings.BansEnabled}\n" +
 								$"Banned Users: {CurMessage}");
 
 				await ctx.RespondAsync(null, false, EBuilder.Build());
@@ -389,7 +389,7 @@ namespace DiscordUrie_DSharpPlus
 			[Hidden]
 			public async Task UpdateSettingsAsync(CommandContext ctx)
 			{
-				DiscordUrieConfig? Settings = await LoadSettings();
+				DiscordUrieConfig? Settings = await LoadSettings(Entry.SQLConn);
 				if (Settings != null)
 				{
 					Entry.Settings = Settings.Value;
@@ -433,16 +433,16 @@ namespace DiscordUrie_DSharpPlus
 					}
 
 					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
-					bool locked = GuildSettings.CSettings.Locked;
+					bool locked = GuildSettings.ColorLocked;
 					bool LockChanged = false;
 
-					if (GuildSettings.CSettings.Locked && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
+					if (GuildSettings.ColorLocked && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
 					{
 						await ctx.RespondAsync("This setting is locked. You do not have the correct permissions to edit it...");
 					}
 					else
 					{
-						if (Enabled == GuildSettings.CSettings.Enabled)
+						if (Enabled == GuildSettings.ColorEnabled)
 						{
 							await ctx.RespondAsync($"This setting is already set to {Enabled}");
 						}
@@ -456,16 +456,11 @@ namespace DiscordUrie_DSharpPlus
 						}
 
 						Entry.Settings.GuildSettings.Remove(GuildSettings);
-						GuildSettings.CSettings = new DiscordUrieSettings.ColorSettings()
-						{
-							Enabled = Enabled,
-							Locked = locked,
-							Blacklist = GuildSettings.CSettings.Blacklist,
-							BlacklistMode = GuildSettings.CSettings.BlacklistMode
-						};
+						GuildSettings.ColorEnabled = Enabled;
+						GuildSettings.ColorLocked = locked;
 
 						Entry.Settings.GuildSettings.Add(GuildSettings);
-						await Entry.Settings.SaveSettings();
+						await Entry.Settings.SaveSettings(Entry.SQLConn);
 						if (Enabled)
 						{
 							if (LockChanged)
@@ -530,6 +525,7 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.Message.DeleteAsync("Command auto deletion.");
 			await HelpThanks.DeleteAsync("Command auto deletion.");
 			await ctx.Client.DisconnectAsync();
+			Entry.SQLConn.Close();
 			Environment.Exit(0);
 
 		}
@@ -537,6 +533,7 @@ namespace DiscordUrie_DSharpPlus
 		public class globals
 		{
 			public CommandContext ctx;
+			public DiscordUrieConfig settings;
 		}
 
 		[Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
@@ -560,7 +557,8 @@ namespace DiscordUrie_DSharpPlus
 
             var globals = new globals
 			{
-				ctx = ctx
+				ctx = ctx,
+				settings = Entry.Settings
 			};
             var sopts = ScriptOptions.Default
                 .WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", "System.Reflection", "System.Text", 
