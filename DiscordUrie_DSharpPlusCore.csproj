@@ -16,6 +16,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Steam.Models" Version="3.0.8" />
     <PackageReference Include="SteamWebAPI2" Version="4.0.8" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.110.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
   </ItemGroup>
 </Project>
