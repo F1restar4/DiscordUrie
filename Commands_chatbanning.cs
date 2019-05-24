@@ -44,9 +44,8 @@ namespace DiscordUrie_DSharpPlus
 				{
 					Entry.Settings.GuildSettings.Remove(GuildSettings);
 					GuildSettings.BansEnabled = true;
-
 					Entry.Settings.GuildSettings.Add(GuildSettings);
-					await Entry.Settings.SaveSettings(Entry.SQLConn);
+					await GuildSettings.SaveGuild(Entry.SQLConn);
 
 					DiscordMessage woaaah = await ctx.RespondAsync("Chat bans enabled...");
 					await Task.Delay(2070);
@@ -77,7 +76,7 @@ namespace DiscordUrie_DSharpPlus
 					GuildSettings.BansEnabled = false;
 
 					Entry.Settings.GuildSettings.Add(GuildSettings);
-					await Entry.Settings.SaveSettings(Entry.SQLConn);
+					await GuildSettings.SaveGuild(Entry.SQLConn);
 
 					DiscordMessage ImSoTired = await ctx.RespondAsync("Chat bans disabled...");
 					await Task.Delay(2070);
