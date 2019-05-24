@@ -129,8 +129,9 @@ namespace DiscordUrie_DSharpPlus
 				if (GuildSettings.Any(xr => xr.Id == guild.Id))
 					return false;
 
-				GuildSettings.Add(await CreateGuildDefaultSettings(guild));
-				await SaveSettings(Entry.SQLConn);
+				var Settings = await CreateGuildDefaultSettings(guild);
+				GuildSettings.Add(Settings);
+				await Settings.SaveGuild(Entry.SQLConn);
 				return true;
 			}
 
@@ -146,7 +147,7 @@ namespace DiscordUrie_DSharpPlus
 
 
 					GuildSettings.Add(NewDefaultServer);
-					await SaveSettings(Entry.SQLConn);
+					await NewDefaultServer.SaveGuild(Entry.SQLConn);
 					return NewDefaultServer;
 				}
 			}

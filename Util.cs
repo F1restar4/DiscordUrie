@@ -78,7 +78,7 @@ namespace DiscordUrie_DSharpPlus
 					Settings.GuildSettings.Remove(GuildSettings);
 					GuildSettings.BannedIds = BannedIds;
 					Settings.GuildSettings.Add(GuildSettings);
-					await Settings.SaveSettings(SQLConn);
+					await GuildSettings.SaveGuild(SQLConn);
 					return true;
 				}
 				else
@@ -107,11 +107,9 @@ namespace DiscordUrie_DSharpPlus
 				Settings.GuildSettings.Remove(GuildSettings);
 				GuildSettings.BannedIds = BannedIds;
 				Settings.GuildSettings.Add(GuildSettings);
-				await Settings.SaveSettings(SQLConn);
+				await GuildSettings.SaveGuild(SQLConn);
 
 				return true;
-
-
 
 			}
 			catch (Exception exc)

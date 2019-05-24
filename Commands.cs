@@ -460,7 +460,7 @@ namespace DiscordUrie_DSharpPlus
 						GuildSettings.ColorLocked = locked;
 
 						Entry.Settings.GuildSettings.Add(GuildSettings);
-						await Entry.Settings.SaveSettings(Entry.SQLConn);
+						await GuildSettings.SaveGuild(Entry.SQLConn);
 						if (Enabled)
 						{
 							if (LockChanged)
