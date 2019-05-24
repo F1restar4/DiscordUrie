@@ -33,7 +33,7 @@ namespace DiscordUrie_DSharpPlus
 
 				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
-				if (GuildSettings.CBSettings.Enabled)
+				if (GuildSettings.BansEnabled)
 				{
 					DiscordMessage woah = await ctx.RespondAsync("Chat bans are already enabled!");
 					await Task.Delay(2070);
@@ -43,13 +43,10 @@ namespace DiscordUrie_DSharpPlus
 				else
 				{
 					Entry.Settings.GuildSettings.Remove(GuildSettings);
-					GuildSettings.CBSettings = new ChatBanSettings()
-					{
-						BannedIds = GuildSettings.CBSettings.BannedIds,
-						Enabled = true,
-					};
+					GuildSettings.BansEnabled = true;
+
 					Entry.Settings.GuildSettings.Add(GuildSettings);
-					await Entry.Settings.SaveSettings();
+					await Entry.Settings.SaveSettings(Entry.SQLConn);
 
 					DiscordMessage woaaah = await ctx.RespondAsync("Chat bans enabled...");
 					await Task.Delay(2070);
@@ -74,16 +71,13 @@ namespace DiscordUrie_DSharpPlus
 				}
 				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
-				if (GuildSettings.CBSettings.Enabled)
+				if (GuildSettings.BansEnabled)
 				{
 					Entry.Settings.GuildSettings.Remove(GuildSettings);
-					GuildSettings.CBSettings = new ChatBanSettings()
-					{
-						BannedIds = GuildSettings.CBSettings.BannedIds,
-						Enabled = false,
-					};
+					GuildSettings.BansEnabled = false;
+
 					Entry.Settings.GuildSettings.Add(GuildSettings);
-					await Entry.Settings.SaveSettings();
+					await Entry.Settings.SaveSettings(Entry.SQLConn);
 
 					DiscordMessage ImSoTired = await ctx.RespondAsync("Chat bans disabled...");
 					await Task.Delay(2070);

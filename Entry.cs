@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Data.SQLite;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Entities;
@@ -27,6 +28,7 @@ namespace DiscordUrie_DSharpPlus
 		public static SteamUser SInterface;
 		public static SteamStore SStore;
 		public static PlayerService SPlayerService;
+		public static SQLiteConnection SQLConn;
 		public static string[] CmdPrefix = { "/" };
 
 		public static void Main(string[] args)
@@ -38,13 +40,21 @@ namespace DiscordUrie_DSharpPlus
 
 		public async Task Start()
 		{
+			if (!File.Exists("DiscordUrieConfig.db"))
+			{
+				SQLiteConnection.CreateFile("DiscordUrieConfig.db");
+			}
+			if (!File.Exists("activity.json"))
+			{
+				File.Create("activity.json");
+			}
+
+			SQLConn = new SQLiteConnection("Data Source=DiscordUrieConfig.db;Version=3;");
+			await SQLConn.OpenAsync();
+			await DiscordUrieSettings.Createdb(SQLConn);
+
 			string token = null;
 
-			if (!File.Exists("config.json"))
-			{
-				File.Create("config.json");
-
-			}
 
 			if (!File.Exists("token.txt"))
 			{
@@ -63,7 +73,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 
-			InitSettings = await DiscordUrieSettings.LoadSettings();
+			InitSettings = await DiscordUrieSettings.LoadSettings(SQLConn);
 
 			if (InitSettings != null)
 				Settings = InitSettings.Value;
@@ -110,6 +120,7 @@ namespace DiscordUrie_DSharpPlus
 			SStore = new SteamStore();
 			SPlayerService = new PlayerService(SKey);
 			await Task.Delay(-1);
+			SQLConn.Close();
 		}
 	}
 }
