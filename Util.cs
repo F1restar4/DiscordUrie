@@ -53,7 +53,7 @@ namespace DiscordUrie_DSharpPlus
 			List<ulong> ServerAdmins = new List<ulong>();
 			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
 
-			ServerAdmins.AddRange(GuildSettings.ASettings.Admins);
+			ServerAdmins.AddRange(GuildSettings.Admins);
 
 			if (ServerAdmins.Any(xr => xr == inputId))
 				return true;
@@ -76,13 +76,9 @@ namespace DiscordUrie_DSharpPlus
 				{
 					DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
 					Settings.GuildSettings.Remove(GuildSettings);
-					GuildSettings.CBSettings = new DiscordUrieSettings.ChatBanSettings()
-					{
-						Enabled = GuildSettings.CBSettings.Enabled,
-						BannedIds = BannedIds,
-					};
+					GuildSettings.BannedIds = BannedIds;
 					Settings.GuildSettings.Add(GuildSettings);
-					await Settings.SaveSettings();
+					await Settings.SaveSettings(SQLConn);
 					return true;
 				}
 				else
@@ -109,15 +105,13 @@ namespace DiscordUrie_DSharpPlus
 				BannedIds.Add(id);
 				DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
 				Settings.GuildSettings.Remove(GuildSettings);
-				GuildSettings.CBSettings = new DiscordUrieSettings.ChatBanSettings()
-				{
-					Enabled = GuildSettings.CBSettings.Enabled,
-					BannedIds = BannedIds,
-				};
+				GuildSettings.BannedIds = BannedIds;
 				Settings.GuildSettings.Add(GuildSettings);
-				await Settings.SaveSettings();
+				await Settings.SaveSettings(SQLConn);
 
 				return true;
+
+
 
 			}
 			catch (Exception exc)

@@ -75,7 +75,7 @@ namespace DiscordUrie_DSharpPlus
                         Owner = ctx.Member.Id
                     });
                     Entry.Settings.GuildSettings.Add(GuildSettings);
-                    await Entry.Settings.SaveSettings();
+                    await Entry.Settings.SaveSettings(Entry.SQLConn);
                     await ctx.RespondAsync("Tag created!");
                 }
                 catch(Exception ex)
@@ -107,7 +107,7 @@ namespace DiscordUrie_DSharpPlus
                     Entry.Settings.GuildSettings.Remove(GuildSettings);
                     GuildSettings.Tags.Remove(Target);
                     Entry.Settings.GuildSettings.Add(GuildSettings);
-                    await Entry.Settings.SaveSettings();
+                    await Entry.Settings.SaveSettings(Entry.SQLConn);
                     await ctx.RespondAsync("Tag removed!");
                 }
                 catch(Exception ex)

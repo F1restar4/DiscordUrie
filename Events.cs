@@ -17,7 +17,7 @@ namespace DiscordUrie_DSharpPlus
 
 			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(e.Guild);
 
-			if (!e.Message.Author.IsBot && GuildSettings.CBSettings.Enabled)
+			if (!e.Message.Author.IsBot && GuildSettings.BansEnabled)
 			{
 
 				ulong id = e.Author.Id;
@@ -38,7 +38,7 @@ namespace DiscordUrie_DSharpPlus
 
 		public static async Task GuildAvailable(GuildCreateEventArgs e)
 		{
-			if (!Settings.GuildSettings.Any(xr => xr.ServerId == e.Guild.Id))
+			if (!Settings.GuildSettings.Any(xr => xr.Id == e.Guild.Id))
 				 await Settings.AddGuild(e.Guild);
 		}
 
@@ -61,7 +61,7 @@ namespace DiscordUrie_DSharpPlus
 				Yes.AddRange(e.Client.Guilds.Values);
 
 				Settings = await DiscordUrieSettings.CreateAllDefaultSettings(e.Client);
-				await Settings.SaveSettings();
+				await Settings.SaveSettings(SQLConn);
 
 			}
 
@@ -95,7 +95,6 @@ namespace DiscordUrie_DSharpPlus
 			await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) left the discord.");
 
 		}
-
 
 	}
 }

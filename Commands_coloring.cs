@@ -25,16 +25,16 @@ namespace DiscordUrie_DSharpPlus
 
 					if (!Override)
 					{
-						if (!GuildSettings.CSettings.Enabled)
+						if (!GuildSettings.ColorEnabled)
 						{
 							await channel.SendMessageAsync("This feature is disabled on this server.");
 							return false;
 						}
 
-						switch (GuildSettings.CSettings.BlacklistMode)
+						switch (GuildSettings.ColorBlacklistMode)
 						{
 							case BlackListModeEnum.Blacklist:
-								if (GuildSettings.CSettings.Blacklist.Any(xr => xr == user.Id))
+								if (GuildSettings.ColorBlacklist.Any(xr => xr == user.Id))
 								{
 									await channel.SendMessageAsync("You are blacklisted from this command and cannot use it.");
 									return false;
@@ -42,7 +42,7 @@ namespace DiscordUrie_DSharpPlus
 								break;
 
 							case BlackListModeEnum.Whitelist:
-								if (!GuildSettings.CSettings.Blacklist.Any(xr => xr == user.Id))
+								if (!GuildSettings.ColorBlacklist.Any(xr => xr == user.Id))
 								{
 									await channel.SendMessageAsync("You have not been whitelisted for this command and cannot use it.");
 									return false;
@@ -72,16 +72,16 @@ namespace DiscordUrie_DSharpPlus
 				{
 					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(server);
 
-					if (!GuildSettings.CSettings.Enabled)
+					if (!GuildSettings.ColorEnabled)
 					{
 						await channel.SendMessageAsync("This feature is disabled on this server.");
 						return false;
 					}
 
-					switch (GuildSettings.CSettings.BlacklistMode)
+					switch (GuildSettings.ColorBlacklistMode)
 					{
 						case BlackListModeEnum.Blacklist:
-							if (GuildSettings.CSettings.Blacklist.Any(xr => xr == user.Id))
+							if (GuildSettings.ColorBlacklist.Any(xr => xr == user.Id))
 							{
 								await channel.SendMessageAsync("You are blacklisted from this command and cannot use it.");
 								return false;
@@ -89,7 +89,7 @@ namespace DiscordUrie_DSharpPlus
 							break;
 
 						case BlackListModeEnum.Whitelist:
-							if (!GuildSettings.CSettings.Blacklist.Any(xr => xr == user.Id))
+							if (!GuildSettings.ColorBlacklist.Any(xr => xr == user.Id))
 							{
 								await channel.SendMessageAsync("You have not been whitelisted for this command and cannot use it.");
 								return false;
@@ -129,7 +129,7 @@ namespace DiscordUrie_DSharpPlus
 
 					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(server);
 
-					if (!GuildSettings.CSettings.Enabled)
+					if (!GuildSettings.ColorEnabled)
 						return null;
 
 
@@ -291,7 +291,7 @@ namespace DiscordUrie_DSharpPlus
 
 					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
-					if (!GuildSettings.CSettings.Enabled)
+					if (!GuildSettings.ColorEnabled)
 					{
 						await ctx.RespondAsync("This feature is disabled on this server.");
 						return;
