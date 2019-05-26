@@ -121,6 +121,7 @@ namespace DiscordUrie_DSharpPlus
             {
                 InteractivityExtension intex = ctx.Client.GetInteractivity();
                 List<DiscordUrieTag> tags = await Entry.Settings.GetTags(ctx.Guild);
+                if (tags.Count <= 0) return;
                 IEnumerable<string> TagKeys = tags.Select(xr => xr.Tag);
 
                 string EditedTags = String.Join("\n", TagKeys);
