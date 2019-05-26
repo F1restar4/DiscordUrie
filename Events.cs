@@ -14,25 +14,24 @@ namespace DiscordUrie_DSharpPlus
 
 		public static async Task ChatBansEventCall(MessageCreateEventArgs e)
 		{
+			if (e.Channel.IsPrivate || e.Message.Author.IsBot)
+				return;
 
 			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(e.Guild);
 
-			if (!e.Message.Author.IsBot && GuildSettings.BansEnabled)
+			if (GuildSettings.BansEnabled)
 			{
-
 				ulong id = e.Author.Id;
-				List<ulong> bans = await Settings.GetChatBanIdList(e.Guild);
 
-				if (bans.Any(xr => xr == id))
+				if (GuildSettings.BannedIds.Any(xr => xr == id))
 					await e.Message.DeleteAsync("Chat ban deletion");
-
 			}
 		}
 
 
 		public static Task ErrorHandler(ClientErrorEventArgs e)
 		{
-			e.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error in the event {e.EventName}. {e.Exception.Message}", DateTime.Now);
+			e.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}", DateTime.Now);
 			return Task.CompletedTask;
 		}
 
