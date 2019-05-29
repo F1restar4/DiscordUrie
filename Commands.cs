@@ -22,6 +22,12 @@ namespace DiscordUrie_DSharpPlus
 	public partial class Commands : BaseCommandModule
 	{
 
+		[Command("uptime")]
+		public async Task UptimeAsync(CommandContext ctx)
+		{
+			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(Entry.StartTime).ToDuration()}");
+		}
+
 		[Command("lookup")]
 		[Description("Looks up info about a user")]
 		public async Task LookupUserAsync(CommandContext ctx, [Description("The user to lookup, can be an ID")]DiscordUser InputUser = null)
@@ -576,7 +582,7 @@ namespace DiscordUrie_DSharpPlus
                 {
                     Title = "Compilation failed",
                     Description = string.Concat("Compilation failed after ", sw1.ElapsedMilliseconds.ToString("#,##0"), "ms with ", csc.Length.ToString("#,##0"), " errors."),
-                    Color = new DiscordColor(0xD091B2)
+                    Color = new DiscordColor(255,0,0)
                 };
                 foreach (var xd in csc.Take(3))
                 {
@@ -611,7 +617,7 @@ namespace DiscordUrie_DSharpPlus
                 {
                     Title = "Execution failed",
                     Description = string.Concat("Execution failed after ", sw2.ElapsedMilliseconds.ToString("#,##0"), "ms with `", rex.GetType(), ": ", rex.Message, "`."),
-                    Color = new DiscordColor(0xD091B2),
+                    Color = new DiscordColor(255,0,0),
                 };
                 await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
                 return;
@@ -621,7 +627,7 @@ namespace DiscordUrie_DSharpPlus
             embed = new DiscordEmbedBuilder
             {
                 Title = "Evaluation successful",
-                Color = new DiscordColor(0xD091B2),
+                Color = new DiscordColor(0,255,0),
             };
 
             embed.AddField("Result", css.ReturnValue != null ? css.ReturnValue.ToString() : "No value returned", false)
