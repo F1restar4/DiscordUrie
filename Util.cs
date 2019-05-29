@@ -26,9 +26,11 @@ namespace DiscordUrie_DSharpPlus
 
 		public static Task<string> ToDuration(this TimeSpan span)
 		{
-            if (span.TotalHours >= 1)
-                return Task.FromResult(span.ToString(@"h\:mm\:ss"));
-			return Task.FromResult(span.ToString(@"m\:ss"));
+			if (span.TotalDays >= 1)
+				return Task.FromResult(span.ToString(@"dd\:hh\:mm\:ss"));
+
+            return Task.FromResult(span.ToString(@"hh\:mm\:ss"));
+
 		}
 
 		public static Task<bool> UserAuthHigh(ulong inputID, DiscordGuild Guild)

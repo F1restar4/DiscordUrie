@@ -30,6 +30,7 @@ namespace DiscordUrie_DSharpPlus
 		public static PlayerService SPlayerService;
 		public static SQLiteConnection SQLConn;
 		public static string[] CmdPrefix = { "/" };
+		public static DateTime StartTime = DateTime.Now;
 
 		public static void Main(string[] args)
 		{
