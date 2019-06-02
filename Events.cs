@@ -83,7 +83,7 @@ namespace DiscordUrie_DSharpPlus
 
 			var L = await e.Guild.GetAuditLogsAsync(1, action_type: AuditLogActionType.Kick);
 			DiscordAuditLogKickEntry LastKick = (DiscordAuditLogKickEntry)L.FirstOrDefault();
-			if (LastKick.Target == e.Member)
+			if (LastKick != null && LastKick.Target == e.Member)
 			{
 				await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was kicked from the discord with the reason `{LastKick.Reason}`");
 				return;
