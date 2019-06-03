@@ -55,6 +55,7 @@ namespace DiscordUrie_DSharpPlus
 			await DiscordUrieSettings.Createdb(SQLConn);
 
 			string token = null;
+			string steamKey = null;
 
 
 			if (!File.Exists("token.txt"))
@@ -62,14 +63,29 @@ namespace DiscordUrie_DSharpPlus
 				Console.Write("Token file not found. Please input a Discord bot token: ");
 				token = Console.ReadLine();
 
-				File.WriteAllText("token.txt", token);
+				await File.WriteAllTextAsync("token.txt", token);
 				Console.Clear();
 			}
 			else
 			{
 				if (token == null)
 				{
-					token = File.ReadAllText("token.txt");
+					token = await File.ReadAllTextAsync("token.txt");
+				}
+			}
+
+			if (!File.Exists("steamkey.txt"))
+			{
+				Console.Write("Input a steam api key: ");
+				steamKey = Console.ReadLine();
+				await File.WriteAllTextAsync("steamkey.txt", steamKey);
+				Console.Clear();
+			}
+			else
+			{
+				if (steamKey == null)
+				{
+					steamKey = await File.ReadAllTextAsync("steamKey.txt");
 				}
 			}
 
@@ -116,10 +132,9 @@ namespace DiscordUrie_DSharpPlus
 
 			await Client.ConnectAsync();
 
-			string SKey = "CB1A5ADCAE06C134617D39DAAAD0AF79";
-			SInterface = new SteamUser(SKey);
+			SInterface = new SteamUser(steamKey);
 			SStore = new SteamStore();
-			SPlayerService = new PlayerService(SKey);
+			SPlayerService = new PlayerService(steamKey);
 			await Task.Delay(-1);
 			SQLConn.Close();
 		}
