@@ -85,7 +85,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				if (steamKey == null)
 				{
-					steamKey = await File.ReadAllTextAsync("steamKey.txt");
+					steamKey = await File.ReadAllTextAsync("steamkey.txt");
 				}
 			}
 
