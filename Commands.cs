@@ -25,7 +25,9 @@ namespace DiscordUrie_DSharpPlus
 		[Command("uptime")]
 		public async Task UptimeAsync(CommandContext ctx)
 		{
-			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(Entry.StartTime).ToDuration()}");
+			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(Entry.StartTime).ToDuration()} \n "+
+			$"Socket uptime: {await DateTime.Now.Subtract(Entry.SocketStart).ToDuration()}");
+		
 		}
 
 		[Command("lookup")]

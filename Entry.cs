@@ -31,6 +31,7 @@ namespace DiscordUrie_DSharpPlus
 		public static SQLiteConnection SQLConn;
 		public static string[] CmdPrefix = { "/" };
 		public static DateTime StartTime = DateTime.Now;
+		public static DateTime SocketStart = StartTime;
 
 		public static void Main(string[] args)
 		{
@@ -121,6 +122,12 @@ namespace DiscordUrie_DSharpPlus
 			Client.GuildMemberRemoved += Events.UserLeaveGuild;
 			Client.GuildAvailable += Events.GuildAvailable;
 			Client.GuildDeleted += Events.GuildDeleted;
+			Client.SocketOpened += async () =>
+			{
+				await Task.Yield();
+				SocketStart = DateTime.Now;
+			};
+
 
 			Client.MessageCreated += async e =>
 			{
