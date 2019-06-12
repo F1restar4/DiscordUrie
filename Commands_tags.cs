@@ -51,7 +51,7 @@ namespace DiscordUrie_DSharpPlus
                 await ctx.RespondAsync(Out);
             }
 
-            [Command("add"), Description("Add a tag")]
+            [Command("add"), Description("Add a tag"), Aliases("create")]
             public async Task TagAdd(CommandContext ctx, string tag, [RemainingText] string Output)
             {
                 try
