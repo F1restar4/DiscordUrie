@@ -91,6 +91,18 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[Command("remove")]
+			public async Task SpamRemoveAsync(CommandContext ctx, int amount)
+			{
+				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
+					return;
+
+				IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Id);
+				await ctx.Channel.DeleteMessagesAsync(Messages.Take(amount), $"Spam remove command by '{ctx.Member.DisplayName}'");
+				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":ok:"));
+				
+			}
+
+			[Command("remove")]
 			[Description("Mass remove messages from a channel using the key as a search term `only works if you're super cool`")]
 			public async Task SpamRemoveAsync(CommandContext ctx, [Description("The key to search for.")] string key, [Description("A specific user to search for, this param is optional")] DiscordMember ByUser = null)
 			{
