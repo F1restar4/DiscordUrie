@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
+using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -30,8 +31,7 @@ namespace DiscordUrie_DSharpPlus
 		
 		}
 
-		[Command("lookup")]
-		[Description("Looks up info about a user")]
+		[Command("lookup"), Description("Looks up info about a user")]
 		public async Task LookupUserAsync(CommandContext ctx, [Description("The user to lookup, can be an ID")]DiscordUser InputUser = null)
 		{
 			if (InputUser == null)
@@ -69,49 +69,34 @@ namespace DiscordUrie_DSharpPlus
 
 		}
 
-		[Group("spam")]
-		[Description("Spam remove group `Unusable unless you're cool`")]
-		[Aliases("s")]
+		[Group("spam"), Description("Spam remove group `Unusable unless you're cool`"), Aliases("s"), RequireAuth]
 		public class SpamStuffGroup : BaseCommandModule
 		{
 
 			[Command("add")]
 			public async Task SpamAddAsync(CommandContext ctx, string Yes, int Count)
 			{
-				if (await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				{
-					await ctx.Message.DeleteAsync();
+				await ctx.Message.DeleteAsync();
 
-					for (int i = 0; i < Count; i++)
-					{
-						await ctx.RespondAsync(Yes);
-						await Task.Delay(1000);
-					}
+				for (int i = 0; i < Count; i++)
+				{
+					await ctx.RespondAsync(Yes);
+					await Task.Delay(1000);
 				}
 			}
 
 			[Command("remove")]
 			public async Task SpamRemoveAsync(CommandContext ctx, int amount)
 			{
-				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-					return;
-
-				IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Id);
-				await ctx.Channel.DeleteMessagesAsync(Messages.Take(amount), $"Spam remove command by '{ctx.Member.DisplayName}'");
-				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":ok:"));
-				
+				IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Id, amount);
+				await ctx.Channel.DeleteMessagesAsync(Messages, $"Spam remove command by '{ctx.Member.DisplayName}'");
+				await ctx.Message.DeleteAsync();	
 			}
 
 			[Command("remove")]
 			[Description("Mass remove messages from a channel using the key as a search term `only works if you're super cool`")]
 			public async Task SpamRemoveAsync(CommandContext ctx, [Description("The key to search for.")] string key, [Description("A specific user to search for, this param is optional")] DiscordMember ByUser = null)
 			{
-
-				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				{
-					await ctx.RespondAsync("You're not super special cool enough to use this command");
-					return;
-				}
 
 				try
 				{
@@ -159,9 +144,7 @@ namespace DiscordUrie_DSharpPlus
 		}
 
 
-		[Group("steam")]
-		[Description("Steam related commands")]
-		[Hidden]
+		[Group("steam"), Hidden, Description("Steam related commands")]
 		public class SteamCommands : BaseCommandModule
 		{
 			class OtherHelpfullMethods
@@ -193,8 +176,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 
-			[Command("profileinfo")]
-			[Aliases("profinf", "calc")]
+			[Command("profileinfo"), Aliases("profinf", "calc")]
 			public async Task ProfileInfoAsync(CommandContext ctx, string Userid)
 			{
 				DiscordMessage LoadingMessage = await ctx.RespondAsync("Retrieving info...");
@@ -307,9 +289,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
-		[Group("settings")]
-		[Description("Various bot related settings")]
-		[Hidden]
+		[Group("settings"), Hidden, Description("Various bot related settings")]
 		public class Settings : BaseCommandModule
 		{
 			[GroupCommand]
@@ -328,8 +308,7 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.RespondAsync(null, false, EBuilder.Build());
 			}
 
-			[Command("list")]
-			[Description("Lists settings")]
+			[Command("list"), Description("Lists settings")]
 			public async Task ListSettingsAsync(CommandContext ctx)
 			{
 				DiscordEmbedBuilder EBuilder = new DiscordEmbedBuilder()
@@ -404,9 +383,7 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.RespondAsync(null, false, EBuilder.Build());
 			}
 
-			[Command("update")]
-			[Description("Updates settings")]
-			[Hidden]
+			[Command("update"), Description("Updates settings")]
 			public async Task UpdateSettingsAsync(CommandContext ctx)
 			{
 				DiscordUrieConfig? Settings = await LoadSettings(Entry.SQLConn);
@@ -421,9 +398,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Group("colorsettings")]
-			[Aliases("color")]
-			[Description("Settings related to the coloring commands")]
+			[Group("colorsettings"), Aliases("color"), Description("Settings related to the coloring commands")]
 			public class ColorSettings : BaseCommandModule
 			{
 				[GroupCommand()]
@@ -441,9 +416,7 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.RespondAsync(null, false, EBuilder.Build());
 				}
 
-				[Command("enabled")]
-				[Aliases("enable")]
-				[Description("Setting to determine if coloring is enabled on this server")]
+				[Command("enabled"), RequireAuth, Aliases("enable"), Description("Setting to determine if coloring is enabled on this server")]
 				public async Task EnabledAsync(CommandContext ctx, bool Enabled, [Description("Set to disable changing this setting unless you're the server owner [only works if you are the owner (or are cool enough)]")] bool? Lock = null)
 				{
 					if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
@@ -524,22 +497,16 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
-		[Command("setmsg")]
-		[Hidden]
+		[Command("setmsg"), Hidden, RequireOwner]
 		public async Task SetGameMsgAsync(CommandContext ctx, string name, ActivityType type)
 		{
-			if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				return;
 			await ctx.Client.UpdateStatusAsync(new DiscordActivity(name, type), UserStatus.Online);
 			await ctx.Message.DeleteAsync(reason: "Command auto deletion.");
 		}
 
-		[Command("shutdown")]
-		[Hidden]
+		[Command("shutdown"), Hidden, RequireAuthHigh]
 		public async Task ShutdownAsync(CommandContext ctx)
 		{
-			if (!await Util.UserAuthHigh(ctx.Member.Id, ctx.Guild))
-				return;
 			DiscordMessage HelpThanks = await ctx.RespondAsync("Shutting down...");
 			await Task.Delay(3000);
 			await ctx.Message.DeleteAsync("Command auto deletion.");
@@ -547,7 +514,6 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.Client.DisconnectAsync();
 			Entry.SQLConn.Close();
 			Environment.Exit(0);
-
 		}
 
 		public class globals
