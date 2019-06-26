@@ -7,30 +7,20 @@ using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
+using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : BaseCommandModule
 	{
-		[Group("bans")]
-		[Description("Chat bans `Unusable unless you're cool`")]
-		[Aliases("b")]
+		[Group("bans"), Aliases("b"), Description("Chat bans `Unusable unless you're cool`")]
+		[RequireAuth]
 		public class ChatBansGroup : BaseCommandModule
 		{
 			[Command("on")]
 			[Description("Enables chat bans `only works if you're super cool`")]
 			public async Task Enable(CommandContext ctx)
 			{
-
-				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				{
-					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
-					await Task.Delay(2070);
-					await ctx.Message.DeleteAsync("Command auto deletion.");
-					await a.DeleteAsync("Command auto deletion.");
-					return;
-				}
-
 				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
 				if (GuildSettings.BansEnabled)
@@ -52,22 +42,12 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.Message.DeleteAsync("Command auto deletion.");
 					await woaaah.DeleteAsync("Command auto deletion.");
 				}
-
 			}
 
 			[Command("off")]
 			[Description("Disables chat bans `only works if you're super cool`")]
 			public async Task Disable(CommandContext ctx)
 			{
-
-				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				{
-					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
-					await Task.Delay(2070);
-					await ctx.Message.DeleteAsync("Command auto deletion.");
-					await a.DeleteAsync("Command auto deletion.");
-					return;
-				}
 				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
 
 				if (GuildSettings.BansEnabled)
@@ -97,16 +77,6 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Adds a user to the ban list `only works if you're super cool`")]
 			public async Task AddBan(CommandContext ctx, [Description("The user id to add")] DiscordMember user)
 			{
-
-				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				{
-					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
-					await Task.Delay(2070);
-					await ctx.Message.DeleteAsync("Command auto deletion.");
-					await a.DeleteAsync("Command auto deletion.");
-					return;
-				}
-
 				bool success = await Util.AddBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)
@@ -123,23 +93,12 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.Message.DeleteAsync("Command auto deletion.");
 					await IReallyWishIWasDeadThankYou.DeleteAsync("Command auto deletion.");
 				}
-
 			}
 
 			[Command("remove")]
 			[Description("Removes a user from the ban list `only works if you're super cool`")]
 			public async Task RemoveBan(CommandContext ctx, [Description("The user id to remove")] DiscordMember user)
 			{
-				if (!await Util.UserAuth(ctx.Member.Id, ctx.Guild))
-				{
-					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
-					await Task.Delay(2070);
-					await ctx.Message.DeleteAsync("Command auto deletion.");
-					await a.DeleteAsync("Command auto deletion.");
-					return;
-				}
-
-
 				bool success = await Util.RemoveBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)

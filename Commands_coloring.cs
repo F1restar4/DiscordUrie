@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
 using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
+using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -222,35 +223,32 @@ namespace DiscordUrie_DSharpPlus
 
 			}
 
-			[Command("set")]
+			[Command("set"), RequireAuth]
 			[Description("Sets a givin user's color `only works if you're super cool`")]
 			public async Task SetTargetColor(CommandContext ctx, [Description("The ID or mention of the target user")] DiscordMember user, [Description("The color to set to, can be in hex, rgb or keyword format (Must be a single string)")]string Color)
 			{
-				if (await Util.UserAuth(ctx.User.Id, ctx.Guild))
+				try
 				{
-					try
+
+
+					if (Color == "off")
+						await MethodShit.RemoveColor(user, ctx.Guild, ctx.Channel);
+
+					else
 					{
+						System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
+						DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
 
-
-						if (Color == "off")
-							await MethodShit.RemoveColor(user, ctx.Guild, ctx.Channel);
-
-						else
-						{
-							System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
-							DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
-
-							await MethodShit.SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
-						}
+						await MethodShit.SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
 					}
-					catch (Exception ex)
-					{
-						await ctx.RespondAsync($"Something went wrong! {ex.Message}");
+				}
+				catch (Exception ex)
+				{
+					await ctx.RespondAsync($"Something went wrong! {ex.Message}");
 
 
-						ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}", DateTime.Now);
+					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}", DateTime.Now);
 
-					}
 				}
 			}
 
