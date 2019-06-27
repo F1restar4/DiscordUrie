@@ -134,7 +134,7 @@ namespace DiscordUrie_DSharpPlus
             public async Task TagInfo(CommandContext ctx, [RemainingText] string tag)
             {
                 DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
-                tag = Regex.Escape(tag);
+                tag = Regex.Escape(tag).ToLower();
                 var Tag = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
 
                 if (Tag == null)
