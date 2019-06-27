@@ -135,7 +135,7 @@ namespace DiscordUrie_DSharpPlus
             {
                 DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
                 tag = Regex.Escape(tag);
-                var Tag = GuildSettings.Tags.First(xr => xr.Tag == tag);
+                var Tag = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
 
                 if (Tag == null)
                 {
