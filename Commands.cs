@@ -386,16 +386,13 @@ namespace DiscordUrie_DSharpPlus
 			[Command("update"), Description("Updates settings")]
 			public async Task UpdateSettingsAsync(CommandContext ctx)
 			{
-				DiscordUrieConfig? Settings = await LoadSettings(Entry.SQLConn);
-				if (Settings != null)
-				{
-					Entry.Settings = Settings.Value;
+				DiscordUrieConfig Settings = await LoadSettings(Entry.SQLConn);
+				Entry.Settings = Settings;
 
-					DiscordMessage Message = await ctx.RespondAsync("Settings updated...");
-					await ctx.Client.UpdateStatusAsync(Entry.Settings.StartupActivity);
-					await Message.DeleteAsync();
-					await ctx.Message.DeleteAsync();
-				}
+				DiscordMessage Message = await ctx.RespondAsync("Settings updated...");
+				await ctx.Client.UpdateStatusAsync(Entry.Settings.StartupActivity);
+				await Message.DeleteAsync();
+				await ctx.Message.DeleteAsync();
 			}
 
 			[Group("colorsettings"), Aliases("color"), Description("Settings related to the coloring commands")]

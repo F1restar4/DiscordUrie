@@ -23,7 +23,6 @@ namespace DiscordUrie_DSharpPlus
 		public DiscordClient Client { get; set; }
 		public CommandsNextExtension cmds;
 		public InteractivityExtension IntExtension;
-		public static DiscordUrieSettings.DiscordUrieConfig? InitSettings;
 		public static DiscordUrieSettings.DiscordUrieConfig Settings;
 		public static SteamUser SInterface;
 		public static SteamStore SStore;
@@ -89,13 +88,7 @@ namespace DiscordUrie_DSharpPlus
 					steamKey = await File.ReadAllTextAsync("steamkey.txt");
 				}
 			}
-
-
-			InitSettings = await DiscordUrieSettings.LoadSettings(SQLConn);
-
-			if (InitSettings != null)
-				Settings = InitSettings.Value;
-
+			Settings = await DiscordUrieSettings.LoadSettings(SQLConn);
 
 			DiscordConfiguration config = new DiscordConfiguration
 			{
