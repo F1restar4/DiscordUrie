@@ -64,7 +64,7 @@ namespace DiscordUrie_DSharpPlus
 			return OutputGuildList;
 		}
 
-		public static async Task<DiscordUrieConfig?> LoadSettings(SQLiteConnection conn)
+		public static async Task<DiscordUrieConfig> LoadSettings(SQLiteConnection conn)
 		{
 			JsonSerializerSettings serializerSettings = new JsonSerializerSettings
 			{
@@ -95,7 +95,7 @@ namespace DiscordUrie_DSharpPlus
 			return OutSettings;
 		}
 
-		public struct DiscordUrieConfig
+		public class DiscordUrieConfig
 		{
 			public Task<bool> IsEmpty()
 			{
@@ -178,14 +178,14 @@ namespace DiscordUrie_DSharpPlus
 			Whitelist = 2
 		}
 
-		public struct DiscordUrieTag
+		public class DiscordUrieTag
 		{
 			public string Tag {get; set;}
 			public string Output {get; set;}
 			public ulong Owner {get; set;}
 		}
 
-		public struct DiscordUrieGuild
+		public class DiscordUrieGuild
 		{
 			public async Task<int> SaveGuild(SQLiteConnection conn)
 			{
