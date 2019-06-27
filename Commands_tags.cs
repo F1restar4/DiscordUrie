@@ -130,6 +130,26 @@ namespace DiscordUrie_DSharpPlus
                 await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, SplitType.Line));
             }
 
+            [Command("info"), Description("Gives information about a tag")]
+            public async Task TagInfo(CommandContext ctx, [RemainingText] string tag)
+            {
+                DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+                tag = Regex.Escape(tag);
+                var Tag = GuildSettings.Tags.First(xr => xr.Tag == tag);
+
+                if (Tag == null)
+                {
+                    await ctx.RespondAsync("Invalid tag");
+                    return;
+                }
+
+                DiscordUser TagOwner = await ctx.Client.GetUserAsync(Tag.Owner);
+                DiscordEmbedBuilder EBuilder = new DiscordEmbedBuilder();
+                EBuilder.WithAuthor($"{TagOwner.Username}#{TagOwner.Discriminator}", iconUrl: TagOwner.GetAvatarUrl(ImageFormat.Png));
+                EBuilder.AddField("Tag Name", Tag.Tag);
+                EBuilder.AddField("Owner Id", Tag.Owner.ToString());
+                await ctx.RespondAsync(embed: EBuilder.Build());
+            }
         }
 
     }
