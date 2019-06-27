@@ -28,7 +28,6 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
-
 		public static Task ErrorHandler(ClientErrorEventArgs e)
 		{
 			e.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}", DateTime.Now);
