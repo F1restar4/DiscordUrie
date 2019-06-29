@@ -111,7 +111,7 @@ namespace DiscordUrie_DSharpPlus
 					}
 					else
 					{
-						DiscordRole CreatedRole = await server.CreateRoleAsync(user.Id.ToString(), null, color, null, null, "Coloring role creation");
+						DiscordRole CreatedRole = await server.CreateRoleAsync(user.Id.ToString(), Permissions.None, color, null, null, "Coloring role creation");
 
 						await user.GrantRoleAsync(CreatedRole, "Coloring role assignment");
 					}
