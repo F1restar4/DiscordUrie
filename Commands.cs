@@ -25,9 +25,9 @@ namespace DiscordUrie_DSharpPlus
 
 		[Command("setmsg")]
 		[RequireOwner]
-		public async Task SetMsg(CommandContext ctx, ActivityType type, [RemainingText] string text)
+		public async Task SetMsg(CommandContext ctx, int type, [RemainingText] string text)
 		{
-			var Activity = new DiscordActivity(text, type);
+			var Activity = new DiscordActivity(text, (ActivityType)type);
 			await ctx.Client.UpdateStatusAsync(Activity);
 			Entry.Settings.StartupActivity = Activity;
 			await Entry.Settings.SaveSettings(Entry.SQLConn);
