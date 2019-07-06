@@ -504,13 +504,6 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
-		[Command("setmsg"), Hidden, RequireOwner]
-		public async Task SetGameMsgAsync(CommandContext ctx, string name, ActivityType type)
-		{
-			await ctx.Client.UpdateStatusAsync(new DiscordActivity(name, type), UserStatus.Online);
-			await ctx.Message.DeleteAsync(reason: "Command auto deletion.");
-		}
-
 		[Command("shutdown"), Hidden, RequireAuthHigh]
 		public async Task ShutdownAsync(CommandContext ctx)
 		{
