@@ -23,6 +23,16 @@ namespace DiscordUrie_DSharpPlus
 	public partial class Commands : BaseCommandModule
 	{
 
+		[Command("setmsg")]
+		[RequireOwner]
+		public async Task SetMsg(CommandContext ctx, ActivityType type, [RemainingText] string text)
+		{
+			var Activity = new DiscordActivity(text, type);
+			await ctx.Client.UpdateStatusAsync(Activity);
+			Entry.Settings.StartupActivity = Activity;
+			await Entry.Settings.SaveSettings(Entry.SQLConn);
+		}
+
 		[Command("uptime")]
 		public async Task UptimeAsync(CommandContext ctx)
 		{
