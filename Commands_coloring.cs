@@ -111,7 +111,6 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-
 			[Command("purge")]
 			public async Task PurgeInactiveColors(CommandContext ctx)
 			{
@@ -218,6 +217,44 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.RespondAsync($"Something went wrong! {ex.Message}");
 					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error getting user's color; {ex.Message}", DateTime.Now);
 				}
+			}
+		
+			[Command("block"), RequireAuth]
+			public async Task BlockAdd(CommandContext ctx, [Description("The user to add to the black/whitelist")]DiscordMember Member)
+			{
+				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				if (GuildSettings.ColorBlacklist.Any(xr => xr == Member.Id))
+				{
+					await ctx.RespondAsync("They're already in the list!");
+					return;
+				}
+				GuildSettings.ColorBlacklist.Add(Member.Id);
+				await GuildSettings.SaveGuild(Entry.SQLConn);
+				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+			}
+
+			[Command("unblock"), RequireAuth]
+			public async Task BlockRemove(CommandContext ctx, [Description("The user to remove from the black/whitelist")]DiscordMember Member)
+			{
+				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				if (!GuildSettings.ColorBlacklist.Any(xr => xr == Member.Id))
+				{
+					await ctx.RespondAsync("They're not in the list!");
+					return;
+				}
+				GuildSettings.ColorBlacklist.Remove(Member.Id);
+				await GuildSettings.SaveGuild(Entry.SQLConn);
+				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark: "));
+			}
+
+			[Command("block mode"), RequireAuth]
+			public async Task BlockMode(CommandContext ctx, int Mode)
+			{
+				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				var ListMode = (BlackListModeEnum)Mode;
+				if (GuildSettings.ColorBlacklistMode == ListMode) return;
+				GuildSettings.ColorBlacklistMode = ListMode;
+				await GuildSettings.SaveGuild(Entry.SQLConn);
 			}
 		}
 	}
