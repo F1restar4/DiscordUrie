@@ -247,7 +247,7 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark: "));
 			}
 
-			[Command("block mode"), RequireAuth]
+			[Command("mode"), RequireAuth]
 			public async Task BlockMode(CommandContext ctx, int Mode)
 			{
 				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
