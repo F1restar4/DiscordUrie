@@ -255,6 +255,7 @@ namespace DiscordUrie_DSharpPlus
 				if (GuildSettings.ColorBlacklistMode == ListMode) return;
 				GuildSettings.ColorBlacklistMode = ListMode;
 				await GuildSettings.SaveGuild(Entry.SQLConn);
+				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark: "));
 			}
 		}
 	}
