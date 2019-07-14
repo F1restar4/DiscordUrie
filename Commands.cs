@@ -160,5 +160,13 @@ namespace DiscordUrie_DSharpPlus
 
 			}
 		}
+	
+		[Command("sudo"), RequireOwner, Hidden]
+		public async Task Sudo(CommandContext ctx, DiscordUser User, [RemainingText]string Command)
+		{
+            var cmd = ctx.CommandsNext.FindCommand(Command, out var args);
+            var fctx = ctx.CommandsNext.CreateFakeContext(User, ctx.Channel, Command, ctx.Prefix, cmd, args);
+			await ctx.CommandsNext.ExecuteCommandAsync(fctx);
+		}
 	}
 }
