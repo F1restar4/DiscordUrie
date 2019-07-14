@@ -31,7 +31,6 @@ namespace DiscordUrie_DSharpPlus
 				GuildSettings = await CreateGuildDefaultSettings(client.Guilds.Values)
 			};
 
-
 			return OutputConfig;
 		}
 
@@ -59,7 +58,6 @@ namespace DiscordUrie_DSharpPlus
 			{
 				OutputGuildList.Add(await CreateGuildDefaultSettings(cur));
 			}
-
 
 			return OutputGuildList;
 		}
