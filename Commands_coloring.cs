@@ -14,7 +14,7 @@ namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : BaseCommandModule
 	{
-		[Group("color"), Description("Coloring group"), ColorCommand]
+		[Group("color"), Description("Coloring group")]
 		public class ColoringStuffGroup : BaseCommandModule
 		{
 
@@ -78,7 +78,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[GroupCommand()]
+			[GroupCommand(), ColorCommand]
 			[Description("Equal to calling color me or color set in one command, mentioning yourself will just run color me and will not require elevated perms")]
 			public async Task ExecuteGroupAsync(CommandContext ctx, [Description("The ID or mention of the target user")] DiscordMember user, [Description("The color to set to, can be in hex, rgb or keyword format (Must be a single string)")] string Color)
 			{
@@ -111,7 +111,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Command("purge")]
+			[Command("purge"), ColorCommand]
 			public async Task PurgeInactiveColors(CommandContext ctx)
 			{
 				int i = 0;
@@ -154,7 +154,7 @@ namespace DiscordUrie_DSharpPlus
 
 			}
 
-			[Command("set"), RequireAuth]
+			[Command("set"), RequireAuth, ColorCommand]
 			[Description("Sets a givin user's color `only works if you're super cool`")]
 			public async Task SetTargetColor(CommandContext ctx, [Description("The ID or mention of the target user")] DiscordMember user, [Description("The color to set to, can be in hex, rgb or keyword format (Must be a single string)")]string Color)
 			{
@@ -176,7 +176,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Command("me")]
+			[Command("me"), ColorCommand]
 			[Description("Sets your color")]
 			public async Task SetSelfColor(CommandContext ctx, [Description("The color to set to, can be in hex, rgb or keyword format (Must be a single string)")]string Color)
 			{
@@ -256,6 +256,26 @@ namespace DiscordUrie_DSharpPlus
 				GuildSettings.ColorBlacklistMode = ListMode;
 				await GuildSettings.SaveGuild(Entry.SQLConn);
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+			}
+
+			[Command("toggle"), RequireAuth]
+			public async Task Toggle(CommandContext ctx)
+			{
+				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				if (GuildSettings.ColorEnabled)
+				{
+					GuildSettings.ColorEnabled = false;
+					await GuildSettings.SaveGuild(Entry.SQLConn);
+					await ctx.RespondAsync("Color commands disabled.");
+					return;
+				}
+				else
+				{
+					GuildSettings.ColorEnabled = true;
+					await GuildSettings.SaveGuild(Entry.SQLConn);
+					await ctx.RespondAsync("Color commands enabled.");
+					return;
+				}
 			}
 		}
 	}
