@@ -85,7 +85,7 @@ namespace DiscordUrie_DSharpPlus
 				try
 				{
 
-					if (user != ctx.Member && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
+					if (user != ctx.Member && !await Util.UserAuth(ctx.Member))
 					{
 						await ctx.RespondAsync("You don't have the correct permissions for this!");
 						return;
