@@ -15,7 +15,7 @@ namespace DiscordUrie_DSharpPlus
         {
             public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
             {
-                if (await Util.UserAuthHigh(ctx.Member.Id, ctx.Guild))
+                if (await Util.UserAuthHigh(ctx.Member))
                     return true;
 
                 var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
@@ -56,7 +56,7 @@ namespace DiscordUrie_DSharpPlus
         {
             public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
             {
-                return await Util.UserAuth(ctx.Member.Id, ctx.Guild);
+                return await Util.UserAuth(ctx.Member);
             }
 
         }
@@ -66,7 +66,7 @@ namespace DiscordUrie_DSharpPlus
         {
             public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
             {
-                return await Util.UserAuthHigh(ctx.Member.Id, ctx.Guild);
+                return await Util.UserAuthHigh(ctx.Member);
             }
         }
     }

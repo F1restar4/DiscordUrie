@@ -99,7 +99,7 @@ namespace DiscordUrie_DSharpPlus
                         return;
                     }
                     DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
-                    if(Target.Owner != ctx.Member.Id && !await Util.UserAuth(ctx.Member.Id, ctx.Guild))
+                    if(Target.Owner != ctx.Member.Id && !await Util.UserAuth(ctx.Member))
                     {
                         await ctx.RespondAsync("You do not have the permissions to do this!");
                         return;

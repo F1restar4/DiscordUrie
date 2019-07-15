@@ -33,31 +33,31 @@ namespace DiscordUrie_DSharpPlus
 
 		}
 
-		public static Task<bool> UserAuthHigh(ulong inputID, DiscordGuild Guild)
+		public static Task<bool> UserAuthHigh(DiscordMember Member)
 		{
-			if (Guild.Owner.Id == inputID)
+			if (Member.IsOwner)
 				return Task.FromResult(true);
 
 			ulong[] SuperDuperCoolPeople = { 105076116942811136, 161658438869450752, 197757126611959808 };
 
-			if (SuperDuperCoolPeople.Any(xr => xr == inputID))
+			if (SuperDuperCoolPeople.Any(xr => xr == Member.Id))
 				return Task.FromResult(true);
 
 			return Task.FromResult(false);
 		}
 
-		public static async Task<bool> UserAuth(ulong inputId, DiscordGuild Guild)
+		public static async Task<bool> UserAuth(DiscordMember Member)
 		{
 
-			if (await UserAuthHigh(inputId, Guild))
+			if (await UserAuthHigh(Member))
 				return true;
 
 			List<ulong> ServerAdmins = new List<ulong>();
-			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Guild);
+			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Member.Guild);
 
 			ServerAdmins.AddRange(GuildSettings.Admins);
 
-			if (ServerAdmins.Any(xr => xr == inputId))
+			if (ServerAdmins.Any(xr => xr == Member.Id))
 				return true;
 
 			return false;
