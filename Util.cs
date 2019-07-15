@@ -52,6 +52,9 @@ namespace DiscordUrie_DSharpPlus
 			if (await UserAuthHigh(Member))
 				return true;
 
+			if ((Member.PermissionsIn(Member.Guild.GetDefaultChannel()) & Permissions.Administrator) == Permissions.Administrator)
+				return true;
+
 			List<ulong> ServerAdmins = new List<ulong>();
 			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await Settings.FindGuildSettings(Member.Guild);
 
