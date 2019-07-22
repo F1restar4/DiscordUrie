@@ -11,6 +11,7 @@ using Steam.Models;
 using Microsoft.CodeAnalysis;
 using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
 using DiscordUrie_DSharpPlus.Attributes;
+using Newtonsoft.Json;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -167,6 +168,12 @@ namespace DiscordUrie_DSharpPlus
             var cmd = ctx.CommandsNext.FindCommand(Command, out var args);
             var fctx = ctx.CommandsNext.CreateFakeContext(User, ctx.Channel, Command, ctx.Prefix, cmd, args);
 			await ctx.CommandsNext.ExecuteCommandAsync(fctx);
+		}
+
+		[Command("msg"), Description("Supplies information about a givin message")]
+		public async Task msg(CommandContext ctx, DiscordMessage msg)
+		{
+			await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(msg, Formatting.Indented)}\n```");
 		}
 	}
 }
