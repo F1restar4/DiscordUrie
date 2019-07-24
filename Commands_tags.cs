@@ -88,6 +88,32 @@ namespace DiscordUrie_DSharpPlus
                 }
             }
 
+            [Command("edit"), Description("Edit a tag")]
+            public async Task TagEdit(CommandContext ctx, string tag, [RemainingText] string output)
+            {
+                tag = Regex.Escape(tag).ToLower();
+                var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild).ConfigureAwait(false);
+                if (!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
+                {
+                    await ctx.RespondAsync("Tag doesn't exist!").ConfigureAwait(false);
+                    return;
+                }
+                var Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
+                var util = new Util(this.discordUrie);
+                if (Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
+                {
+                    await ctx.RespondAsync("You do not own this tag and do not have the permissions to edit this.").ConfigureAwait(false);
+                    return;
+                }
+                this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
+                GuildSettings.Tags.Remove(Target);
+                Target.Output = output;
+                GuildSettings.Tags.Add(Target);
+                this.discordUrie.Config.GuildSettings.Add(GuildSettings);
+                await GuildSettings.SaveGuild(this.discordUrie.SQLConn).ConfigureAwait(false);
+                await ctx.RespondAsync("Tag edited!").ConfigureAwait(false);
+            }
+
             [Command("remove"), Description("Remove a tag")]
             public async Task TagRemove(CommandContext ctx, [RemainingText] string tag)
             {
