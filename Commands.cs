@@ -6,54 +6,57 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using SteamWebAPI2.Interfaces;
-using Steam.Models;
-using Microsoft.CodeAnalysis;
-using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
-using DiscordUrie_DSharpPlus.Attributes;
 using Newtonsoft.Json;
 
 namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : BaseCommandModule
 	{
+		private DiscordUrie discordUrie { get; set; }
+
+		public Commands(DiscordUrie du)
+		{
+			discordUrie = du;
+		}
+
 		[Group("steam"), Hidden, Description("Steam related commands")]
 		public class SteamCommands : BaseCommandModule
 		{
-			class OtherHelpfullMethods
+			private DiscordUrie discordUrie { get; set; }
+			public SteamCommands(DiscordUrie du)
 			{
-				public static Task<ulong?> Convert32IdTo64(string ThirtyTwoBitId)
-				{
-					string[] SplitInput = ThirtyTwoBitId.Split(':');
-
-					string Woah = null;
-					string haoW = null;
-
-					if (SplitInput[0] == "STEAM_0")
-					{
-						Woah = SplitInput[1];
-						haoW = SplitInput[2];
-					}
-
-					if (!string.IsNullOrWhiteSpace(Woah) || !string.IsNullOrWhiteSpace(haoW))
-					{
-						ulong Converted = Convert.ToUInt64(haoW) * 2;
-						Converted += 76561197960265728;
-						Converted += Convert.ToUInt64(Woah);
-
-						return Task.FromResult<ulong?>(Converted);
-					}
-
-					return Task.FromResult<ulong?>(null);
-				}
+				discordUrie = du;
 			}
+			public Task<ulong?> Convert32IdTo64(string ThirtyTwoBitId)
+			{
+				string[] SplitInput = ThirtyTwoBitId.Split(':');
 
+				string Woah = null;
+				string haoW = null;
+
+				if (SplitInput[0] == "STEAM_0")
+				{
+					Woah = SplitInput[1];
+					haoW = SplitInput[2];
+				}
+
+				if (!string.IsNullOrWhiteSpace(Woah) || !string.IsNullOrWhiteSpace(haoW))
+				{
+					ulong Converted = Convert.ToUInt64(haoW) * 2;
+					Converted += 76561197960265728;
+					Converted += Convert.ToUInt64(Woah);
+
+					return Task.FromResult<ulong?>(Converted);
+				}
+
+				return Task.FromResult<ulong?>(null);
+			}
 
 			[Command("profileinfo"), Aliases("profinf", "calc")]
 			public async Task ProfileInfoAsync(CommandContext ctx, string Userid)
 			{
 				DiscordMessage LoadingMessage = await ctx.RespondAsync("Retrieving info...");
-				ulong? ConvertedId = await OtherHelpfullMethods.Convert32IdTo64(Userid);
+				ulong? ConvertedId = await Convert32IdTo64(Userid);
 
 				if (ConvertedId == null)
 				{
@@ -63,22 +66,22 @@ namespace DiscordUrie_DSharpPlus
 					}
 					catch
 					{
-						var b = await Entry.SInterface.ResolveVanityUrlAsync(Userid);
+						var b = await discordUrie.SInterface.ResolveVanityUrlAsync(Userid);
 						ConvertedId = b.Data;
 
 					}
 				}
 
-				var Response = await Entry.SInterface.GetPlayerSummaryAsync(ConvertedId.Value);
+				var Response = await discordUrie.SInterface.GetPlayerSummaryAsync(ConvertedId.Value);
 				var Data = Response.Data;
 
 
-				var Games = await Entry.SPlayerService.GetOwnedGamesAsync(Data.SteamId, true);
+				var Games = await discordUrie.SPlayerService.GetOwnedGamesAsync(Data.SteamId, true);
 				var Games2 = Games.Data;
 
 
 
-				var LevelResponse = await Entry.SPlayerService.GetSteamLevelAsync(Data.SteamId);
+				var LevelResponse = await discordUrie.SPlayerService.GetSteamLevelAsync(Data.SteamId);
 				uint PlayerLevel = LevelResponse.Data.Value;
 				string PlayerLevelStr = PlayerLevel.ToString();
 

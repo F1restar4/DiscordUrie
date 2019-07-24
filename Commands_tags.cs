@@ -10,7 +10,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
-using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -20,11 +19,16 @@ namespace DiscordUrie_DSharpPlus
         [Group("tag"), Description("I dunno some gay shit")]
         public class Tag : BaseCommandModule
         {
+            private DiscordUrie discordUrie { get; set; }
+            public Tag(DiscordUrie du)
+            {
+                discordUrie = du;
+            }
 
             [GroupCommand()]
             public async Task GroupExecute(CommandContext ctx, [RemainingText] string tag)
             {
-                DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+                var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
                 tag = Regex.Escape(tag).ToLower();
 
@@ -56,7 +60,7 @@ namespace DiscordUrie_DSharpPlus
             {
                 try
                 {
-                    DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+                    var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
                 
                     tag = Regex.Escape(tag);
                     Output = Regex.Escape(Output);
@@ -66,16 +70,16 @@ namespace DiscordUrie_DSharpPlus
                         return;
                     }
                 
-                    Entry.Settings.GuildSettings.Remove(GuildSettings);
+                    discordUrie.Config.GuildSettings.Remove(GuildSettings);
 
-                    GuildSettings.Tags.Add(new DiscordUrieTag
+                    GuildSettings.Tags.Add(new DiscordUrieSettings.DiscordUrieTag
                     {
                         Tag = tag,
                         Output = Output,
                         Owner = ctx.Member.Id
                     });
-                    Entry.Settings.GuildSettings.Add(GuildSettings);
-                    await GuildSettings.SaveGuild(Entry.SQLConn);
+                    discordUrie.Config.GuildSettings.Add(GuildSettings);
+                    await GuildSettings.SaveGuild(discordUrie.SQLConn);
                     await ctx.RespondAsync("Tag created!");
                 }
                 catch(Exception ex)
@@ -90,7 +94,7 @@ namespace DiscordUrie_DSharpPlus
                 try
                 {
                     tag = Regex.Escape(tag).ToLower();
-                    DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+                    var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
 
                     if(!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
@@ -98,16 +102,17 @@ namespace DiscordUrie_DSharpPlus
                         await ctx.RespondAsync("Tag doesn't exist!");
                         return;
                     }
-                    DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
-                    if(Target.Owner != ctx.Member.Id && !await Util.UserAuth(ctx.Member))
+                    DiscordUrieSettings.DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
+                    var util = new Util(discordUrie);
+                    if(Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
                     {
                         await ctx.RespondAsync("You do not have the permissions to do this!");
                         return;
                     }
-                    Entry.Settings.GuildSettings.Remove(GuildSettings);
+                    discordUrie.Config.GuildSettings.Remove(GuildSettings);
                     GuildSettings.Tags.Remove(Target);
-                    Entry.Settings.GuildSettings.Add(GuildSettings);
-                    await GuildSettings.SaveGuild(Entry.SQLConn);
+                    discordUrie.Config.GuildSettings.Add(GuildSettings);
+                    await GuildSettings.SaveGuild(discordUrie.SQLConn);
                     await ctx.RespondAsync("Tag removed!");
                 }
                 catch(Exception ex)
@@ -120,7 +125,7 @@ namespace DiscordUrie_DSharpPlus
             public async Task TagList(CommandContext ctx)
             {
                 InteractivityExtension intex = ctx.Client.GetInteractivity();
-                List<DiscordUrieTag> tags = await Entry.Settings.GetTags(ctx.Guild);
+                List<DiscordUrieSettings.DiscordUrieTag> tags = await discordUrie.Config.GetTags(ctx.Guild);
                 if (tags.Count <= 0) return;
                 IEnumerable<string> TagKeys = tags.Select(xr => xr.Tag);
 
@@ -133,7 +138,7 @@ namespace DiscordUrie_DSharpPlus
             [Command("info"), Description("Gives information about a tag")]
             public async Task TagInfo(CommandContext ctx, [RemainingText] string tag)
             {
-                DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+                var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
                 tag = Regex.Escape(tag).ToLower();
                 var Tag = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
 
