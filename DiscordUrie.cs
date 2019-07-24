@@ -39,6 +39,7 @@ namespace DiscordUrie_DSharpPlus
 
             SQLConn = new SQLiteConnection("Data Source=DiscordUrieConfig.db;Version=3;");
 
+			this.StartTime = DateTime.Now;
             this.Config = cfg;
             string token;
             string steamKey;
