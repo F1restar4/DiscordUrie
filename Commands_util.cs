@@ -6,7 +6,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
 using DiscordUrie_DSharpPlus.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Scripting;
@@ -21,16 +20,16 @@ namespace DiscordUrie_DSharpPlus
 		{
 			var Activity = new DiscordActivity(text, (ActivityType)type);
 			await ctx.Client.UpdateStatusAsync(Activity);
-			Entry.Settings.StartupActivity = Activity;
-			await Entry.Settings.SaveSettings(Entry.SQLConn);
+			discordUrie.Config.StartupActivity = Activity;
+			await discordUrie.Config.SaveSettings(discordUrie.SQLConn);
 			await ctx.Message.DeleteAsync();
 		}
 
 		[Command("uptime")]
 		public async Task UptimeAsync(CommandContext ctx)
 		{
-			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(Entry.StartTime).ToDuration()} \n"+
-			$"Socket uptime: {await DateTime.Now.Subtract(Entry.SocketStart).ToDuration()}");
+			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n"+
+			$"Socket uptime: {await DateTime.Now.Subtract(discordUrie.SocketStart).ToDuration()}");
 		
 		}
 
@@ -80,14 +79,13 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.Message.DeleteAsync("Command auto deletion.");
 			await HelpThanks.DeleteAsync("Command auto deletion.");
 			await ctx.Client.DisconnectAsync();
-			Entry.SQLConn.Close();
 			Environment.Exit(0);
 		}
 
 		public class globals
 		{
 			public CommandContext ctx;
-			public DiscordUrieConfig settings;
+			public DiscordUrieSettings.DiscordUrieConfig settings;
 		}
 
 		[Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
@@ -112,7 +110,7 @@ namespace DiscordUrie_DSharpPlus
             var globals = new globals
 			{
 				ctx = ctx,
-				settings = Entry.Settings
+				settings = discordUrie.Config
 			};
             var sopts = ScriptOptions.Default
                 .WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", "System.Reflection", "System.Text", 

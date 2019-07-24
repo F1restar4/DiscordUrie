@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -15,10 +16,12 @@ namespace DiscordUrie_DSharpPlus
         {
             public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
             {
-                if (await Util.UserAuthHigh(ctx.Member))
+                var du = ctx.Services.GetService<DiscordUrie>();
+                var util = new Util(du);
+                if (await util.UserAuthHigh(ctx.Member))
                     return true;
 
-                var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+                var GuildSettings = await du.Config.FindGuildSettings(ctx.Guild);
                 if (!GuildSettings.ColorEnabled)
                 {
                     await ctx.RespondAsync("This is disabled on this guild.");
@@ -56,7 +59,9 @@ namespace DiscordUrie_DSharpPlus
         {
             public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
             {
-                return await Util.UserAuth(ctx.Member);
+                var du = ctx.Services.GetService<DiscordUrie>();
+                var util = new Util(du);
+                return await util.UserAuth(ctx.Member);
             }
 
         }
@@ -66,7 +71,9 @@ namespace DiscordUrie_DSharpPlus
         {
             public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
             {
-                return await Util.UserAuthHigh(ctx.Member);
+                var du = ctx.Services.GetService<DiscordUrie>();
+                var util = new Util(du);
+                return await util.UserAuthHigh(ctx.Member);
             }
         }
     }

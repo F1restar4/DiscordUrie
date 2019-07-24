@@ -13,17 +13,20 @@ namespace DiscordUrie_DSharpPlus
 	public class DiscordUrieSettings
 	{
 
-		public static async Task<int> Createdb(SQLiteConnection conn)
+		public async Task<int> Createdb(SQLiteConnection conn)
 		{
+			await conn.OpenAsync();
 			var command = new SQLiteCommand("CREATE TABLE IF NOT EXISTS config (Id UNSIGNED INTEGER PRIMARY KEY," +
 											"ColorEnabled INTEGER, ColorLocked INTEGER, ColorBlacklistMode INTEGER, ColorBlacklist TEXT," +
 											"BansEnabled INTEGER, BannedIds TEXT, Admins TEXT, Tags TEXT);", conn);
-			return await command.ExecuteNonQueryAsync();
+			var pee = await command.ExecuteNonQueryAsync();
+			conn.Close();
+			return pee;
 		}
 
-		public static async Task<DiscordUrieConfig> CreateAllDefaultSettings(BaseDiscordClient client)
+		public async Task<DiscordUrieConfig> CreateAllDefaultSettings(BaseDiscordClient client, SQLiteConnection SQLConn)
 		{
-			DiscordUrieConfig OutputConfig = new DiscordUrieConfig
+			DiscordUrieConfig OutputConfig = new DiscordUrieConfig(this, SQLConn)
 			{
 
 				StartupActivity = new DiscordActivity("the voices in my head", ActivityType.ListeningTo),
@@ -34,7 +37,7 @@ namespace DiscordUrie_DSharpPlus
 			return OutputConfig;
 		}
 
-		public static Task<DiscordUrieGuild> CreateGuildDefaultSettings(DiscordGuild Guild)
+		public Task<DiscordUrieGuild> CreateGuildDefaultSettings(DiscordGuild Guild)
 		{
 			return Task.FromResult(new DiscordUrieGuild()
 			{
@@ -50,7 +53,7 @@ namespace DiscordUrie_DSharpPlus
 			});
 		}
 
-		public static async Task<List<DiscordUrieGuild>> CreateGuildDefaultSettings(IEnumerable<DiscordGuild> GuildList)
+		public async Task<List<DiscordUrieGuild>> CreateGuildDefaultSettings(IEnumerable<DiscordGuild> GuildList)
 		{
 			List<DiscordUrieGuild> OutputGuildList = new List<DiscordUrieGuild>();
 
@@ -62,8 +65,9 @@ namespace DiscordUrie_DSharpPlus
 			return OutputGuildList;
 		}
 
-		public static async Task<DiscordUrieConfig> LoadSettings(SQLiteConnection conn)
+		public async Task<DiscordUrieConfig> LoadSettings(SQLiteConnection conn)
 		{
+			await conn.OpenAsync();
 			JsonSerializerSettings serializerSettings = new JsonSerializerSettings
 			{
 				NullValueHandling = NullValueHandling.Ignore
@@ -71,7 +75,7 @@ namespace DiscordUrie_DSharpPlus
 
 			var command = new SQLiteCommand("SELECT * FROM config", conn);
 			var reader = await command.ExecuteReaderAsync();
-			DiscordUrieConfig OutSettings = new DiscordUrieConfig
+			DiscordUrieConfig OutSettings = new DiscordUrieConfig(this, conn)
 			{
 				StartupActivity = JsonConvert.DeserializeObject<DiscordActivity>(File.ReadAllText("activity.json")),
 				GuildSettings = new List<DiscordUrieGuild>()
@@ -90,11 +94,20 @@ namespace DiscordUrie_DSharpPlus
 					Tags = JsonConvert.DeserializeObject<List<DiscordUrieTag>>((string)reader["Tags"])
 				});
 			}
+			conn.Close();
 			return OutSettings;
 		}
 
 		public class DiscordUrieConfig
 		{
+			public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn,  List<DiscordUrieGuild> Guilds = null, DiscordActivity Activity = null)
+			{
+				this.SettingsInstance = Settings;
+				this.SQLConn = SQLConn;
+				this.GuildSettings = Guilds;
+				this.StartupActivity = Activity;
+			}
+
 			public Task<bool> IsEmpty()
 			{
 				if (GuildSettings == null || StartupActivity == null)
@@ -106,7 +119,7 @@ namespace DiscordUrie_DSharpPlus
 
 			public async Task<int> SaveSettings(SQLiteConnection conn)
 			{
-				await File.WriteAllTextAsync("activity.json",JsonConvert.SerializeObject(Entry.Settings.StartupActivity));
+				await File.WriteAllTextAsync("activity.json",JsonConvert.SerializeObject(this.StartupActivity));
 				int affected = 0;
 				foreach(DiscordUrieGuild cur in GuildSettings)
 				{
@@ -118,7 +131,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task<bool> RemoveGuild(ulong guildid)
 			{
 				bool result = GuildSettings.Remove(GuildSettings.First(xr => xr.Id == guildid));
-				await SaveSettings(Entry.SQLConn);
+				await SaveSettings(this.SQLConn);
 				return result;
 			}
 
@@ -127,9 +140,9 @@ namespace DiscordUrie_DSharpPlus
 				if (GuildSettings.Any(xr => xr.Id == guild.Id))
 					return false;
 
-				var Settings = await CreateGuildDefaultSettings(guild);
+				var Settings = await this.SettingsInstance.CreateGuildDefaultSettings(guild);
 				GuildSettings.Add(Settings);
-				await Settings.SaveGuild(Entry.SQLConn);
+				await Settings.SaveGuild(this.SQLConn);
 				return true;
 			}
 
@@ -141,11 +154,11 @@ namespace DiscordUrie_DSharpPlus
 				}
 				else
 				{
-					DiscordUrieGuild NewDefaultServer = await CreateGuildDefaultSettings(SearchForGuild);
+					DiscordUrieGuild NewDefaultServer = await this.SettingsInstance.CreateGuildDefaultSettings(SearchForGuild);
 
 
 					GuildSettings.Add(NewDefaultServer);
-					await NewDefaultServer.SaveGuild(Entry.SQLConn);
+					await NewDefaultServer.SaveGuild(this.SQLConn);
 					return NewDefaultServer;
 				}
 			}
@@ -167,6 +180,8 @@ namespace DiscordUrie_DSharpPlus
 			public DiscordActivity StartupActivity { get; set; }
 
 			public List<DiscordUrieGuild> GuildSettings { get; set; }
+			private DiscordUrieSettings SettingsInstance { get; }
+			private SQLiteConnection SQLConn { get; }
 		}
 
 		public enum BlackListModeEnum
@@ -187,6 +202,7 @@ namespace DiscordUrie_DSharpPlus
 		{
 			public async Task<int> SaveGuild(SQLiteConnection conn)
 			{
+				await conn.OpenAsync();
 				JsonSerializerSettings serializerSettings = new JsonSerializerSettings
 				{
 					Formatting = Formatting.None,
@@ -204,7 +220,9 @@ namespace DiscordUrie_DSharpPlus
 				command.Parameters.AddWithValue("@BannedIds", JsonConvert.SerializeObject(BannedIds, serializerSettings));
 				command.Parameters.AddWithValue("@Admins", JsonConvert.SerializeObject(Admins, serializerSettings));
 				command.Parameters.AddWithValue("@Tags", JsonConvert.SerializeObject(Tags, serializerSettings));
-				return await command.ExecuteNonQueryAsync();
+				var peeagain = await command.ExecuteNonQueryAsync();
+				conn.Close();
+				return peeagain;
 			}
 			public ulong Id {get; set;}
 			public bool ColorEnabled {get; set;}

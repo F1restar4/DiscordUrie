@@ -6,7 +6,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
 using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
@@ -17,11 +16,17 @@ namespace DiscordUrie_DSharpPlus
 		[RequireAuth]
 		public class ChatBansGroup : BaseCommandModule
 		{
+			private DiscordUrie discordUrie { get; set; }
+			public ChatBansGroup(DiscordUrie du)
+			{
+				discordUrie = du;
+			}
+
 			[Command("on")]
 			[Description("Enables chat bans `only works if you're super cool`")]
 			public async Task Enable(CommandContext ctx)
 			{
-				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
 				if (GuildSettings.BansEnabled)
 				{
@@ -32,10 +37,10 @@ namespace DiscordUrie_DSharpPlus
 				}
 				else
 				{
-					Entry.Settings.GuildSettings.Remove(GuildSettings);
+					discordUrie.Config.GuildSettings.Remove(GuildSettings);
 					GuildSettings.BansEnabled = true;
-					Entry.Settings.GuildSettings.Add(GuildSettings);
-					await GuildSettings.SaveGuild(Entry.SQLConn);
+					discordUrie.Config.GuildSettings.Add(GuildSettings);
+					await GuildSettings.SaveGuild(discordUrie.SQLConn);
 
 					DiscordMessage woaaah = await ctx.RespondAsync("Chat bans enabled...");
 					await Task.Delay(2070);
@@ -48,15 +53,15 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Disables chat bans `only works if you're super cool`")]
 			public async Task Disable(CommandContext ctx)
 			{
-				DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
 				if (GuildSettings.BansEnabled)
 				{
-					Entry.Settings.GuildSettings.Remove(GuildSettings);
+					discordUrie.Config.GuildSettings.Remove(GuildSettings);
 					GuildSettings.BansEnabled = false;
 
-					Entry.Settings.GuildSettings.Add(GuildSettings);
-					await GuildSettings.SaveGuild(Entry.SQLConn);
+					discordUrie.Config.GuildSettings.Add(GuildSettings);
+					await GuildSettings.SaveGuild(discordUrie.SQLConn);
 
 					DiscordMessage ImSoTired = await ctx.RespondAsync("Chat bans disabled...");
 					await Task.Delay(2070);
@@ -77,7 +82,8 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Adds a user to the ban list `only works if you're super cool`")]
 			public async Task AddBan(CommandContext ctx, [Description("The user id to add")] DiscordMember user)
 			{
-				bool success = await Util.AddBan(ctx.Client, user.Id, ctx.Guild);
+                var util = new Util(discordUrie);
+				bool success = await util.AddBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)
 				{
@@ -99,7 +105,8 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Removes a user from the ban list `only works if you're super cool`")]
 			public async Task RemoveBan(CommandContext ctx, [Description("The user id to remove")] DiscordMember user)
 			{
-				bool success = await Util.RemoveBan(ctx.Client, user.Id, ctx.Guild);
+				var util = new Util(discordUrie);
+				bool success = await util.RemoveBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)
 				{
@@ -122,7 +129,7 @@ namespace DiscordUrie_DSharpPlus
 			[Description("Displays all the currently chat banned users")]
 			public async Task BanCheck(CommandContext ctx)
 			{
-				List<ulong> idlist = await Entry.Settings.GetChatBanIdList(ctx.Guild);
+				List<ulong> idlist = await discordUrie.Config.GetChatBanIdList(ctx.Guild);
 				string CurMessage = "The users that are currently in the chat bans list are: ";
 				int IHateMyLife = 0;
 

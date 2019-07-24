@@ -7,7 +7,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
-using static DiscordUrie_DSharpPlus.DiscordUrieSettings;
 using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
@@ -17,65 +16,62 @@ namespace DiscordUrie_DSharpPlus
 		[Group("color"), Description("Coloring group")]
 		public class ColoringStuffGroup : BaseCommandModule
 		{
-
-			public class MethodShit
+			private DiscordUrie discordUrie { get; set; }
+			public ColoringStuffGroup(DiscordUrie du)
 			{
-				public static async Task<bool> RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel, bool silent = false)
+				discordUrie = du;
+			}
+
+			public async Task<bool> RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel, bool silent = false)
+			{
+				IReadOnlyDictionary<ulong, DiscordRole> roles = server.Roles;
+
+				if (!roles.Any(xr => xr.Value.Name == user.Id.ToString()))
 				{
-					IReadOnlyDictionary<ulong, DiscordRole> roles = server.Roles;
-
-					if (!roles.Any(xr => xr.Value.Name == user.Id.ToString()))
-					{
-						if (silent) return false;
-						await channel.SendMessageAsync("There was no color to remove!");
-						return false;
-					}
-
-					DiscordRole cur = roles.First(xr => xr.Value.Name == user.Id.ToString()).Value;
-					await cur.DeleteAsync("Color deletion");
-
-					await channel.SendMessageAsync("Color removed successfully.");
-					Console.WriteLine("User {0}'s color was removed.", user.Username);
-					return true;
+					if (silent) return false;
+					await channel.SendMessageAsync("There was no color to remove!");
+					return false;
 				}
 
-				public static async Task<bool> SetColor(DiscordMember user, DiscordGuild server, DiscordChannel channel, DiscordColor color)
+				DiscordRole cur = roles.First(xr => xr.Value.Name == user.Id.ToString()).Value;
+				await cur.DeleteAsync("Color deletion");
+
+				await channel.SendMessageAsync("Color removed successfully.");
+				Console.WriteLine("User {0}'s color was removed.", user.Username);
+				return true;
+			}
+
+			public async Task<bool> SetColor(DiscordMember user, DiscordGuild server, DiscordChannel channel, DiscordColor color)
+			{
+				IReadOnlyDictionary<ulong, DiscordRole> roles = server.Roles;
+				DiscordRole existingRole = null;
+				string UserId = user.Id.ToString();
+
+				if (roles.Any(xr => xr.Value.Name == UserId))
 				{
-					IReadOnlyDictionary<ulong, DiscordRole> roles = server.Roles;
-					DiscordRole existingRole = null;
-					string UserId = user.Id.ToString();
+					existingRole = roles.First(xr => xr.Value.Name == UserId).Value;
+					await existingRole.ModifyAsync(color: color, reason: "Coloring role edit");
+				}
+				else
+				{
+					DiscordRole CreatedRole = await server.CreateRoleAsync(user.Id.ToString(), Permissions.None, color, null, null, "Coloring role creation");
 
-					if (roles.Any(xr => xr.Value.Name == UserId))
-					{
-						existingRole = roles.First(xr => xr.Value.Name == UserId).Value;
-						await existingRole.ModifyAsync(color: color, reason: "Coloring role edit");
-					}
-					else
-					{
-						DiscordRole CreatedRole = await server.CreateRoleAsync(user.Id.ToString(), Permissions.None, color, null, null, "Coloring role creation");
-
-						await user.GrantRoleAsync(CreatedRole, "Coloring role assignment");
-					}
-
-					await channel.SendMessageAsync("Color set successfully.");
-
-					Console.WriteLine("User {0}'s color was set to {1}", user.Username, color.R + ", " + color.G + ", " + color.B);
-					return true;
+					await user.GrantRoleAsync(CreatedRole, "Coloring role assignment");
 				}
 
-				public static async Task<DiscordColor?> GetColor(DiscordMember user, DiscordGuild server)
-				{
-					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(server);
+				await channel.SendMessageAsync("Color set successfully.");
 
-					if (!GuildSettings.ColorEnabled)
-						return null;
+				Console.WriteLine("User {0}'s color was set to {1}", user.Username, color.R + ", " + color.G + ", " + color.B);
+				return true;
+			}
 
-					IReadOnlyDictionary<ulong, DiscordRole> roleList = server.Roles;
-					string UserId = user.Id.ToString();
+			public Task<DiscordColor> GetColor(DiscordMember user, DiscordGuild server)
+			{
+				IReadOnlyDictionary<ulong, DiscordRole> roleList = server.Roles;
+				string UserId = user.Id.ToString();
 
-					if (!roleList.Any(xr => xr.Value.Name == UserId)) return null;
-					return roleList.First(xr => xr.Value.Name == UserId).Value.Color;
-				}
+				if (!roleList.Any(xr => xr.Value.Name == UserId)) return null;
+				return Task.FromResult(roleList.First(xr => xr.Value.Name == UserId).Value.Color);
 			}
 
 			[GroupCommand(), ColorCommand]
@@ -84,8 +80,8 @@ namespace DiscordUrie_DSharpPlus
 			{
 				try
 				{
-
-					if (user != ctx.Member && !await Util.UserAuth(ctx.Member))
+					var util = new Util(discordUrie);
+					if (user != ctx.Member && !await util.UserAuth(ctx.Member))
 					{
 						await ctx.RespondAsync("You don't have the correct permissions for this!");
 						return;
@@ -93,14 +89,14 @@ namespace DiscordUrie_DSharpPlus
 
 					if (Color == "off")
 					{
-						await MethodShit.RemoveColor(user, ctx.Guild, ctx.Channel);
+						await RemoveColor(user, ctx.Guild, ctx.Channel);
 						return;
 					}
 
 					System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
 					DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
 
-					await MethodShit.SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
+					await SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
 				}
 				catch (Exception ex)
 				{
@@ -161,12 +157,12 @@ namespace DiscordUrie_DSharpPlus
 				try
 				{
 					if (Color == "off")
-						await MethodShit.RemoveColor(user, ctx.Guild, ctx.Channel);
+						await RemoveColor(user, ctx.Guild, ctx.Channel);
 					else
 					{
 						System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
 						DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
-						await MethodShit.SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
+						await SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
 					}
 				}
 				catch (Exception ex)
@@ -183,13 +179,13 @@ namespace DiscordUrie_DSharpPlus
 				try
 				{
 					if (Color == "off")
-						await MethodShit.RemoveColor(ctx.User, ctx.Guild, ctx.Channel);
+						await RemoveColor(ctx.User, ctx.Guild, ctx.Channel);
 
 					else
 					{
 						System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
 						DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
-						await MethodShit.SetColor(ctx.Member, ctx.Guild, ctx.Channel, RoleColor);
+						await SetColor(ctx.Member, ctx.Guild, ctx.Channel, RoleColor);
 					}
 				}
 				catch (Exception ex)
@@ -205,8 +201,8 @@ namespace DiscordUrie_DSharpPlus
 			{
 				try
 				{
-					DiscordUrieGuild GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
-					DiscordColor? UserColor = await MethodShit.GetColor(User, ctx.Guild);
+					var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
+					DiscordColor? UserColor = await GetColor(User, ctx.Guild);
 					if (UserColor != null)
 						await ctx.RespondAsync($"{User.Username}'s current color is {UserColor} or {UserColor.Value.R}, {UserColor.Value.G}, {UserColor.Value.B}");
 					else
@@ -222,57 +218,57 @@ namespace DiscordUrie_DSharpPlus
 			[Command("block"), RequireAuth]
 			public async Task BlockAdd(CommandContext ctx, [Description("The user to add to the black/whitelist")]DiscordMember Member)
 			{
-				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 				if (GuildSettings.ColorBlacklist.Any(xr => xr == Member.Id))
 				{
 					await ctx.RespondAsync("They're already in the list!");
 					return;
 				}
 				GuildSettings.ColorBlacklist.Add(Member.Id);
-				await GuildSettings.SaveGuild(Entry.SQLConn);
+				await GuildSettings.SaveGuild(discordUrie.SQLConn);
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
 			[Command("unblock"), RequireAuth]
 			public async Task BlockRemove(CommandContext ctx, [Description("The user to remove from the black/whitelist")]DiscordMember Member)
 			{
-				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 				if (!GuildSettings.ColorBlacklist.Any(xr => xr == Member.Id))
 				{
 					await ctx.RespondAsync("They're not in the list!");
 					return;
 				}
 				GuildSettings.ColorBlacklist.Remove(Member.Id);
-				await GuildSettings.SaveGuild(Entry.SQLConn);
+				await GuildSettings.SaveGuild(discordUrie.SQLConn);
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
 			[Command("mode"), RequireAuth]
 			public async Task BlockMode(CommandContext ctx, int Mode)
 			{
-				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
-				var ListMode = (BlackListModeEnum)Mode;
+				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
+				var ListMode = (DiscordUrieSettings.BlackListModeEnum)Mode;
 				if (GuildSettings.ColorBlacklistMode == ListMode) return;
 				GuildSettings.ColorBlacklistMode = ListMode;
-				await GuildSettings.SaveGuild(Entry.SQLConn);
+				await GuildSettings.SaveGuild(discordUrie.SQLConn);
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
 			[Command("toggle"), RequireAuth]
 			public async Task Toggle(CommandContext ctx)
 			{
-				var GuildSettings = await Entry.Settings.FindGuildSettings(ctx.Guild);
+				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 				if (GuildSettings.ColorEnabled)
 				{
 					GuildSettings.ColorEnabled = false;
-					await GuildSettings.SaveGuild(Entry.SQLConn);
+					await GuildSettings.SaveGuild(discordUrie.SQLConn);
 					await ctx.RespondAsync("Color commands disabled.");
 					return;
 				}
 				else
 				{
 					GuildSettings.ColorEnabled = true;
-					await GuildSettings.SaveGuild(Entry.SQLConn);
+					await GuildSettings.SaveGuild(discordUrie.SQLConn);
 					await ctx.RespondAsync("Color commands enabled.");
 					return;
 				}
