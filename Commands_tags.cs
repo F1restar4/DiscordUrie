@@ -38,7 +38,7 @@ namespace DiscordUrie_DSharpPlus
                     return;
                 }
 
-                var Contained = GuildSettings.Tags.FindAll(xr => xr.Tag.ToLower().Contains(tag));
+                List<DiscordUrieTag> Contained = GuildSettings.Tags.FindAll(xr => xr.Tag.ToLower().Contains(tag));
                 if (Contained.Count <= 0)
                 {
                     await ctx.RespondAsync("Tag not found.");
@@ -71,13 +71,7 @@ namespace DiscordUrie_DSharpPlus
                     }
                 
                     discordUrie.Config.GuildSettings.Remove(GuildSettings);
-
-                    GuildSettings.Tags.Add(new DiscordUrieSettings.DiscordUrieTag
-                    {
-                        Tag = tag,
-                        Output = Output,
-                        Owner = ctx.Member.Id
-                    });
+                    GuildSettings.Tags.Add(new DiscordUrieTag(tag, Output, ctx.Member.Id));
                     discordUrie.Config.GuildSettings.Add(GuildSettings);
                     await GuildSettings.SaveGuild(discordUrie.SQLConn);
                     await ctx.RespondAsync("Tag created!");
@@ -128,7 +122,7 @@ namespace DiscordUrie_DSharpPlus
                         await ctx.RespondAsync("Tag doesn't exist!");
                         return;
                     }
-                    DiscordUrieSettings.DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
+                    DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
                     var util = new Util(discordUrie);
                     if(Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
                     {
@@ -151,7 +145,7 @@ namespace DiscordUrie_DSharpPlus
             public async Task TagList(CommandContext ctx)
             {
                 InteractivityExtension intex = ctx.Client.GetInteractivity();
-                List<DiscordUrieSettings.DiscordUrieTag> tags = await discordUrie.Config.GetTags(ctx.Guild);
+                List<DiscordUrieTag> tags = await discordUrie.Config.GetTags(ctx.Guild);
                 if (tags.Count <= 0) return;
                 IEnumerable<string> TagKeys = tags.Select(xr => xr.Tag);
 

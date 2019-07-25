@@ -23,7 +23,7 @@ namespace DiscordUrie_DSharpPlus
         public DiscordClient Client { get; }
         public CommandsNextExtension CNext { get; }
         public InteractivityExtension Interactivity { get; }
-        public DiscordUrieSettings.DiscordUrieConfig Config { get; set; }
+        public DiscordUrieConfig Config { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime SocketStart { get; set; }
         public string[] CmdPrefix = { "/" };
@@ -33,7 +33,7 @@ namespace DiscordUrie_DSharpPlus
         public SQLiteConnection SQLConn { get; }
         public DiscordUrieSettings SettingsInstance { get; }
 
-        public DiscordUrie(DiscordUrieSettings.DiscordUrieConfig cfg)
+        public DiscordUrie(DiscordUrieConfig cfg)
         {
             SettingsInstance = new DiscordUrieSettings();
 
@@ -128,7 +128,7 @@ namespace DiscordUrie_DSharpPlus
 			if (e.Channel.IsPrivate || e.Message.Author.IsBot)
 				return;
 
-			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await this.Config.FindGuildSettings(e.Guild);
+			DiscordUrieGuild GuildSettings = await this.Config.FindGuildSettings(e.Guild);
 
 			if (GuildSettings.BansEnabled)
 			{
