@@ -38,20 +38,8 @@ namespace DiscordUrie_DSharpPlus
 		}
 
 		public Task<DiscordUrieGuild> CreateGuildDefaultSettings(DiscordGuild Guild)
-		{
-			return Task.FromResult(new DiscordUrieGuild()
-			{
-				Id = Guild.Id,
-				ColorEnabled = true,
-				ColorLocked = false,
-				ColorBlacklistMode = BlackListModeEnum.Off,
-				ColorBlacklist = new List<ulong>(),
-				BansEnabled = false,
-				BannedIds = new List<ulong>(),
-				Admins = new List<ulong>(),
-				Tags = new List<DiscordUrieTag>()
-			});
-		}
+			=> Task.FromResult(new DiscordUrieGuild(Guild.Id));
+
 
 		public async Task<List<DiscordUrieGuild>> CreateGuildDefaultSettings(IEnumerable<DiscordGuild> GuildList)
 		{
@@ -82,9 +70,8 @@ namespace DiscordUrie_DSharpPlus
 			};
 			while(await reader.ReadAsync())
 			{
-				OutSettings.GuildSettings.Add(new DiscordUrieGuild
+				OutSettings.GuildSettings.Add(new DiscordUrieGuild(Convert.ToUInt64(reader["id"]))
 				{
-					Id = Convert.ToUInt64(reader["Id"]),
 					ColorEnabled  = Convert.ToBoolean(reader["ColorEnabled"]),
 					ColorLocked = Convert.ToBoolean(reader["ColorLocked"]),
 					ColorBlacklistMode = (BlackListModeEnum)Convert.ToInt32(reader["ColorBlacklistMode"]),
@@ -98,142 +85,155 @@ namespace DiscordUrie_DSharpPlus
 			return OutSettings;
 		}
 
-		public class DiscordUrieConfig
+	}
+
+	public class DiscordUrieConfig
+	{
+		public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn,  List<DiscordUrieGuild> Guilds = null, DiscordActivity Activity = null)
 		{
-			public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn,  List<DiscordUrieGuild> Guilds = null, DiscordActivity Activity = null)
-			{
-				this.SettingsInstance = Settings;
-				this.SQLConn = SQLConn;
-				this.GuildSettings = Guilds;
-				this.StartupActivity = Activity;
-			}
-
-			public Task<bool> IsEmpty()
-			{
-				if (GuildSettings == null || StartupActivity == null)
-				{
-					return Task.FromResult(true);
-				}
-				return Task.FromResult(false);
-			}
-
-			public async Task<int> SaveSettings(SQLiteConnection conn)
-			{
-				await File.WriteAllTextAsync("activity.json",JsonConvert.SerializeObject(this.StartupActivity));
-				int affected = 0;
-				foreach(DiscordUrieGuild cur in GuildSettings)
-				{
-					affected += await cur.SaveGuild(conn);
-				}
-				return affected;
-			}
-
-			public async Task<bool> RemoveGuild(ulong guildid)
-			{
-				bool result = GuildSettings.Remove(GuildSettings.First(xr => xr.Id == guildid));
-				await SaveSettings(this.SQLConn);
-				return result;
-			}
-
-			public async Task<bool> AddGuild(DiscordGuild guild)
-			{
-				if (GuildSettings.Any(xr => xr.Id == guild.Id))
-					return false;
-
-				var Settings = await this.SettingsInstance.CreateGuildDefaultSettings(guild);
-				GuildSettings.Add(Settings);
-				await Settings.SaveGuild(this.SQLConn);
-				return true;
-			}
-
-			public async Task<DiscordUrieGuild> FindGuildSettings(DiscordGuild SearchForGuild)
-			{
-				if (GuildSettings.Any(xr => xr.Id == SearchForGuild.Id))
-				{
-					return GuildSettings.First(xr => xr.Id == SearchForGuild.Id);
-				}
-				else
-				{
-					DiscordUrieGuild NewDefaultServer = await this.SettingsInstance.CreateGuildDefaultSettings(SearchForGuild);
-
-
-					GuildSettings.Add(NewDefaultServer);
-					await NewDefaultServer.SaveGuild(this.SQLConn);
-					return NewDefaultServer;
-				}
-			}
-
-			public async Task<List<ulong>> GetChatBanIdList(DiscordGuild Guild)
-			{
-
-				DiscordUrieSettings.DiscordUrieGuild GuildSettings = await FindGuildSettings(Guild);
-
-				return GuildSettings.BannedIds;
-			}
-
-			public async Task<List<DiscordUrieTag>> GetTags(DiscordGuild guild)
-			{
-				DiscordUrieGuild GuildSettings = await FindGuildSettings(guild);
-				return GuildSettings.Tags;
-			}
-
-			public DiscordActivity StartupActivity { get; set; }
-
-			public List<DiscordUrieGuild> GuildSettings { get; set; }
-			private DiscordUrieSettings SettingsInstance { get; }
-			private SQLiteConnection SQLConn { get; }
+			this.SettingsInstance = Settings;
+			this.SQLConn = SQLConn;
+			this.GuildSettings = Guilds;
+			this.StartupActivity = Activity;
 		}
 
-		public enum BlackListModeEnum
+		public Task<bool> IsEmpty()
 		{
-			Off = 0,
-			Blacklist = 1,
-			Whitelist = 2
-		}
-
-		public class DiscordUrieTag
-		{
-			public string Tag {get; set;}
-			public string Output {get; set;}
-			public ulong Owner {get; set;}
-		}
-
-		public class DiscordUrieGuild
-		{
-			public async Task<int> SaveGuild(SQLiteConnection conn)
+			if (GuildSettings == null || StartupActivity == null)
 			{
-				await conn.OpenAsync();
-				JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-				{
-					Formatting = Formatting.None,
-					NullValueHandling = NullValueHandling.Ignore
-				};
-				var command = new SQLiteCommand($"INSERT OR REPLACE INTO config VALUES(@Id, " +
-				"@ColorEnabled, @ColorLocked, @ColorBlacklistMode, @ColorBlacklist, " +
-				"@BansEnabled, @BannedIds, @Admins, @Tags)", conn);
-				command.Parameters.AddWithValue("@Id", Id);
-				command.Parameters.AddWithValue("@ColorEnabled", ColorEnabled);
-				command.Parameters.AddWithValue("@ColorLocked", ColorLocked);
-				command.Parameters.AddWithValue("@ColorBlacklistMode", ColorBlacklistMode);
-				command.Parameters.AddWithValue("@ColorBlacklist", JsonConvert.SerializeObject(ColorBlacklist, serializerSettings));
-				command.Parameters.AddWithValue("@BansEnabled", BansEnabled);
-				command.Parameters.AddWithValue("@BannedIds", JsonConvert.SerializeObject(BannedIds, serializerSettings));
-				command.Parameters.AddWithValue("@Admins", JsonConvert.SerializeObject(Admins, serializerSettings));
-				command.Parameters.AddWithValue("@Tags", JsonConvert.SerializeObject(Tags, serializerSettings));
-				var peeagain = await command.ExecuteNonQueryAsync();
-				conn.Close();
-				return peeagain;
+				return Task.FromResult(true);
 			}
-			public ulong Id {get; set;}
-			public bool ColorEnabled {get; set;}
-			public bool ColorLocked {get; set;}
-			public BlackListModeEnum ColorBlacklistMode {get; set;}
-			public List<ulong> ColorBlacklist {get; set;}
-			public bool BansEnabled {get; set;}
-			public List<ulong> BannedIds {get; set;}
-			public List<ulong> Admins {get; set;}
-			public List<DiscordUrieTag> Tags {get; set;}
+			return Task.FromResult(false);
 		}
 
+		public async Task<int> SaveSettings(SQLiteConnection conn)
+		{
+			await File.WriteAllTextAsync("activity.json",JsonConvert.SerializeObject(this.StartupActivity));
+			int affected = 0;
+			foreach(DiscordUrieGuild cur in GuildSettings)
+			{
+				affected += await cur.SaveGuild(conn);
+			}
+			return affected;
+		}
+
+		public async Task<bool> RemoveGuild(ulong guildid)
+		{
+			bool result = GuildSettings.Remove(GuildSettings.First(xr => xr.Id == guildid));
+			await SaveSettings(this.SQLConn);
+			return result;
+		}
+
+		public async Task<bool> AddGuild(DiscordGuild guild)
+		{
+			if (GuildSettings.Any(xr => xr.Id == guild.Id))
+				return false;
+
+			var Settings = await this.SettingsInstance.CreateGuildDefaultSettings(guild);
+			GuildSettings.Add(Settings);
+			await Settings.SaveGuild(this.SQLConn);
+			return true;
+		}
+
+		public async Task<DiscordUrieGuild> FindGuildSettings(DiscordGuild SearchForGuild)
+		{
+			if (GuildSettings.Any(xr => xr.Id == SearchForGuild.Id))
+			{
+				return GuildSettings.First(xr => xr.Id == SearchForGuild.Id);
+			}
+			else
+			{
+				DiscordUrieGuild NewDefaultServer = await this.SettingsInstance.CreateGuildDefaultSettings(SearchForGuild);
+				GuildSettings.Add(NewDefaultServer);
+				await NewDefaultServer.SaveGuild(this.SQLConn);
+				return NewDefaultServer;
+			}
+		}
+
+		public async Task<List<ulong>> GetChatBanIdList(DiscordGuild Guild)
+		{
+			DiscordUrieGuild GuildSettings = await FindGuildSettings(Guild);
+			return GuildSettings.BannedIds;
+		}
+
+		public async Task<List<DiscordUrieTag>> GetTags(DiscordGuild guild)
+		{
+			DiscordUrieGuild GuildSettings = await FindGuildSettings(guild);
+			return GuildSettings.Tags;
+		}
+
+		public DiscordActivity StartupActivity { get; set; }
+		public List<DiscordUrieGuild> GuildSettings { get; set; }
+		public DiscordUrieSettings SettingsInstance { get; }
+		public SQLiteConnection SQLConn { get; }
+	}
+
+	public enum BlackListModeEnum
+	{
+		Off = 0,
+		Blacklist = 1,
+		Whitelist = 2
+	}
+
+	public class DiscordUrieTag
+	{
+		public DiscordUrieTag(string Tag, string Output, ulong Owner)
+		{
+			this.Tag = Tag;
+			this.Output = Output;
+			this.Owner = Owner;
+		}
+		public string Tag {get; set;}
+		public string Output {get; set;}
+		public ulong Owner {get; set;}
+	}
+
+	public class DiscordUrieGuild
+	{
+		public DiscordUrieGuild(ulong Id)
+		{
+			this.Id = Id;
+			this.ColorEnabled = true;
+			this.ColorLocked = false;
+			this.ColorBlacklistMode = BlackListModeEnum.Off;
+			this.ColorBlacklist = new List<ulong>();
+			this.BansEnabled = false;
+			this.BannedIds = new List<ulong>();
+			this.Admins = new List<ulong>();
+			this.Tags = new List<DiscordUrieTag>();
+		}
+		public async Task<int> SaveGuild(SQLiteConnection conn)
+		{
+			await conn.OpenAsync();
+			JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+			{
+				Formatting = Formatting.None,
+				NullValueHandling = NullValueHandling.Ignore
+			};
+			var command = new SQLiteCommand($"INSERT OR REPLACE INTO config VALUES(@Id, " +
+			"@ColorEnabled, @ColorLocked, @ColorBlacklistMode, @ColorBlacklist, " +
+			"@BansEnabled, @BannedIds, @Admins, @Tags)", conn);
+			command.Parameters.AddWithValue("@Id", Id);
+			command.Parameters.AddWithValue("@ColorEnabled", ColorEnabled);
+			command.Parameters.AddWithValue("@ColorLocked", ColorLocked);
+			command.Parameters.AddWithValue("@ColorBlacklistMode", ColorBlacklistMode);
+			command.Parameters.AddWithValue("@ColorBlacklist", JsonConvert.SerializeObject(ColorBlacklist, serializerSettings));
+			command.Parameters.AddWithValue("@BansEnabled", BansEnabled);
+			command.Parameters.AddWithValue("@BannedIds", JsonConvert.SerializeObject(BannedIds, serializerSettings));
+			command.Parameters.AddWithValue("@Admins", JsonConvert.SerializeObject(Admins, serializerSettings));
+			command.Parameters.AddWithValue("@Tags", JsonConvert.SerializeObject(Tags, serializerSettings));
+			var peeagain = await command.ExecuteNonQueryAsync();
+			conn.Close();
+			return peeagain;
+		}
+		public ulong Id {get; set;}
+		public bool ColorEnabled {get; set;}
+		public bool ColorLocked {get; set;}
+		public BlackListModeEnum ColorBlacklistMode {get; set;}
+		public List<ulong> ColorBlacklist {get; set;}
+		public bool BansEnabled {get; set;}
+		public List<ulong> BannedIds {get; set;}
+		public List<ulong> Admins {get; set;}
+		public List<DiscordUrieTag> Tags {get; set;}
 	}
 }

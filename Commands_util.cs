@@ -85,7 +85,7 @@ namespace DiscordUrie_DSharpPlus
 		public class globals
 		{
 			public CommandContext ctx;
-			public DiscordUrieSettings.DiscordUrieConfig settings;
+			public DiscordUrieConfig settings;
 		}
 
 		[Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]

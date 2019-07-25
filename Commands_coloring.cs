@@ -247,7 +247,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task BlockMode(CommandContext ctx, int Mode)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
-				var ListMode = (DiscordUrieSettings.BlackListModeEnum)Mode;
+				var ListMode = (BlackListModeEnum)Mode;
 				if (GuildSettings.ColorBlacklistMode == ListMode) return;
 				GuildSettings.ColorBlacklistMode = ListMode;
 				await GuildSettings.SaveGuild(discordUrie.SQLConn);

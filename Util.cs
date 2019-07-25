@@ -63,7 +63,7 @@ namespace DiscordUrie_DSharpPlus
 				return true;
 
 			List<ulong> ServerAdmins = new List<ulong>();
-			DiscordUrieSettings.DiscordUrieGuild GuildSettings = await discordUrie.Config.FindGuildSettings(Member.Guild);
+			DiscordUrieGuild GuildSettings = await discordUrie.Config.FindGuildSettings(Member.Guild);
 
 			ServerAdmins.AddRange(GuildSettings.Admins);
 
@@ -86,7 +86,7 @@ namespace DiscordUrie_DSharpPlus
 
 				if (removed)
 				{
-					DiscordUrieSettings.DiscordUrieGuild GuildSettings = await discordUrie.Config.FindGuildSettings(Guild);
+					DiscordUrieGuild GuildSettings = await discordUrie.Config.FindGuildSettings(Guild);
 					discordUrie.Config.GuildSettings.Remove(GuildSettings);
 					GuildSettings.BannedIds = BannedIds;
 					discordUrie.Config.GuildSettings.Add(GuildSettings);
@@ -115,7 +115,7 @@ namespace DiscordUrie_DSharpPlus
 					return false;
 
 				BannedIds.Add(id);
-				DiscordUrieSettings.DiscordUrieGuild GuildSettings = await discordUrie.Config.FindGuildSettings(Guild);
+				DiscordUrieGuild GuildSettings = await discordUrie.Config.FindGuildSettings(Guild);
 				discordUrie.Config.GuildSettings.Remove(GuildSettings);
 				GuildSettings.BannedIds = BannedIds;
 				discordUrie.Config.GuildSettings.Add(GuildSettings);

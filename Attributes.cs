@@ -30,7 +30,7 @@ namespace DiscordUrie_DSharpPlus
 
 				switch (GuildSettings.ColorBlacklistMode)
 				{
-				    case DiscordUrieSettings.BlackListModeEnum.Blacklist:
+				    case BlackListModeEnum.Blacklist:
 					    if (GuildSettings.ColorBlacklist.Any(xr => xr == ctx.Member.Id))
 					    {
 						    await ctx.RespondAsync("You are blacklisted from this command and cannot use it.");
@@ -38,7 +38,7 @@ namespace DiscordUrie_DSharpPlus
 					    }
 					    break;
 
-			        case DiscordUrieSettings.BlackListModeEnum.Whitelist:
+			        case BlackListModeEnum.Whitelist:
 						if (!GuildSettings.ColorBlacklist.Any(xr => xr == ctx.Member.Id))
 						{
 							await ctx.RespondAsync("You have not been whitelisted for this command and cannot use it.");
