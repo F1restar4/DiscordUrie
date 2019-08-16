@@ -6,3 +6,4 @@ config.json
 *.db
 activity.json
 steamkey.txt
+lavapass.txt
