@@ -12,6 +12,8 @@ using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Lavalink;
+using DSharpPlus.Net;
 using SteamWebAPI2.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,10 +21,13 @@ namespace DiscordUrie_DSharpPlus
 {
     public class DiscordUrie
     {
-
         public DiscordClient Client { get; }
         public CommandsNextExtension CNext { get; }
         public InteractivityExtension Interactivity { get; }
+		public LavalinkExtension Lavalink { get; }
+		public LavalinkNodeConnection LavalinkNode { get; set; }
+		public string LavaPass { get; }
+		public List<GuildMusicData> MusicData { get; }
         public DiscordUrieConfig Config { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime SocketStart { get; set; }
@@ -41,6 +46,7 @@ namespace DiscordUrie_DSharpPlus
 
 			this.StartTime = DateTime.Now;
             this.Config = cfg;
+			this.MusicData = new List<GuildMusicData>();
             string token;
             string steamKey;
 
@@ -67,6 +73,18 @@ namespace DiscordUrie_DSharpPlus
 			else
 			{
 				steamKey = File.ReadAllText("steamkey.txt");
+			}
+
+			if (!File.Exists("lavapass.txt"))
+			{
+				Console.Write("Input the lavalink server password");
+				this.LavaPass = Console.ReadLine();
+				File.WriteAllText("lavapass.txt", this.LavaPass);
+				Console.Clear();
+			}
+			else
+			{
+				this.LavaPass = File.ReadAllText("lavapass.txt");
 			}
             
             this.Client = new DiscordClient(new DiscordConfiguration
@@ -107,6 +125,8 @@ namespace DiscordUrie_DSharpPlus
 				EnableDms = false,
 				Services = depend
 			});
+
+			this.Lavalink = Client.UseLavalink();
 
             this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
         
@@ -162,6 +182,13 @@ namespace DiscordUrie_DSharpPlus
 
 		private async Task Client_Ready(ReadyEventArgs e)
 		{	
+			var LavaConfig = new LavalinkConfiguration
+			{
+				    RestEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
+    				SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
+					Password = this.LavaPass
+			};
+			this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
 
 			if (await this.Config.IsEmpty())
 			{
