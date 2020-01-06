@@ -97,10 +97,10 @@ namespace DiscordUrie_DSharpPlus
                 var tracks = await discordUrie.LavalinkNode.GetTracksAsync(search);
                 var track = tracks.Tracks.First();
                 MusicData.Enqueue(track);
+                await ctx.RespondAsync($"Queued {track.Title}");
                 if (MusicData.NowPlaying.Title == null && MusicData.Queue.Count <= 1)
                     await this.Play(ctx.Guild);
 
-                await ctx.RespondAsync($"Queued {track.Title}");
             }
 
             [Command("stop")]
@@ -121,7 +121,12 @@ namespace DiscordUrie_DSharpPlus
 
             [Command("skip")]
             public async Task Skip(CommandContext ctx)
-                => await this.Play(ctx.Guild);
+            {
+                var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
+                var seekto = connection.CurrentState.CurrentTrack.Length.Add(TimeSpan.FromSeconds(-1));
+                connection.Seek(seekto);
+                await ctx.RespondAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
+            }
 
             [Command("nowplaying"), Aliases("np")]
             public async Task NowPlaying(CommandContext ctx)
