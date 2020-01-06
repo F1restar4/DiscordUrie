@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Drawing;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
@@ -93,7 +94,7 @@ namespace DiscordUrie_DSharpPlus
 						return;
 					}
 
-					System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
+					System.Drawing.Color col = ColorTranslator.FromHtml(Color);
 					DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
 
 					await SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
@@ -160,7 +161,7 @@ namespace DiscordUrie_DSharpPlus
 						await RemoveColor(user, ctx.Guild, ctx.Channel);
 					else
 					{
-						System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
+						System.Drawing.Color col = ColorTranslator.FromHtml(Color);
 						DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
 						await SetColor(user, ctx.Guild, ctx.Channel, RoleColor);
 					}
@@ -183,7 +184,7 @@ namespace DiscordUrie_DSharpPlus
 
 					else
 					{
-						System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(Color);
+						System.Drawing.Color col = ColorTranslator.FromHtml(Color);
 						DiscordColor RoleColor = new DiscordColor(col.R, col.G, col.B);
 						await SetColor(ctx.Member, ctx.Guild, ctx.Channel, RoleColor);
 					}
