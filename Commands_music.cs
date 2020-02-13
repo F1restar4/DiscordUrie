@@ -94,7 +94,7 @@ namespace DiscordUrie_DSharpPlus
                     connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
 
                 var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
-                var tracks = await discordUrie.LavalinkNode.GetTracksAsync(search);
+                var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
                 var track = tracks.Tracks.First();
                 MusicData.Enqueue(track);
                 await ctx.RespondAsync($"Queued {track.Title}");
@@ -123,8 +123,7 @@ namespace DiscordUrie_DSharpPlus
             public async Task Skip(CommandContext ctx)
             {
                 var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
-                var seekto = connection.CurrentState.CurrentTrack.Length.Add(TimeSpan.FromSeconds(-1));
-                connection.Seek(seekto);
+                connection.Seek(connection.CurrentState.CurrentTrack.Length);
                 await ctx.RespondAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
             }
 
