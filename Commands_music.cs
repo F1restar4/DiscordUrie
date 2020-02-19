@@ -50,7 +50,7 @@ namespace DiscordUrie_DSharpPlus
                     await MusicData.UpdateChannel.SendMessageAsync("Not connected.");
                     return;
                 }
-                connection.Disconnect();
+                await connection.DisconnectAsync();
                 this.musicData.Remove(MusicData);
             }
 
@@ -65,7 +65,7 @@ namespace DiscordUrie_DSharpPlus
                     await Leave(guild);
                 
                 MusicData.StartNext();
-                connection.Play(MusicData.NowPlaying);
+                await connection.PlayAsync(MusicData.NowPlaying);
                 await MusicData.UpdateChannel.SendMessageAsync($"Playing `{MusicData.NowPlaying.Title}`");
             }
 
@@ -110,7 +110,7 @@ namespace DiscordUrie_DSharpPlus
                 if (connection != null)
                     return;
 
-                connection.Stop();
+                await connection.StopAsync();
                 await this.Leave(ctx.Guild);
                 await ctx.RespondAsync("Stopped player.");
             }
@@ -123,7 +123,7 @@ namespace DiscordUrie_DSharpPlus
             public async Task Skip(CommandContext ctx)
             {
                 var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
-                connection.Seek(connection.CurrentState.CurrentTrack.Length);
+                await connection.SeekAsync(connection.CurrentState.CurrentTrack.Length);
                 await ctx.RespondAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
             }
 
