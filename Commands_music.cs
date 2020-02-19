@@ -71,6 +71,7 @@ namespace DiscordUrie_DSharpPlus
 
             async Task PlaybackFinished(TrackFinishEventArgs e)
             {
+                if (e.Reason != TrackEndReason.Finished) return;
                 var MusicData = this.musicData.First(xr => xr.GuildId == e.Player.Guild.Id);
                 if (MusicData.Queue.Count == 0)
                     await this.Leave(e.Player.Guild);
@@ -98,7 +99,7 @@ namespace DiscordUrie_DSharpPlus
                 var track = tracks.Tracks.First();
                 MusicData.Enqueue(track);
                 await ctx.RespondAsync($"Queued {track.Title}");
-                if (MusicData.NowPlaying.Title == null && MusicData.Queue.Count <= 1)
+                if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
                     await this.Play(ctx.Guild);
 
             }
