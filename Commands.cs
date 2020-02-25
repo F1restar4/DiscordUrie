@@ -6,6 +6,7 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DiscordUrie_DSharpPlus.Attributes;
 using Newtonsoft.Json;
 
 namespace DiscordUrie_DSharpPlus
@@ -18,6 +19,38 @@ namespace DiscordUrie_DSharpPlus
 		{
 			discordUrie = du;
 		}
+
+		public override async Task BeforeExecutionAsync(CommandContext ctx)
+		{
+			var util = new Util(discordUrie);
+			if (await util.UserAuth(ctx.Member)) return;
+			if (discordUrie.LockedOutUsers.Any(xr => xr == ctx.Member))
+				throw new DSharpPlus.CommandsNext.Exceptions.CommandNotFoundException(ctx.Command.Name);
+		}
+
+		[Command("Lock"), RequireAuth]
+		public async Task Lock(CommandContext ctx, DiscordMember Member)
+		{
+			if (discordUrie.LockedOutUsers.Any(xr => xr == Member))
+			{
+				await ctx.RespondAsync("They're already locked.");
+				return;
+			}
+			
+			discordUrie.LockedOutUsers.Add(Member);
+			await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+		}
+
+		[Command("Unlock"), RequireAuth]
+		public async Task Unlock(CommandContext ctx, DiscordMember Member)
+		{
+			if (!discordUrie.LockedOutUsers.Any(xr => xr == Member))
+				return;
+			
+			discordUrie.LockedOutUsers.Remove(Member);
+			await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+		}
+
 
 		[Group("steam"), Hidden, Description("Steam related commands")]
 		public class SteamCommands : BaseCommandModule
