@@ -37,6 +37,7 @@ namespace DiscordUrie_DSharpPlus
 		public PlayerService SPlayerService { get; }
         public SQLiteConnection SQLConn { get; }
         public DiscordUrieSettings SettingsInstance { get; }
+		public List<DiscordMember> LockedOutUsers { get; set; }
 
         public DiscordUrie(DiscordUrieConfig cfg)
         {
@@ -47,6 +48,7 @@ namespace DiscordUrie_DSharpPlus
 			this.StartTime = DateTime.Now;
             this.Config = cfg;
 			this.MusicData = new List<GuildMusicData>();
+			this.LockedOutUsers = new List<DiscordMember>();
             string token;
             string steamKey;
 
