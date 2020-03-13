@@ -71,7 +71,7 @@ namespace DiscordUrie_DSharpPlus
 
 		}
     
-        [Command("shutdown"), Hidden, RequireAuthHigh]
+        [Command("shutdown"), Hidden, RequireOwner]
 		public async Task ShutdownAsync(CommandContext ctx)
 		{
 			DiscordMessage HelpThanks = await ctx.RespondAsync("Shutting down...");
