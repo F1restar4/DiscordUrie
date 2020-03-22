@@ -86,6 +86,7 @@ namespace DiscordUrie_DSharpPlus
 		{
 			public CommandContext ctx;
 			public DiscordUrieConfig settings;
+            public DiscordUrie discordUrie;
 		}
 
 		[Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
@@ -110,7 +111,8 @@ namespace DiscordUrie_DSharpPlus
             var globals = new globals
 			{
 				ctx = ctx,
-				settings = discordUrie.Config
+				settings = discordUrie.Config,
+                discordUrie = discordUrie
 			};
             var sopts = ScriptOptions.Default
                 .WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", "System.Reflection", "System.Text", 
