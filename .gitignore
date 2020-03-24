@@ -7,3 +7,4 @@ config.json
 activity.json
 steamkey.txt
 lavapass.txt
+.vs/*
