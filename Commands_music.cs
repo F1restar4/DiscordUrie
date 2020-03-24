@@ -27,7 +27,7 @@ namespace DiscordUrie_DSharpPlus
             {
                 if (discordUrie.LavalinkNode.GetConnection(guild) != null)
                 {
-                    await channel.SendMessageAsync("Already connected.");
+                    await channel.SendMessageAsync("Already connected."); 
                     return null;
                 }
                 if (member.VoiceState.Channel == null)
@@ -37,6 +37,8 @@ namespace DiscordUrie_DSharpPlus
                 }
                 var conn = await discordUrie.LavalinkNode.ConnectAsync(member.VoiceState.Channel);
                 conn.PlaybackFinished += PlaybackFinished;
+                if (this.musicData.Any(xr => xr.GuildId == guild.Id))
+                    this.musicData.RemoveAll(xr => xr.GuildId == guild.Id);
                 this.musicData.Add(new GuildMusicData(guild, conn.Channel, channel));
                 return conn;
             }
@@ -96,12 +98,38 @@ namespace DiscordUrie_DSharpPlus
 
                 var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
                 var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
+                if (tracks.Tracks.Count() == 0)
+                {
+                    await ctx.RespondAsync("No matches found.");
+                    return;
+                }
                 var track = tracks.Tracks.First();
                 MusicData.Enqueue(track);
                 await ctx.RespondAsync($"Queued {track.Title}");
                 if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
                     await this.Play(ctx.Guild);
 
+            }
+
+            [Command("clear")]
+            public async Task Clear(CommandContext ctx)
+            {
+                var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
+                var MusicData = this.musicData.FirstOrDefault(xr => xr.GuildId == ctx.Guild.Id);
+                if (connection == null)
+                {
+                    this.musicData.Remove(MusicData);
+                    await ctx.RespondAsync("Cleared the queue.");
+                    return;
+                }
+
+                await connection.StopAsync();
+                if (MusicData == null)
+                    return;
+                
+                MusicData.ClearQueue();
+                MusicData.ClearNP();
+                await ctx.RespondAsync("Cleared the queue.");
             }
 
             [Command("stop")]

@@ -33,6 +33,9 @@ namespace DiscordUrie_DSharpPlus
         public void ClearQueue()
             => this.Queue.Clear();
 
+        public void ClearNP()
+            => NowPlaying = null;
+
         public void StartNext()
         {
             this.NowPlaying = this.GetNext();
