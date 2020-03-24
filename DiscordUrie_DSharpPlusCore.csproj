@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00670" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00670" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00670" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00670" />
-    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-nightly-00670" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00671" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00671" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00671" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00671" />
+    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-nightly-00671" />
     <PackageReference Include="Emzi0767.Microsoft.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Emzi0767.Microsoft.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.0.0" />
