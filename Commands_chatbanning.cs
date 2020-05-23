@@ -12,8 +12,7 @@ namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : BaseCommandModule
 	{
-		[Group("bans"), Aliases("b"), Description("Chat bans `Unusable unless you're cool`")]
-		[RequireAuth]
+		[Group("bans"), Aliases("b"), Description("Chat bans"), RequireAuth]
 		public class ChatBansGroup : BaseCommandModule
 		{
 			private DiscordUrie discordUrie { get; set; }
@@ -22,8 +21,7 @@ namespace DiscordUrie_DSharpPlus
 				discordUrie = du;
 			}
 
-			[Command("on")]
-			[Description("Enables chat bans `only works if you're super cool`")]
+			[Command("on"), Description("Enables chat bans")]
 			public async Task Enable(CommandContext ctx)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
@@ -49,8 +47,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Command("off")]
-			[Description("Disables chat bans `only works if you're super cool`")]
+			[Command("off"), Description("Disables chat bans")]
 			public async Task Disable(CommandContext ctx)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
@@ -71,15 +68,14 @@ namespace DiscordUrie_DSharpPlus
 				}
 				else
 				{
-					DiscordMessage a = await ctx.RespondAsync("Incorrect permissions!");
+					DiscordMessage a = await ctx.RespondAsync("Chat bans are already disabled!");
 					await Task.Delay(2070);
 					await ctx.Message.DeleteAsync("Command auto deletion.");
 					await a.DeleteAsync("Command auto deletion.");
 				}
 			}
 
-			[Command("add")]
-			[Description("Adds a user to the ban list `only works if you're super cool`")]
+			[Command("add"), Description("Adds a user to the ban list")]
 			public async Task AddBan(CommandContext ctx, [Description("The user id to add")] DiscordMember user)
 			{
                 var util = new Util(discordUrie);
@@ -101,8 +97,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Command("remove")]
-			[Description("Removes a user from the ban list `only works if you're super cool`")]
+			[Command("remove"), Description("Removes a user from the ban list")]
 			public async Task RemoveBan(CommandContext ctx, [Description("The user id to remove")] DiscordMember user)
 			{
 				var util = new Util(discordUrie);
@@ -125,8 +120,7 @@ namespace DiscordUrie_DSharpPlus
 
 			}
 
-			[Command("check")]
-			[Description("Displays all the currently chat banned users")]
+			[Command("check"), Description("Displays all the currently chat banned users")]
 			public async Task BanCheck(CommandContext ctx)
 			{
 				List<ulong> idlist = await discordUrie.Config.GetChatBanIdList(ctx.Guild);

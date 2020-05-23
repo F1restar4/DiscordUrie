@@ -14,7 +14,7 @@ namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : BaseCommandModule
 	{
-		[Group("color"), Description("Coloring group")]
+		[Group("color"), Description("Allows users to modify their displayed color as desired.")]
 		public class ColoringStuffGroup : BaseCommandModule
 		{
 			private DiscordUrie discordUrie { get; set; }
@@ -108,7 +108,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Command("purge"), ColorCommand]
+			[Command("purge"), ColorCommand, Description("Removes unused color roles")]
 			public async Task PurgeInactiveColors(CommandContext ctx)
 			{
 				int i = 0;
@@ -152,7 +152,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[Command("set"), RequireAuth, ColorCommand]
-			[Description("Sets a givin user's color `only works if you're super cool`")]
+			[Description("Sets a givin user's color")]
 			public async Task SetTargetColor(CommandContext ctx, [Description("The ID or mention of the target user")] DiscordMember user, [Description("The color to set to, can be in hex, rgb or keyword format (Must be a single string)")]string Color)
 			{
 				try
@@ -216,7 +216,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 		
-			[Command("block"), RequireAuth]
+			[Command("block"), RequireAuth, Description("Adds a user to the color commmand black/whitelist")]
 			public async Task BlockAdd(CommandContext ctx, [Description("The user to add to the black/whitelist")]DiscordMember Member)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
@@ -230,7 +230,7 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
-			[Command("unblock"), RequireAuth]
+			[Command("unblock"), RequireAuth, Description("Removes a user from the color command black/whitelist")]
 			public async Task BlockRemove(CommandContext ctx, [Description("The user to remove from the black/whitelist")]DiscordMember Member)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
@@ -244,7 +244,7 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
-			[Command("mode"), RequireAuth]
+			[Command("mode"), RequireAuth, Description("Switches the blacklist mode between off, blacklist and whitelist 0-2")]
 			public async Task BlockMode(CommandContext ctx, int Mode)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
@@ -255,7 +255,7 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
-			[Command("toggle"), RequireAuth]
+			[Command("toggle"), RequireAuth, Description("Enables and disables use of any color commands")]
 			public async Task Toggle(CommandContext ctx)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
