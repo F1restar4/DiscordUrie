@@ -13,7 +13,7 @@ namespace DiscordUrie_DSharpPlus
 {
     public partial class Commands : BaseCommandModule
     {
-        [Group("music"), Aliases("m")]
+        [Group("music"), Aliases("m"), Description("Used to play music (or any youtube video).")]
         public class Music : BaseCommandModule
         {
             public DiscordUrie discordUrie { get; set; }
@@ -81,16 +81,16 @@ namespace DiscordUrie_DSharpPlus
                 await this.Play(e.Player.Guild);
             }
 
-            [Command("join")]
+            [Command("join"), Description("Joins your voice channel.")]
             public async Task Join(CommandContext ctx)
             => await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
 
-            [Command("leave")]
+            [Command("leave"), Description("Leaves the voice channel and clears the queue.")]
             public async Task Leave(CommandContext ctx)
             => await this.Leave(ctx.Guild);
 
-            [Command("search")]
-            public async Task Search(CommandContext ctx, [RemainingText]string search)
+            [Command("search"), Description("Searches for any youtube video and queues it to be played.")]
+            public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
             {
                 var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
                 if (connection == null) 
@@ -111,7 +111,7 @@ namespace DiscordUrie_DSharpPlus
 
             }
 
-            [Command("clear")]
+            [Command("clear"), Description("Clear the queue.")]
             public async Task Clear(CommandContext ctx)
             {
                 var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
@@ -132,7 +132,7 @@ namespace DiscordUrie_DSharpPlus
                 await ctx.RespondAsync("Cleared the queue.");
             }
 
-            [Command("stop")]
+            [Command("stop"), Description("Same as leave.")]
             public async Task Stop(CommandContext ctx)
             {
                 var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
@@ -144,11 +144,7 @@ namespace DiscordUrie_DSharpPlus
                 await ctx.RespondAsync("Stopped player.");
             }
 
-            [Command("play")]
-            public async Task Play(CommandContext ctx)
-                => await this.Play(ctx.Guild);
-
-            [Command("skip")]
+            [Command("skip"), Description("Skips the current song.")]
             public async Task Skip(CommandContext ctx)
             {
                 var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
@@ -156,7 +152,7 @@ namespace DiscordUrie_DSharpPlus
                 await ctx.RespondAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
             }
 
-            [Command("nowplaying"), Aliases("np")]
+            [Command("nowplaying"), Aliases("np"), Description("Displays the currently playing track.")]
             public async Task NowPlaying(CommandContext ctx)
             {
                 var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
@@ -164,7 +160,7 @@ namespace DiscordUrie_DSharpPlus
                 await ctx.RespondAsync($"Currently playing `{NP.Title}` at `{NP.Position}/{NP.Length}`");
             }
 
-            [Command("remove")]
+            [Command("remove"), Description("Removes the track at a specific position in the queue.")]
             public async Task Remove(CommandContext ctx, int index)
             {
                 var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
@@ -172,7 +168,7 @@ namespace DiscordUrie_DSharpPlus
                 await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
             }
 
-            [Command("queue")]
+            [Command("queue"), Description("Shows the queue.")]
             public async Task ShowQueue(CommandContext ctx)
             {
                 var Interactivity = ctx.Client.GetInteractivity();

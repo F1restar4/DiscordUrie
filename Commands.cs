@@ -28,7 +28,7 @@ namespace DiscordUrie_DSharpPlus
 				throw new DSharpPlus.CommandsNext.Exceptions.CommandNotFoundException(ctx.Command.Name);
 		}
 
-		[Command("Lock"), RequireAuth]
+		[Command("Lock"), RequireAuth, Description("Disables all commands for a user.")]
 		public async Task Lock(CommandContext ctx, DiscordMember Member)
 		{
 			if (discordUrie.LockedOutUsers.Any(xr => xr == Member))
@@ -41,7 +41,7 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 		}
 
-		[Command("Unlock"), RequireAuth]
+		[Command("Unlock"), RequireAuth, Description("Allows use of all commands for a user if they were previously disabled.")]
 		public async Task Unlock(CommandContext ctx, DiscordMember Member)
 		{
 			if (!discordUrie.LockedOutUsers.Any(xr => xr == Member))

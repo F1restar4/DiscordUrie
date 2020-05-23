@@ -12,7 +12,7 @@ namespace DiscordUrie_DSharpPlus
 {
     public partial class Commands : BaseCommandModule
     {
-        [Group("spam"), Description("Spam remove group `Unusable unless you're cool`"), Aliases("s"), RequireAuth]
+        [Group("spam"), Description("Spam remove group"), Aliases("s"), RequireAuth]
 		public class SpamStuffGroup : BaseCommandModule
 		{
 
@@ -28,7 +28,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			}
 
-			[Command("remove")]
+			[Command("remove"), Description("Mass remove the last x number of messages")]
 			public async Task SpamRemoveAsync(CommandContext ctx, int amount)
 			{
 				IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Id, amount);
@@ -37,7 +37,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[Command("remove")]
-			[Description("Mass remove messages from a channel using the key as a search term `only works if you're super cool`")]
+			[Description("Mass remove messages from a channel using the key as a search term")]
 			public async Task SpamRemoveAsync(CommandContext ctx, [Description("The key to search for.")] string key, [Description("A specific user to search for, this param is optional")] DiscordMember ByUser = null)
 			{
 
