@@ -178,7 +178,6 @@ namespace DiscordUrie_DSharpPlus
 				DiscordEmbedBuilder EmbedBuilder = new DiscordEmbedBuilder
 				{
 					Color = color,
-					ThumbnailUrl = Data.AvatarMediumUrl,
 				};
 
 				/*foreach (Steam.Models.SteamCommunity.OwnedGameModel cur in Games2.OwnedGames)

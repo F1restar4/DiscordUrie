@@ -25,7 +25,7 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.Message.DeleteAsync();
 		}
 
-		[Command("uptime")]
+		[Command("uptime"), Description("Displays the bot's uptime.")]
 		public async Task UptimeAsync(CommandContext ctx)
 		{
 			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n"+
