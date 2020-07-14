@@ -117,11 +117,14 @@ namespace DiscordUrie_DSharpPlus
 			return affected;
 		}
 
-		public async Task<bool> RemoveGuild(ulong guildid)
+		public async Task<int> RemoveGuild(ulong guildid)
 		{
 			bool result = GuildSettings.Remove(GuildSettings.First(xr => xr.Id == guildid));
-			await SaveSettings(this.SQLConn);
-			return result;
+			await this.SQLConn.OpenAsync();
+			var command = new SQLiteCommand($"DELETE FROM config WHERE id = {guildid}", this.SQLConn);
+			var Out = await command.ExecuteNonQueryAsync();
+			this.SQLConn.Close();
+			return Out;
 		}
 
 		public async Task<bool> AddGuild(DiscordGuild guild)
