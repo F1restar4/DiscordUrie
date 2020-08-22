@@ -19,40 +19,40 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordUrie_DSharpPlus
 {
-    public class DiscordUrie
-    {
-        public DiscordClient Client { get; }
-        public CommandsNextExtension CNext { get; }
-        public InteractivityExtension Interactivity { get; }
+	public class DiscordUrie
+	{
+		public DiscordClient Client { get; }
+		public CommandsNextExtension CNext { get; }
+		public InteractivityExtension Interactivity { get; }
 		public LavalinkExtension Lavalink { get; }
 		public LavalinkNodeConnection LavalinkNode { get; set; }
 		public string LavaPass { get; }
 		public List<GuildMusicData> MusicData { get; }
-        public DiscordUrieConfig Config { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime SocketStart { get; set; }
-        public string[] CmdPrefix = { "/" };
-        public SteamUser SInterface { get; }
+		public DiscordUrieConfig Config { get; set; }
+		public DateTime StartTime { get; set; }
+		public DateTime SocketStart { get; set; }
+		public string[] CmdPrefix = { "/" };
+		public SteamUser SInterface { get; }
 		public SteamStore SStore { get; }
 		public PlayerService SPlayerService { get; }
-        public SQLiteConnection SQLConn { get; }
-        public DiscordUrieSettings SettingsInstance { get; }
+		public SQLiteConnection SQLConn { get; }
+		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
 
-        public DiscordUrie(DiscordUrieConfig cfg)
-        {
-            SettingsInstance = new DiscordUrieSettings();
+		public DiscordUrie(DiscordUrieConfig cfg)
+		{
+			SettingsInstance = new DiscordUrieSettings();
 
-            SQLConn = new SQLiteConnection("Data Source=DiscordUrieConfig.db;Version=3;");
+			SQLConn = new SQLiteConnection("Data Source=DiscordUrieConfig.db;Version=3;");
 
 			this.StartTime = DateTime.Now;
-            this.Config = cfg;
+			this.Config = cfg;
 			this.MusicData = new List<GuildMusicData>();
 			this.LockedOutUsers = new List<DiscordMember>();
-            string token;
-            string steamKey;
+			string token;
+			string steamKey;
 
-            if (!File.Exists("token.txt"))
+			if (!File.Exists("token.txt"))
 			{
 				Console.Write("Token file not found. Please input a Discord bot token: ");
 				token = Console.ReadLine();
@@ -62,7 +62,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 			else
 			{
-			    token = File.ReadAllText("token.txt");
+				token = File.ReadAllText("token.txt");
 			}
 
 			if (!File.Exists("steamkey.txt"))
@@ -88,14 +88,14 @@ namespace DiscordUrie_DSharpPlus
 			{
 				this.LavaPass = File.ReadAllText("lavapass.txt");
 			}
-            
-            this.Client = new DiscordClient(new DiscordConfiguration
-            {
+			
+			this.Client = new DiscordClient(new DiscordConfiguration
+			{
 				Token = token,
 				UseInternalLogHandler = true,
-            });
+			});
 
-            this.Client.Ready += this.Client_Ready;
+			this.Client.Ready += this.Client_Ready;
 			this.Client.ClientErrored += this.ErrorHandler;
 			this.Client.GuildMemberRemoved += this.UserLeaveGuild;
 			this.Client.GuildAvailable += this.GuildAvailable;
@@ -115,7 +115,7 @@ namespace DiscordUrie_DSharpPlus
 				}
 			};
 
-            var depend = new ServiceCollection()
+			var depend = new ServiceCollection()
 				.AddSingleton(this)
 				.BuildServiceProvider();
 
@@ -130,19 +130,19 @@ namespace DiscordUrie_DSharpPlus
 
 			this.Lavalink = Client.UseLavalink();
 
-            this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
+			this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
 			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration());
 
-            this.SInterface = new SteamUser(steamKey);
+			this.SInterface = new SteamUser(steamKey);
 			this.SStore = new SteamStore();
 			this.SPlayerService = new PlayerService(steamKey);
 
-        }
+		}
 
-        public async Task StartAsync()
-        {
-            await this.Client.ConnectAsync();
-        }
+		public async Task StartAsync()
+		{
+			await this.Client.ConnectAsync();
+		}
 	
 		private async Task ChatBansEventCall(MessageCreateEventArgs e)
 		{
@@ -185,8 +185,8 @@ namespace DiscordUrie_DSharpPlus
 		{	
 			var LavaConfig = new LavalinkConfiguration
 			{
-				    RestEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
-    				SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
+					RestEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
+					SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
 					Password = this.LavaPass
 			};
 			this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
@@ -230,5 +230,5 @@ namespace DiscordUrie_DSharpPlus
 			await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) left the guild.");
 
 		}
-    }
+	}
 }
