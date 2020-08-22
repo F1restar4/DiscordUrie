@@ -4,11 +4,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00709" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00709" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00709" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00709" />
-    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-nightly-00709" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00712" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00712" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00712" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00712" />
+    <PackageReference Include="DSharpPlus.VoiceNext" Version="4.0.0-nightly-00712" />
     <PackageReference Include="Emzi0767.Microsoft.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Emzi0767.Microsoft.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.0.0" />

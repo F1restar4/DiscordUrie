@@ -171,7 +171,6 @@ namespace DiscordUrie_DSharpPlus
 				return;
 			}
 
-			// execution succeeded
 			embed = new DiscordEmbedBuilder
 			{
 				Title = "Evaluation successful",
