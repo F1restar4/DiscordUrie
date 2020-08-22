@@ -10,9 +10,9 @@ using Newtonsoft.Json;
 
 namespace DiscordUrie_DSharpPlus
 {
-    public partial class Commands : BaseCommandModule
-    {
-        [Command("raw"), Description("Supplies information about a givin object")]
+	public partial class Commands : BaseCommandModule
+	{
+		[Command("raw"), Description("Supplies information about a givin object")]
 		public async Task Raw(CommandContext ctx, DiscordMessage msg)
 		{
 			await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(msg, Formatting.Indented)}\n```");
@@ -41,5 +41,5 @@ namespace DiscordUrie_DSharpPlus
 		{
 			await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(guild, Formatting.Indented)}\n```");
 		}
-    }
+	}
 }
