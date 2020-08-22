@@ -26,7 +26,7 @@ namespace DiscordUrie_DSharpPlus
 			if (span.TotalDays >= 1)
 				return Task.FromResult(span.ToString(@"dd\:hh\:mm\:ss"));
 
-            return Task.FromResult(span.ToString(@"hh\:mm\:ss"));
+			return Task.FromResult(span.ToString(@"hh\:mm\:ss"));
 
 		}
 	}

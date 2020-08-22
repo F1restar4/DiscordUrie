@@ -10,9 +10,9 @@ using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
-    public partial class Commands : BaseCommandModule
-    {
-        [Group("spam"), Description("Spam remove group"), Aliases("s"), RequireAuth]
+	public partial class Commands : BaseCommandModule
+	{
+		[Group("spam"), Description("Spam remove group"), Aliases("s"), RequireAuth]
 		public class SpamStuffGroup : BaseCommandModule
 		{
 
@@ -85,5 +85,5 @@ namespace DiscordUrie_DSharpPlus
 
 			}
 		}
-    }
+	}
 }
