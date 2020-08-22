@@ -78,7 +78,7 @@ namespace DiscordUrie_DSharpPlus
 			[Command("add"), Description("Adds a user to the ban list")]
 			public async Task AddBan(CommandContext ctx, [Description("The user id to add")] DiscordMember user)
 			{
-                var util = new Util(discordUrie);
+				var util = new Util(discordUrie);
 				bool success = await util.AddBan(ctx.Client, user.Id, ctx.Guild);
 
 				if (success == true)
