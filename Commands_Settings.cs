@@ -19,6 +19,7 @@ namespace DiscordUrie_DSharpPlus
                 this.discordUrie = du;
             }
 
+            [Command("NotificationChannel")]
             public async Task NotificationChannel(CommandContext ctx)
             {
                 var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
@@ -32,7 +33,7 @@ namespace DiscordUrie_DSharpPlus
                         Out = $"set to {ctx.Guild.GetDefaultChannel().Mention}";
                         break;
                     default:
-                        Out = $"set to {ctx.Guild.GetChannel(GuildSettings.NotificationChannel)}";
+                        Out = $"set to {ctx.Guild.GetChannel(GuildSettings.NotificationChannel).Mention}";
                         break;
                 }
                 await ctx.RespondAsync($"Notifications currently {Out}");
