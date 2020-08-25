@@ -98,6 +98,7 @@ namespace DiscordUrie_DSharpPlus
 			this.Client.Ready += this.Client_Ready;
 			this.Client.ClientErrored += this.ErrorHandler;
 			this.Client.GuildMemberRemoved += this.UserLeaveGuild;
+			this.Client.GuildMemberAdded += this.UserJoinGuild;
 			this.Client.GuildAvailable += this.GuildAvailable;
 			this.Client.GuildDeleted += this.GuildDeleted;
 			this.Client.SocketOpened += async () =>
@@ -203,6 +204,17 @@ namespace DiscordUrie_DSharpPlus
 
 			await e.Client.UpdateStatusAsync(this.Config.StartupActivity, UserStatus.Online);
 			e.Client.DebugLogger.LogMessage(LogLevel.Info, "Discord Urie", "Connected successfully", DateTime.Now);
+		}
+
+		private async Task UserJoinGuild(GuildMemberAddEventArgs e)
+		{
+			if (e.Member.IsCurrent) return;
+
+			var GuildSettings = await this.Config.FindGuildSettings(e.Guild);
+			if (GuildSettings.AutoRole == 0) return;
+
+			var role = e.Guild.GetRole(GuildSettings.AutoRole);
+			await e.Member.GrantRoleAsync(role, "Auto role");
 		}
 
 		private async Task UserLeaveGuild(GuildMemberRemoveEventArgs e)

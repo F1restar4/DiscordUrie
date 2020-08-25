@@ -67,6 +67,51 @@ namespace DiscordUrie_DSharpPlus
                     await ctx.RespondAsync("Notifications disabled.");
                 }
             }
+       
+            [Command("Autorole")]
+            public async Task AutoRole(CommandContext ctx)
+            {
+                var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
+                if (GuildSettings.AutoRole == 0)
+                {
+                    await ctx.RespondAsync("Autorole is currently disabled.");
+                }
+                else
+                {
+                    var role = ctx.Guild.GetRole(GuildSettings.AutoRole);
+                    await ctx.RespondAsync($"Autorole is set to {role.Mention}");
+                }
+            }
+
+            [Command("Autorole")]
+            public async Task AutoRole(CommandContext ctx, DiscordRole role)
+            {
+                var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
+                if (GuildSettings.AutoRole == role.Id)
+                    return;
+                this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
+                GuildSettings.AutoRole = role.Id;
+                this.discordUrie.Config.GuildSettings.Add(GuildSettings);
+                await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
+                await ctx.RespondAsync($"Autorole set to {role.Mention}");
+            }
+
+            [Command("Autorole")]
+            public async Task AutoRole(CommandContext ctx, string command)
+            {
+                if (command == "disable" || command == "off" || command == "false")
+                {
+                    var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
+                    if (GuildSettings.AutoRole == 0)
+                        return;
+                    this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
+                    GuildSettings.AutoRole = 0;
+                    this.discordUrie.Config.GuildSettings.Add(GuildSettings);
+                    await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
+                    await ctx.RespondAsync("Autorole disabled");
+                }
+            }
+
         }
 
     }
