@@ -19,6 +19,25 @@ namespace DiscordUrie_DSharpPlus
                 this.discordUrie = du;
             }
 
+            public async Task NotificationChannel(CommandContext ctx)
+            {
+                var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
+                string Out;
+                switch (GuildSettings.NotificationChannel)
+                {
+                    case 0:
+                        Out = "disabled.";
+                        break;
+                    case 1:
+                        Out = $"set to {ctx.Guild.GetDefaultChannel().Mention}";
+                        break;
+                    default:
+                        Out = $"set to {ctx.Guild.GetChannel(GuildSettings.NotificationChannel)}";
+                        break;
+                }
+                await ctx.RespondAsync($"Notifications currently {Out}");
+            }
+
             [Command("NotificationChannel")]
             public async Task NotificationChannel(CommandContext ctx, DiscordChannel channel)
             {
