@@ -18,7 +18,7 @@ namespace DiscordUrie_DSharpPlus
 			await conn.OpenAsync();
 			var command = new SQLiteCommand("CREATE TABLE IF NOT EXISTS config (Id UNSIGNED INTEGER PRIMARY KEY," +
 											"ColorEnabled INTEGER, ColorLocked INTEGER, ColorBlacklistMode INTEGER, ColorBlacklist TEXT," +
-											"BansEnabled INTEGER, BannedIds TEXT, Admins TEXT, Tags TEXT);", conn);
+											"BansEnabled INTEGER, BannedIds TEXT, Admins TEXT, Tags TEXT, NotificationChannel INTEGER);", conn);
 			var pee = await command.ExecuteNonQueryAsync();
 			conn.Close();
 			return pee;
@@ -78,7 +78,8 @@ namespace DiscordUrie_DSharpPlus
 					ColorBlacklist = JsonConvert.DeserializeObject<List<ulong>>((string)reader["ColorBlacklist"]),
 					BansEnabled = Convert.ToBoolean(reader["BansEnabled"]),
 					BannedIds = JsonConvert.DeserializeObject<List<ulong>>((string)reader["BannedIds"]),
-					Tags = JsonConvert.DeserializeObject<List<DiscordUrieTag>>((string)reader["Tags"])
+					Tags = JsonConvert.DeserializeObject<List<DiscordUrieTag>>((string)reader["Tags"]),
+					NotificationChannel = Convert.ToUInt64(reader["NotificationChannel"])
 				});
 			}
 			conn.Close();
@@ -204,6 +205,7 @@ namespace DiscordUrie_DSharpPlus
 			this.BannedIds = new List<ulong>();
 			this.Admins = new List<ulong>();
 			this.Tags = new List<DiscordUrieTag>();
+			this.NotificationChannel = 1;
 		}
 		public async Task<int> SaveGuild(SQLiteConnection conn)
 		{
@@ -215,7 +217,7 @@ namespace DiscordUrie_DSharpPlus
 			};
 			var command = new SQLiteCommand($"INSERT OR REPLACE INTO config VALUES(@Id, " +
 			"@ColorEnabled, @ColorLocked, @ColorBlacklistMode, @ColorBlacklist, " +
-			"@BansEnabled, @BannedIds, @Admins, @Tags)", conn);
+			"@BansEnabled, @BannedIds, @Admins, @Tags, @NotificationChannel)", conn);
 			command.Parameters.AddWithValue("@Id", Id);
 			command.Parameters.AddWithValue("@ColorEnabled", ColorEnabled);
 			command.Parameters.AddWithValue("@ColorLocked", ColorLocked);
@@ -225,6 +227,7 @@ namespace DiscordUrie_DSharpPlus
 			command.Parameters.AddWithValue("@BannedIds", JsonConvert.SerializeObject(BannedIds, serializerSettings));
 			command.Parameters.AddWithValue("@Admins", JsonConvert.SerializeObject(Admins, serializerSettings));
 			command.Parameters.AddWithValue("@Tags", JsonConvert.SerializeObject(Tags, serializerSettings));
+			command.Parameters.AddWithValue("@NotificationChannel", NotificationChannel);
 			var peeagain = await command.ExecuteNonQueryAsync();
 			conn.Close();
 			return peeagain;
@@ -238,5 +241,6 @@ namespace DiscordUrie_DSharpPlus
 		public List<ulong> BannedIds {get; set;}
 		public List<ulong> Admins {get; set;}
 		public List<DiscordUrieTag> Tags {get; set;}
+		public ulong NotificationChannel {get; set;}
 	}
 }
