@@ -209,11 +209,30 @@ namespace DiscordUrie_DSharpPlus
 		{
 			if (e.Member.IsCurrent) return;
 			
+			var GuildSettings = await this.Config.FindGuildSettings(e.Guild);
+			DiscordChannel channel;
+			switch(GuildSettings.NotificationChannel)
+			{
+				case 0:
+					return;
+				
+				case 1:
+					channel = e.Guild.GetDefaultChannel();
+					break;
+
+				default:
+					channel = e.Guild.GetChannel(GuildSettings.NotificationChannel);
+					break;
+			}
+
+			if (channel == null)
+				return;
+
 			DiscordBan UserBan = await e.Guild.GetBanAsync(e.Member);
 
 			if (UserBan != null)
 			{
-				await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was banned from the guild with the reason `{UserBan.Reason}`");
+				await channel.SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was banned from the guild with the reason `{UserBan.Reason}`");
 				return;
 			}
 
@@ -221,13 +240,13 @@ namespace DiscordUrie_DSharpPlus
 			DiscordAuditLogKickEntry LastKick = (DiscordAuditLogKickEntry)L.FirstOrDefault();
 			if (LastKick != null && LastKick.Target == e.Member)
 			{
-				await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was kicked from the guild with the reason `{LastKick.Reason}`");
+				await channel.SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was kicked from the guild with the reason `{LastKick.Reason}`");
 				return;
 			}
 
 
 
-			await e.Guild.GetDefaultChannel().SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) left the guild.");
+			await channel.SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) left the guild.");
 
 		}
 	}
