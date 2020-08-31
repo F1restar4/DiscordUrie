@@ -103,26 +103,19 @@ namespace DiscordUrie_DSharpPlus
 					return;
 				}
 				LavalinkTrack track;
-				var trackarray = tracks.Tracks.Take(5).ToArray();
+				var trackarray = tracks.Tracks.Take(5);
 				var embed = new DiscordEmbedBuilder
 				{
 					Title = "Track selection",
 					Color = new DiscordColor("#00ffff")
 				};
-				string Out = "";
-				int I = 1;
-				foreach (var cur in trackarray)
-				{
-					Out += $"{I}. {cur.Title} \n";
-					I++;
-				}
-				embed.AddField("Tracks", Out);
+				embed.AddField("Tracks", string.Join("\n", trackarray.Select((xr, index) => $"{index + 1}. {xr.Title}")));
 				var Int = ctx.Client.GetInteractivity();
 				await ctx.RespondAsync(embed: embed.Build());
 				var Message = await Int.WaitForMessageAsync(xr => Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5);
 				if (Message.TimedOut)
 					await ctx.RespondAsync("Response time elapsed.");
-				track = trackarray[Convert.ToInt32(Message.Result.Content) - 1];
+				track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
 				MusicData.Enqueue(track);
 				await ctx.RespondAsync($"Queued {track.Title}");
 				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
