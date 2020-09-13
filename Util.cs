@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -100,7 +101,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 			catch (Exception exc)
 			{
-				Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error removing chat ban. {exc.Message}", DateTime.Now);
+				Client.Logger.Log(LogLevel.Error, "Discord Urie", $"Error removing chat ban. {exc.Message}");
 				throw exc;
 			}
 		}
@@ -126,7 +127,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 			catch (Exception exc)
 			{
-				Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", "Error adding ban to list.", DateTime.Now, exc);
+				Client.Logger.Log(LogLevel.Error, exc, "Discord Urie", "Error adding ban to list.");
 				throw exc;
 			}
 

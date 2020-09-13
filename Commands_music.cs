@@ -25,7 +25,7 @@ namespace DiscordUrie_DSharpPlus
 
 			async Task<LavalinkGuildConnection> Join(DiscordGuild guild, DiscordChannel channel, DiscordMember member)
 			{
-				if (discordUrie.LavalinkNode.GetConnection(guild) != null)
+				if (discordUrie.LavalinkNode.GetGuildConnection(guild) != null)
 				{
 					await channel.SendMessageAsync("Already connected."); 
 					return null;
@@ -45,7 +45,7 @@ namespace DiscordUrie_DSharpPlus
 
 			async Task Leave(DiscordGuild guild)
 			{
-				var connection = discordUrie.LavalinkNode.GetConnection(guild);
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(guild);
 				var MusicData = this.musicData.First(xr => xr.GuildId == guild.Id);
 				if (connection == null || !connection.IsConnected)
 				{
@@ -58,7 +58,7 @@ namespace DiscordUrie_DSharpPlus
 
 			async Task Play(DiscordGuild guild)
 			{
-				var connection = discordUrie.LavalinkNode.GetConnection(guild);
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(guild);
 				var MusicData = this.musicData.First(xr => xr.GuildId == guild.Id);
 				if (connection == null || !connection.IsConnected)
 					return;
@@ -92,7 +92,7 @@ namespace DiscordUrie_DSharpPlus
 			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
 			public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
 			{
-				var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				if (connection == null) 
 					connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
 				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
@@ -126,7 +126,7 @@ namespace DiscordUrie_DSharpPlus
 			[Command("clear"), Description("Clear the queue.")]
 			public async Task Clear(CommandContext ctx)
 			{
-				var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				var MusicData = this.musicData.FirstOrDefault(xr => xr.GuildId == ctx.Guild.Id);
 				if (connection == null)
 				{
@@ -147,7 +147,7 @@ namespace DiscordUrie_DSharpPlus
 			[Command("stop"), Description("Same as leave.")]
 			public async Task Stop(CommandContext ctx)
 			{
-				var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				if (connection != null)
 					return;
 
@@ -159,7 +159,7 @@ namespace DiscordUrie_DSharpPlus
 			[Command("skip"), Description("Skips the current song.")]
 			public async Task Skip(CommandContext ctx)
 			{
-				var connection = discordUrie.LavalinkNode.GetConnection(ctx.Guild);
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				await connection.SeekAsync(connection.CurrentState.CurrentTrack.Length);
 				await ctx.RespondAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
 			}
