@@ -16,6 +16,7 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using SteamWebAPI2.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -92,7 +93,8 @@ namespace DiscordUrie_DSharpPlus
 			this.Client = new DiscordClient(new DiscordConfiguration
 			{
 				Token = token,
-				UseInternalLogHandler = true,
+				MinimumLogLevel = LogLevel.Information,
+				
 			});
 
 			this.Client.Ready += this.Client_Ready;
@@ -163,7 +165,7 @@ namespace DiscordUrie_DSharpPlus
 
 		private Task ErrorHandler(ClientErrorEventArgs e)
 		{
-			e.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}", DateTime.Now);
+			e.Client.Logger.Log(LogLevel.Error, "Discord Urie", $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}");
 			return Task.CompletedTask;
 		}
 
@@ -178,7 +180,7 @@ namespace DiscordUrie_DSharpPlus
 			if (!e.Unavailable)
 			{
 				await this.Config.RemoveGuild(e.Guild.Id);
-				e.Client.DebugLogger.LogMessage(LogLevel.Info, "DicordUrie", $"Removed from guild: {e.Guild.Name}", DateTime.Now);
+				e.Client.Logger.Log(LogLevel.Information, "DicordUrie", $"Removed from guild: {e.Guild.Name}");
 			}
 		}
 
@@ -203,7 +205,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			await e.Client.UpdateStatusAsync(this.Config.StartupActivity, UserStatus.Online);
-			e.Client.DebugLogger.LogMessage(LogLevel.Info, "Discord Urie", "Connected successfully", DateTime.Now);
+			e.Client.Logger.Log(LogLevel.Information, "Discord Urie", "Connected successfully");
 		}
 
 		private async Task UserJoinGuild(GuildMemberAddEventArgs e)

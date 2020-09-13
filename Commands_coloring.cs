@@ -9,6 +9,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
 using DiscordUrie_DSharpPlus.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -102,9 +103,7 @@ namespace DiscordUrie_DSharpPlus
 				catch (Exception ex)
 				{
 					await ctx.RespondAsync($"Something went wrong! {ex.Message}");
-
-
-					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}", DateTime.Now);
+					ctx.Client.Logger.Log(LogLevel.Error, ex, "Error in setting color");
 				}
 			}
 
@@ -140,7 +139,6 @@ namespace DiscordUrie_DSharpPlus
 					catch
 					{
 						await cur.DeleteAsync("Color role purge.");
-						ctx.Client.DebugLogger.LogMessage(LogLevel.Debug, "DiscordUrie", $"CPurge: {user.Username}", DateTime.Now);
 						i++;
 						continue;
 					}
@@ -169,7 +167,7 @@ namespace DiscordUrie_DSharpPlus
 				catch (Exception ex)
 				{
 					await ctx.RespondAsync($"Something went wrong! {ex.Message}");
-					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}", DateTime.Now);
+					ctx.Client.Logger.Log(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}");
 				}
 			}
 
@@ -192,7 +190,7 @@ namespace DiscordUrie_DSharpPlus
 				catch (Exception ex)
 				{
 					await ctx.RespondAsync($"Something went wrong! {ex.Message}");
-					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}", DateTime.Now);
+					ctx.Client.Logger.Log(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}");
 				}
 			}
 
@@ -212,7 +210,7 @@ namespace DiscordUrie_DSharpPlus
 				catch (Exception ex)
 				{
 					await ctx.RespondAsync($"Something went wrong! {ex.Message}");
-					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Discord Urie", $"Error getting user's color; {ex.Message}", DateTime.Now);
+					ctx.Client.Logger.Log(LogLevel.Error, "Discord Urie", $"Error getting user's color; {ex.Message}");
 				}
 			}
 		

@@ -7,6 +7,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DiscordUrie_DSharpPlus.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -63,7 +64,7 @@ namespace DiscordUrie_DSharpPlus
 
 					await ctx.Channel.DeleteMessagesAsync(FilteredMessages, "Spam Removal Command Deletion");
 
-					ctx.Client.DebugLogger.LogMessage(LogLevel.Info, "Discord Urie", $"Removed {FilteredMessages.Count()} matching messages.", DateTime.Now);
+					ctx.Client.Logger.Log(Microsoft.Extensions.Logging.LogLevel.Information, "Discord Urie", $"Removed {FilteredMessages.Count()} matching messages.");
 
 					await InitRemoveMessage.ModifyAsync($"Removed {FilteredMessages.Count()} matching messages.");
 					await Task.Delay(3000);
@@ -74,7 +75,7 @@ namespace DiscordUrie_DSharpPlus
 				catch (Exception ex)
 				{
 					DiscordMessage ErrorMessage = await ctx.RespondAsync($"Something went wrong: {ex.Message}");
-					ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Dicord Urie", $"Error in /s remove; {ex.Message}", DateTime.Now);
+					ctx.Client.Logger.Log(LogLevel.Error, "Dicord Urie", $"Error in /s remove; {ex.Message}");
 
 					await Task.Delay(5000);
 
