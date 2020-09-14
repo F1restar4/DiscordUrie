@@ -101,7 +101,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 			catch (Exception exc)
 			{
-				Client.Logger.Log(LogLevel.Error, "Discord Urie", $"Error removing chat ban. {exc.Message}");
+				Client.Logger.Log(LogLevel.Error, $"Error removing chat ban. {exc.Message}");
 				throw exc;
 			}
 		}
@@ -127,7 +127,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 			catch (Exception exc)
 			{
-				Client.Logger.Log(LogLevel.Error, exc, "Discord Urie", "Error adding ban to list.");
+				Client.Logger.Log(LogLevel.Error, exc, "Error adding ban to list.");
 				throw exc;
 			}
 

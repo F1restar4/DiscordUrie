@@ -165,7 +165,7 @@ namespace DiscordUrie_DSharpPlus
 
 		private Task ErrorHandler(ClientErrorEventArgs e)
 		{
-			e.Client.Logger.Log(LogLevel.Error, "Discord Urie", $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}");
+			e.Client.Logger.Log(LogLevel.Error, $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}");
 			return Task.CompletedTask;
 		}
 
@@ -180,7 +180,7 @@ namespace DiscordUrie_DSharpPlus
 			if (!e.Unavailable)
 			{
 				await this.Config.RemoveGuild(e.Guild.Id);
-				e.Client.Logger.Log(LogLevel.Information, "DicordUrie", $"Removed from guild: {e.Guild.Name}");
+				e.Client.Logger.Log(LogLevel.Information, $"Removed from guild: {e.Guild.Name}");
 			}
 		}
 
@@ -205,7 +205,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			await e.Client.UpdateStatusAsync(this.Config.StartupActivity, UserStatus.Online);
-			e.Client.Logger.Log(LogLevel.Information, "Discord Urie", "Connected successfully");
+			e.Client.Logger.Log(LogLevel.Information, "Connected successfully");
 		}
 
 		private async Task UserJoinGuild(GuildMemberAddEventArgs e)
