@@ -8,6 +8,9 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DiscordUrie_DSharpPlus.Attributes;
 using Newtonsoft.Json;
+using ScpListSharp.Entities;
+using ScpListSharp;
+using System.Text.RegularExpressions;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -209,6 +212,33 @@ namespace DiscordUrie_DSharpPlus
 		public async Task msg(CommandContext ctx, DiscordMessage msg)
 		{
 			await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(msg, Formatting.Indented)}\n```");
+		}
+
+		[Command("scp")]
+		public async Task Scp(CommandContext ctx)
+		{
+			List<SCPServer> ServerList;
+			try
+			{
+				ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey);
+			}
+			catch (Exception ex)
+			{
+				await ctx.RespondAsync(ex.Message);
+				return;
+			}
+			var TargetServer = ServerList.First();
+			var FixedInfo = Regex.Replace(TargetServer.Info, "<[^>]+>", "");
+			FixedInfo = FixedInfo.Substring(0, FixedInfo.Length-12);
+			DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+			builder.Title = FixedInfo;
+			builder.WithColor(new DiscordColor("#00ffff"));
+			builder.AddField("Players", TargetServer.Players);
+			builder.AddField("Friendly fire", TargetServer.FF.ToString());
+			builder.AddField("Version", TargetServer.Version);
+			builder.AddField("Modded", TargetServer.Modded.ToString());
+			await ctx.RespondAsync(embed: builder.Build());
+
 		}
 	}
 }

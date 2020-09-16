@@ -39,6 +39,8 @@ namespace DiscordUrie_DSharpPlus
 		public SQLiteConnection SQLConn { get; }
 		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
+		public int SCPID { get; set; }
+		public string SCPKey { get; set; }
 
 		public DiscordUrie(DiscordUrieConfig cfg)
 		{
@@ -80,7 +82,7 @@ namespace DiscordUrie_DSharpPlus
 
 			if (!File.Exists("lavapass.txt"))
 			{
-				Console.Write("Input the lavalink server password");
+				Console.Write("Input the lavalink server password: ");
 				this.LavaPass = Console.ReadLine();
 				File.WriteAllText("lavapass.txt", this.LavaPass);
 				Console.Clear();
@@ -88,6 +90,22 @@ namespace DiscordUrie_DSharpPlus
 			else
 			{
 				this.LavaPass = File.ReadAllText("lavapass.txt");
+			}
+
+			if (!File.Exists("ScpInfo.txt"))
+			{
+				Console.Write("Input your SCP account ID");
+				this.SCPID = Convert.ToInt32(Console.ReadLine());
+				Console.Write("Input your SCP server api key: ");
+				this.SCPKey = Console.ReadLine();
+				string[] data = {this.SCPID.ToString(), this.SCPKey};
+				File.WriteAllLines("ScpInfo.txt", data);
+			}
+			else
+			{
+				var data = File.ReadAllLines("ScpInfo.txt");
+				this.SCPID = Convert.ToInt32(data[0]);
+				this.SCPKey = data[1];
 			}
 			
 			this.Client = new DiscordClient(new DiscordConfiguration
