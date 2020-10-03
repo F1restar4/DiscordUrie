@@ -71,10 +71,10 @@ namespace DiscordUrie_DSharpPlus
 				await MusicData.UpdateChannel.SendMessageAsync($"Playing `{MusicData.NowPlaying.Title}`");
 			}
 
-			async Task PlaybackFinished(TrackFinishEventArgs e)
+			async Task PlaybackFinished(LavalinkGuildConnection conn, TrackFinishEventArgs e)
 			{
 				if (e.Reason != TrackEndReason.Finished) return;
-				var MusicData = this.musicData.First(xr => xr.GuildId == e.Player.Guild.Id);
+				var MusicData = this.musicData.First(xr => xr.GuildId == conn.Guild.Id);
 				if (MusicData.Queue.Count == 0)
 					await this.Leave(e.Player.Guild);
 
