@@ -121,14 +121,14 @@ namespace DiscordUrie_DSharpPlus
 			this.Client.GuildMemberAdded += this.UserJoinGuild;
 			this.Client.GuildAvailable += this.GuildAvailable;
 			this.Client.GuildDeleted += this.GuildDeleted;
-			this.Client.SocketOpened += async () =>
+			this.Client.SocketOpened += async (client, e) =>
 			{
 				await Task.Yield();
 				this.SocketStart = DateTime.Now;
 			};
 
 
-			this.Client.MessageCreated += async e =>
+			this.Client.MessageCreated += async (client, e) =>
 			{
 				if (!e.Author.IsBot)
 				{
@@ -181,28 +181,28 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
-		private Task ErrorHandler(ClientErrorEventArgs e)
+		private Task ErrorHandler(DiscordClient client, ClientErrorEventArgs e)
 		{
-			e.Client.Logger.Log(LogLevel.Error, $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}");
+			client.Logger.Log(LogLevel.Error, $"{e.Exception.GetType()} in the event {e.EventName}. {e.Exception.Message}");
 			return Task.CompletedTask;
 		}
 
-		private async Task GuildAvailable(GuildCreateEventArgs e)
+		private async Task GuildAvailable(DiscordClient client, GuildCreateEventArgs e)
 		{
 			if (!this.Config.GuildSettings.Any(xr => xr.Id == e.Guild.Id))
 				 await this.Config.AddGuild(e.Guild);
 		}
 
-		private async Task GuildDeleted(GuildDeleteEventArgs e)
+		private async Task GuildDeleted(DiscordClient client, GuildDeleteEventArgs e)
 		{
 			if (!e.Unavailable)
 			{
 				await this.Config.RemoveGuild(e.Guild.Id);
-				e.Client.Logger.Log(LogLevel.Information, $"Removed from guild: {e.Guild.Name}");
+				client.Logger.Log(LogLevel.Information, $"Removed from guild: {e.Guild.Name}");
 			}
 		}
 
-		private async Task Client_Ready(ReadyEventArgs e)
+		private async Task Client_Ready(DiscordClient client, ReadyEventArgs e)
 		{	
 			var LavaConfig = new LavalinkConfiguration
 			{
@@ -216,17 +216,17 @@ namespace DiscordUrie_DSharpPlus
 			{
 				List<DiscordGuild> Yes = new List<DiscordGuild>();
 
-				Yes.AddRange(e.Client.Guilds.Values);
+				Yes.AddRange(client.Guilds.Values);
 
-				this.Config = await this.SettingsInstance.CreateAllDefaultSettings(e.Client, this.SQLConn);
+				this.Config = await this.SettingsInstance.CreateAllDefaultSettings(client, this.SQLConn);
 				await this.Config.SaveSettings(SQLConn);
 			}
 
-			await e.Client.UpdateStatusAsync(this.Config.StartupActivity, UserStatus.Online);
-			e.Client.Logger.Log(LogLevel.Information, "Connected successfully");
+			await client.UpdateStatusAsync(this.Config.StartupActivity, UserStatus.Online);
+			client.Logger.Log(LogLevel.Information, "Connected successfully");
 		}
 
-		private async Task UserJoinGuild(GuildMemberAddEventArgs e)
+		private async Task UserJoinGuild(DiscordClient client, GuildMemberAddEventArgs e)
 		{
 			if (e.Member.IsCurrent) return;
 
@@ -237,7 +237,7 @@ namespace DiscordUrie_DSharpPlus
 			await e.Member.GrantRoleAsync(role, "Auto role");
 		}
 
-		private async Task UserLeaveGuild(GuildMemberRemoveEventArgs e)
+		private async Task UserLeaveGuild(DiscordClient client, GuildMemberRemoveEventArgs e)
 		{
 			if (e.Member.IsCurrent) return;
 			
