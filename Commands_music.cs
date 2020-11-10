@@ -94,18 +94,20 @@ namespace DiscordUrie_DSharpPlus
 			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
 			public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
 			{
-				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
-				if (connection == null) 
-					connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
-				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
 				if (tracks.Tracks.Count() == 0)
 				{
 					await ctx.RespondAsync("No matches found.");
 					return;
 				}
+
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
+				if (connection == null) 
+					connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
+				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				LavalinkTrack track;
 				var trackarray = tracks.Tracks.Take(5);
+
 				var embed = new DiscordEmbedBuilder
 				{
 					Title = "Track selection",
@@ -115,6 +117,7 @@ namespace DiscordUrie_DSharpPlus
 				var Int = ctx.Client.GetInteractivity();
 				await ctx.RespondAsync(embed: embed.Build());
 				var Message = await Int.WaitForMessageAsync(xr => Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5);
+				
 				if (Message.TimedOut)
 					await ctx.RespondAsync("Response time elapsed.");
 				track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
