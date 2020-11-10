@@ -9,6 +9,8 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
+
 namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : BaseCommandModule

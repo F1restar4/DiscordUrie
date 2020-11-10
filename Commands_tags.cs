@@ -10,6 +10,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
@@ -159,7 +160,7 @@ namespace DiscordUrie_DSharpPlus
 				string EditedTags = String.Join("\n", TagKeys);
 
 
-				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, SplitType.Line));
+				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
 			}
 
 			[Command("info"), Description("Gives information about a tag")]
