@@ -113,7 +113,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				Token = token,
 				MinimumLogLevel = LogLevel.Information,
-				
+				Intents = DiscordIntents.All,
 			});
 
 			this.Client.Ready += this.Client_Ready;
