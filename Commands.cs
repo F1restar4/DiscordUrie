@@ -74,7 +74,7 @@ namespace DiscordUrie_DSharpPlus
 			List<SCPServer> ServerList;
 			try
 			{
-				ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey);
+				ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey, false, PlayerList: false, Pastebin: false, Flags: false, Nicknames: false);
 			}
 			catch (Exception ex)
 			{
