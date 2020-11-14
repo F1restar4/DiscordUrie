@@ -15,7 +15,6 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
-using SteamWebAPI2.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -34,9 +33,6 @@ namespace DiscordUrie_DSharpPlus
 		public DateTime StartTime { get; set; }
 		public DateTime SocketStart { get; set; }
 		public string[] CmdPrefix = { "/" };
-		public SteamUser SInterface { get; }
-		public SteamStore SStore { get; }
-		public PlayerService SPlayerService { get; }
 		public SQLiteConnection SQLConn { get; }
 		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
@@ -54,7 +50,6 @@ namespace DiscordUrie_DSharpPlus
 			this.MusicData = new List<GuildMusicData>();
 			this.LockedOutUsers = new List<DiscordMember>();
 			string token;
-			string steamKey;
 
 			if (!File.Exists("token.txt"))
 			{
@@ -67,18 +62,6 @@ namespace DiscordUrie_DSharpPlus
 			else
 			{
 				token = File.ReadAllText("token.txt");
-			}
-
-			if (!File.Exists("steamkey.txt"))
-			{
-				Console.Write("Input a steam api key: ");
-				steamKey = Console.ReadLine();
-				File.WriteAllText("steamkey.txt", steamKey);
-				Console.Clear();
-			}
-			else
-			{
-				steamKey = File.ReadAllText("steamkey.txt");
 			}
 
 			if (!File.Exists("lavapass.txt"))
@@ -154,11 +137,6 @@ namespace DiscordUrie_DSharpPlus
 
 			this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
 			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration());
-
-			this.SInterface = new SteamUser(steamKey);
-			this.SStore = new SteamStore();
-			this.SPlayerService = new PlayerService(steamKey);
-
 		}
 
 		public async Task StartAsync()
