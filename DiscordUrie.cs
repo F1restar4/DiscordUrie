@@ -255,8 +255,6 @@ namespace DiscordUrie_DSharpPlus
 				return;
 			}
 
-
-
 			await channel.SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) left the guild.");
 
 		}
