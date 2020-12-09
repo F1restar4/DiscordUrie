@@ -87,6 +87,7 @@ namespace DiscordUrie_DSharpPlus
 			DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
 			builder.Title = FixedInfo;
 			builder.WithColor(new DiscordColor("#00ffff"));
+			builder.AddField("Online", TargetServer.Online.ToString());
 			builder.AddField("Players", TargetServer.Players);
 			builder.AddField("Friendly fire", TargetServer.FF.ToString());
 			builder.AddField("Version", TargetServer.Version);
