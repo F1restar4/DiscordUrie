@@ -74,7 +74,7 @@ namespace DiscordUrie_DSharpPlus
 			List<SCPServer> ServerList;
 			try
 			{
-				ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey, false, PlayerList: false, Pastebin: false, Flags: false, Nicknames: false);
+				ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey, Players: true, Info: true, Version: true, Online: true);
 			}
 			catch (Exception ex)
 			{
@@ -83,7 +83,6 @@ namespace DiscordUrie_DSharpPlus
 			}
 			var TargetServer = ServerList.First();
 			var FixedInfo = Regex.Replace(TargetServer.Info, "<[^>]+>", "");
-			FixedInfo = FixedInfo.Substring(0, FixedInfo.Length-12);
 			DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
 			builder.Title = FixedInfo;
 			builder.WithColor(new DiscordColor("#00ffff"));
