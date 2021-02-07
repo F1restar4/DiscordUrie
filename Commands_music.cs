@@ -123,6 +123,7 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.RespondAsync("Response time elapsed.");
 					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
 						await this.Leave(ctx.Guild);
+					return;
 				}
 
 				track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
