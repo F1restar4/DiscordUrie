@@ -119,7 +119,12 @@ namespace DiscordUrie_DSharpPlus
 				var Message = await Int.WaitForMessageAsync(xr => Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5);
 				
 				if (Message.TimedOut)
+				{
 					await ctx.RespondAsync("Response time elapsed.");
+					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
+						await this.Leave(ctx.Guild);
+				}
+
 				track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
 				MusicData.Enqueue(track);
 				await ctx.RespondAsync($"Queued {track.Title}");
