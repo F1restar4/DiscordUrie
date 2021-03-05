@@ -89,6 +89,8 @@ namespace DiscordUrie_DSharpPlus
 			public DiscordUrie discordUrie;
 		}
 
+		//This command's code is almost entirely written by Emzi0767 and falls under the Apache License 2.0.
+		//Taken from: https://github.com/Emzi0767/Discord-Companion-Cube-Bot/
 		[Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
 		public async Task EvaluateAsync(CommandContext ctx, [RemainingText, Description("Code to evaluate.")] string code)
 		{
