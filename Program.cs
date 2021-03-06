@@ -14,6 +14,7 @@ namespace DiscordUrie_DSharpPlus
 
 		public async Task MainAsync()
 		{
+			//Check for the database file and create it if it doesn't exist
 			if (!File.Exists("DiscordUrieConfig.db"))
 			{
 				SQLiteConnection.CreateFile("DiscordUrieConfig.db");
@@ -22,11 +23,14 @@ namespace DiscordUrie_DSharpPlus
 			{
 				File.Create("activity.json");
 			}
+			//Setup database connection
 			var SQLConn = new SQLiteConnection("Data Source=DiscordUrieConfig.db;Version=3;");
 			var Sett = new DiscordUrieSettings();
 			await Sett.Createdb(SQLConn);
 
-			var DiscordUrie = new DiscordUrie(await Sett.LoadSettings(SQLConn));
+			//Load settings from database and create a new instance of the bot with it
+			var DiscordUrie = new DiscordUrie(await Sett.LoadSettings(SQLConn), SQLConn, Sett);
+			//Start.
 			await DiscordUrie.StartAsync();
 			await Task.Delay(-1);
 		}
