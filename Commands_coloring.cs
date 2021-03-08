@@ -24,15 +24,14 @@ namespace DiscordUrie_DSharpPlus
 				discordUrie = du;
 			}
 
-			public async Task<bool> RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel, bool silent = false)
+			public async Task RemoveColor(DiscordUser user, DiscordGuild server, DiscordChannel channel)
 			{
 				IReadOnlyDictionary<ulong, DiscordRole> roles = server.Roles;
 
 				if (!roles.Any(xr => xr.Value.Name == user.Id.ToString()))
 				{
-					if (silent) return false;
 					await channel.SendMessageAsync("There was no color to remove!");
-					return false;
+					return;
 				}
 
 				DiscordRole cur = roles.First(xr => xr.Value.Name == user.Id.ToString()).Value;
@@ -40,10 +39,10 @@ namespace DiscordUrie_DSharpPlus
 
 				await channel.SendMessageAsync("Color removed successfully.");
 				Console.WriteLine("User {0}'s color was removed.", user.Username);
-				return true;
+				return;
 			}
 
-			public async Task<bool> SetColor(DiscordMember user, DiscordGuild server, DiscordChannel channel, DiscordColor color)
+			public async Task SetColor(DiscordMember user, DiscordGuild server, DiscordChannel channel, DiscordColor color)
 			{
 				IReadOnlyDictionary<ulong, DiscordRole> roles = server.Roles;
 				DiscordRole existingRole = null;
@@ -64,7 +63,7 @@ namespace DiscordUrie_DSharpPlus
 				await channel.SendMessageAsync("Color set successfully.");
 
 				Console.WriteLine("User {0}'s color was set to {1}", user.Username, color.R + ", " + color.G + ", " + color.B);
-				return true;
+				return;
 			}
 
 			public Task<DiscordColor> GetColor(DiscordMember user, DiscordGuild server)
