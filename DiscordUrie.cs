@@ -259,7 +259,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			//Check if the user was kicked
-			//The only way to determine this is throught the audit logs which can make this inconsistent
+			//The only way to determine this is through the audit logs which can make this inconsistent
 			var L = await e.Guild.GetAuditLogsAsync(1, action_type: AuditLogActionType.Kick);
 			DiscordAuditLogKickEntry LastKick = (DiscordAuditLogKickEntry)L.FirstOrDefault();
 			if (LastKick != null && LastKick.Target == e.Member)

@@ -30,7 +30,6 @@ namespace DiscordUrie_DSharpPlus
 		{
 			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n"+
 			$"Socket uptime: {await DateTime.Now.Subtract(discordUrie.SocketStart).ToDuration()}");
-		
 		}
 
 		[Command("lookup"), Description("Looks up info about a user")]
