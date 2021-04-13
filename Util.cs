@@ -46,7 +46,7 @@ namespace DiscordUrie_DSharpPlus
 			if (Member.IsOwner)
 				return Task.FromResult(true);
 
-			ulong[] SuperDuperCoolPeople = { 105076116942811136, 203376733469016064 };
+			ulong[] SuperDuperCoolPeople = { 105076116942811136 };
 
 			if (SuperDuperCoolPeople.Any(xr => xr == Member.Id))
 				return Task.FromResult(true);

@@ -26,7 +26,7 @@ namespace DiscordUrie_DSharpPlus
 		public override async Task BeforeExecutionAsync(CommandContext ctx)
 		{
 			var util = new Util(discordUrie);
-			if (await util.UserAuth(ctx.Member)) return;
+			if (await util.UserAuthHigh(ctx.Member)) return;
 			if (discordUrie.LockedOutUsers.Any(xr => xr == ctx.Member))
 				throw new DSharpPlus.CommandsNext.Exceptions.CommandNotFoundException(ctx.Command.Name);
 		}
