@@ -81,6 +81,32 @@ namespace DiscordUrie_DSharpPlus
 			Environment.Exit(0);
 		}
 
+		[Command("Reboot"), RequireOwner, Hidden]
+		public async Task RebootAsync(CommandContext ctx)
+		{
+			await ctx.RespondAsync("Rebooting...");
+			await Task.Delay(3000);
+			await ctx.Client.DisconnectAsync();
+			try
+			{
+				var Process = new Process();
+				var ProcessStartInfo = new ProcessStartInfo()
+				{
+					WindowStyle = ProcessWindowStyle.Hidden,
+					FileName = "/bin/bash",
+					WorkingDirectory = "/home/bot",
+					Arguments = "-c ./RebootBot.sh"
+				};
+				Process.StartInfo = ProcessStartInfo;
+				Process.Start();
+				Environment.Exit(0);
+			}
+			catch
+			{
+
+			}
+		}
+
 		public class globals
 		{
 			public CommandContext ctx;
