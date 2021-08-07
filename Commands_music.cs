@@ -116,7 +116,7 @@ namespace DiscordUrie_DSharpPlus
 				embed.AddField("Tracks", string.Join("\n", trackarray.Select((xr, index) => $"{index + 1}. {xr.Title}")));
 				var Int = ctx.Client.GetInteractivity();
 				await ctx.RespondAsync(embed: embed.Build());
-				var Message = await Int.WaitForMessageAsync(xr => Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5);
+				var Message = await Int.WaitForMessageAsync(xr => xr.Author == ctx.User &&(Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5));
 				
 				if (Message.TimedOut)
 				{
