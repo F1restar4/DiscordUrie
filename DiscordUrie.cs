@@ -251,11 +251,16 @@ namespace DiscordUrie_DSharpPlus
 				return;
 
 			//Check if the user was banned
-			DiscordBan UserBan = await e.Guild.GetBanAsync(e.Member);
-			if (UserBan != null)
+
+			try
 			{
+				DiscordBan UserBan = await e.Guild.GetBanAsync(e.Member);
 				await channel.SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was banned from the guild with the reason `{UserBan.Reason}`");
 				return;
+			}
+			catch
+			{
+
 			}
 
 			//Check if the user was kicked
