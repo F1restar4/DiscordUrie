@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using ScpListSharp.Entities;
 using ScpListSharp;
 using System.Text.RegularExpressions;
+using Firestar4.ScpBanInfo;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -92,6 +93,31 @@ namespace DiscordUrie_DSharpPlus
 			builder.AddField("Version", TargetServer.Version);
 			builder.AddField("Modded", TargetServer.Modded.ToString());
 			await ctx.RespondAsync(embed: builder.Build());
+
+		}
+
+		[Command("scpbans"), Description("Search for a ban on the scp server"), RequireAuth]
+		public async Task ScpBans(CommandContext ctx, [Description("The string to search by. Searches for the name, id, or ban reason.")]string search)
+		{
+			var data = await ScpBanInfo.GetData();
+			
+			var pop = data.FindAll(xr => search == xr.Target.Name || search == xr.Target.ID.ToString() || search == xr.Reason);
+			if (pop.Count == 0)
+			{
+				await ctx.RespondAsync("No matches found.");
+				return;
+			}
+			var peep = pop.First();
+
+			DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+			builder.Title = $"Ban info for: {peep.Target.Name}";
+			builder.Description = $"ID: {peep.Target.ID.ToString()}";
+			builder.AddField("Reason", peep.Reason);
+			builder.AddField("Admin name", peep.AdminName);
+			builder.AddField("Ban time", peep.BanTime.ToShortDateString());
+			builder.AddField("Unban time", peep.UnbanTime.ToShortDateString());
+			builder.AddField("Ban duration", (peep.BanTime - peep.UnbanTime).ToString("%d' day(s), '%h' hour(s), '%m' minutes, '%s' second(s)'"));
+			await ctx.RespondAsync(builder);
 
 		}
 	}
