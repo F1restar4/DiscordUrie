@@ -97,11 +97,11 @@ namespace DiscordUrie_DSharpPlus
 		}
 
 		[Command("scpbans"), Description("Search for a ban on the scp server"), RequireAuth]
-		public async Task ScpBans(CommandContext ctx, [Description("The string to search by. Searches for the name, id, or ban reason.")]string search)
+		public async Task ScpBans(CommandContext ctx, [Description("The string to search by. Searches for the name, id, or ban reason."), RemainingText]string search)
 		{
 			var data = await ScpBanInfo.GetData();
-			
-			var pop = data.FindAll(xr => search == xr.Target.Name || search == xr.Target.ID.ToString() || search == xr.Reason);
+			string lower = search.ToLower();
+			var pop = data.FindAll(xr => lower == xr.Target.Name.ToLower() || search == xr.Target.ID.ToString() || lower == xr.Reason.ToLower());
 			if (pop.Count == 0)
 			{
 				await ctx.RespondAsync("No matches found.");
