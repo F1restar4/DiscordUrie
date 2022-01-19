@@ -141,7 +141,10 @@ namespace DiscordUrie_DSharpPlus
 
 			this.Lavalink = Client.UseLavalink();
 			this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
-			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration());
+			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration
+			{
+				AckPaginationButtons = true,
+			});
 		}
 
 		public async Task StartAsync()
