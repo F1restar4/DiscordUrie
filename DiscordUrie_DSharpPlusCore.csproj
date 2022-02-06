@@ -21,5 +21,8 @@
     <Reference Include="DiscordUrieScpSsh">
       <HintPath>DiscordUriesScpSsh.dll</HintPath>
     </Reference>
+    <Reference Include = "Firestar4.OpenTDBWrapper">
+      <HintPath>OpenTDBWrapper.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
