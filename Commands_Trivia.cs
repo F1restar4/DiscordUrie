@@ -42,6 +42,8 @@ namespace DiscordUrie_DSharpPlus
             "hyper chad",
             "smartass",
             "cheater",
+            "intellectual",
+            
 
         };
         [Command("trivia")]
@@ -123,7 +125,7 @@ namespace DiscordUrie_DSharpPlus
                 Buttons.Add(new DiscordButtonComponent(DSharpPlus.ButtonStyle.Secondary, cur, cur, true));
             }
             await Result.Interaction.CreateResponseAsync(DSharpPlus.InteractionResponseType.UpdateMessage,
-            new DiscordInteractionResponseBuilder().AddComponents(Buttons.ToArray()).WithContent($"Thats wrong, {Insults.OrderBy(x => Guid.NewGuid()).First()}. How the fuck did you get that wrong?").AddEmbed(embed));
+            new DiscordInteractionResponseBuilder().AddComponents(Buttons.ToArray()).WithContent($"Thats wrong, {Insults.OrderBy(x => Guid.NewGuid()).First()}. The correct answer was `{question.CorrectAnswer}`").AddEmbed(embed));
         }
     }
 
