@@ -24,7 +24,7 @@ namespace DiscordUrie_DSharpPlus
 
 				for (int i = 0; i < Count; i++)
 				{
-					await ctx.RespondAsync(Yes);
+					await ctx.Channel.SendMessageAsync(Yes);
 					await Task.Delay(1000);
 				}
 			}
