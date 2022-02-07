@@ -55,7 +55,7 @@ namespace DiscordUrie_DSharpPlus
             AllAnswers = AllAnswers.OrderBy(a => Guid.NewGuid()).ToList();
             DiscordEmbedBuilder builder = new DiscordEmbedBuilder
             {
-                Title = $"Trivia Question for {ctx.Member.Nickname}",
+                Title = $"Trivia Question for {ctx.Member.DisplayName}",
             };
             builder.AddField(question.Question, "You have twelve seconds.");
             builder.AddField("Difficulty", $"`{question.Difficulty}`", true);
