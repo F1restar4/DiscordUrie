@@ -202,7 +202,7 @@ namespace DiscordUrie_DSharpPlus
 					.Select(xr => new Page(embed: new DiscordEmbedBuilder().WithDescription($"Now playing: {GuildMusicData.NowPlaying.Title}\n\n{string.Join("\n", xr.Select(xg => $"`{xg.index}` {xg.track.Title}"))}").WithColor(new DiscordColor("#00ffff"))))
 					.ToArray();
 
-				await Interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, QueuePages, new DSharpPlus.Interactivity.EventHandling.PaginationButtons());
+				await Interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, QueuePages, new DSharpPlus.Interactivity.EventHandling.PaginationButtons(), timeoutoverride: TimeSpan.FromSeconds(12));
 			}
 		}
 	}

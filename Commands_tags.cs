@@ -160,7 +160,7 @@ namespace DiscordUrie_DSharpPlus
 				string EditedTags = String.Join("\n", TagKeys);
 
 
-				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
+				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line), timeoutoverride: TimeSpan.FromSeconds(12));
 			}
 
 			[Command("info"), Description("Gives information about a tag")]
