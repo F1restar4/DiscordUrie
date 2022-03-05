@@ -9,8 +9,8 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Interactivity.EventHandling;
-using ScpListSharp;
-using ScpListSharp.Entities;
+using Firestar4.ScpListSharp;
+using Firestar4.ScpListSharp.Entities;
 using Firestar4.ScpBanInfo;
 using DiscordUrie_DSharpPlus.Attributes;
 
