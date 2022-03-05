@@ -38,6 +38,7 @@ namespace DiscordUrie_DSharpPlus
 		public List<DiscordMember> LockedOutUsers { get; set; }
 		public int SCPID { get; set; }
 		public string SCPKey { get; set; }
+		public List<ScpListSharp.Entities.SCPServer> CachedServerInfo = new List<ScpListSharp.Entities.SCPServer>();
 
 		public DiscordUrie(DiscordUrieConfig cfg, SQLiteConnection connection, DiscordUrieSettings sett)
 		{

@@ -21,17 +21,25 @@ namespace DiscordUrie_DSharpPlus
         [Command("scp")]
 		public async Task Scp(CommandContext ctx)
 		{
-			List<SCPServer> ServerList;
+			SCPServer TargetServer;
+			DiscordMessageBuilder MessageBuilder = new DiscordMessageBuilder();
 			try
 			{
-				ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey, Players: true, Info: true, Version: true, Online: true);
+				var ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey, Players: true, Info: true, Version: true, Online: true);
+				discordUrie.CachedServerInfo = ServerList;
+				TargetServer = ServerList.First();
 			}
 			catch (Exception ex)
 			{
-				await ctx.RespondAsync(ex.Message);
-				return;
+				if (discordUrie.CachedServerInfo.Count == 0)
+				{
+					await ctx.RespondAsync(ex.Message);
+					return;
+				}
+				TargetServer = discordUrie.CachedServerInfo.First();
+				MessageBuilder.WithContent("Rate limited, displaying cached info.");
 			}
-			var TargetServer = ServerList.First();
+
 			var FixedInfo = Regex.Replace(TargetServer.Info, "<[^>]+>", "");
 			DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
 			builder.Title = FixedInfo;
@@ -41,7 +49,8 @@ namespace DiscordUrie_DSharpPlus
 			builder.AddField("Friendly fire", TargetServer.FF.ToString());
 			builder.AddField("Version", TargetServer.Version);
 			builder.AddField("Modded", TargetServer.Modded.ToString());
-			await ctx.RespondAsync(embed: builder.Build());
+			MessageBuilder.AddEmbed(builder.Build());
+			await ctx.RespondAsync(MessageBuilder);
 
 		}
 
