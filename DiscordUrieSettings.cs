@@ -18,7 +18,7 @@ namespace DiscordUrie_DSharpPlus
 			await conn.OpenAsync();
 			var command = new SQLiteCommand("CREATE TABLE IF NOT EXISTS config (Id UNSIGNED INTEGER PRIMARY KEY," +
 											"ColorEnabled INTEGER, ColorLocked INTEGER, ColorBlacklistMode INTEGER, ColorBlacklist TEXT," +
-											"BansEnabled INTEGER, BannedIds TEXT, Admins TEXT, Tags TEXT, NotificationChannel INTEGER, AutoRole INTEGER);", conn);
+											"Admins TEXT, Tags TEXT, NotificationChannel INTEGER, AutoRole INTEGER);", conn);
 			var pee = await command.ExecuteNonQueryAsync();
 			conn.Close();
 			return pee;
@@ -76,8 +76,6 @@ namespace DiscordUrie_DSharpPlus
 					ColorLocked = Convert.ToBoolean(reader["ColorLocked"]),
 					ColorBlacklistMode = (BlackListModeEnum)Convert.ToInt32(reader["ColorBlacklistMode"]),
 					ColorBlacklist = JsonConvert.DeserializeObject<List<ulong>>((string)reader["ColorBlacklist"]),
-					BansEnabled = Convert.ToBoolean(reader["BansEnabled"]),
-					BannedIds = JsonConvert.DeserializeObject<List<ulong>>((string)reader["BannedIds"]),
 					Tags = JsonConvert.DeserializeObject<List<DiscordUrieTag>>((string)reader["Tags"]),
 					NotificationChannel = Convert.ToUInt64(reader["NotificationChannel"]),
 					AutoRole = Convert.ToUInt64(reader["AutoRole"])
@@ -154,13 +152,6 @@ namespace DiscordUrie_DSharpPlus
 				return NewDefaultServer;
 			}
 		}
-
-		public async Task<List<ulong>> GetChatBanIdList(DiscordGuild Guild)
-		{
-			DiscordUrieGuild GuildSettings = await FindGuildSettings(Guild);
-			return GuildSettings.BannedIds;
-		}
-
 		public async Task<List<DiscordUrieTag>> GetTags(DiscordGuild guild)
 		{
 			DiscordUrieGuild GuildSettings = await FindGuildSettings(guild);
@@ -202,8 +193,6 @@ namespace DiscordUrie_DSharpPlus
 			this.ColorLocked = false;
 			this.ColorBlacklistMode = BlackListModeEnum.Off;
 			this.ColorBlacklist = new List<ulong>();
-			this.BansEnabled = false;
-			this.BannedIds = new List<ulong>();
 			this.Admins = new List<ulong>();
 			this.Tags = new List<DiscordUrieTag>();
 			this.NotificationChannel = 1;
@@ -219,14 +208,12 @@ namespace DiscordUrie_DSharpPlus
 			};
 			var command = new SQLiteCommand($"INSERT OR REPLACE INTO config VALUES(@Id, " +
 			"@ColorEnabled, @ColorLocked, @ColorBlacklistMode, @ColorBlacklist, " +
-			"@BansEnabled, @BannedIds, @Admins, @Tags, @NotificationChannel, @AutoRole)", conn);
+			"@Admins, @Tags, @NotificationChannel, @AutoRole)", conn);
 			command.Parameters.AddWithValue("@Id", Id);
 			command.Parameters.AddWithValue("@ColorEnabled", ColorEnabled);
 			command.Parameters.AddWithValue("@ColorLocked", ColorLocked);
 			command.Parameters.AddWithValue("@ColorBlacklistMode", ColorBlacklistMode);
 			command.Parameters.AddWithValue("@ColorBlacklist", JsonConvert.SerializeObject(ColorBlacklist, serializerSettings));
-			command.Parameters.AddWithValue("@BansEnabled", BansEnabled);
-			command.Parameters.AddWithValue("@BannedIds", JsonConvert.SerializeObject(BannedIds, serializerSettings));
 			command.Parameters.AddWithValue("@Admins", JsonConvert.SerializeObject(Admins, serializerSettings));
 			command.Parameters.AddWithValue("@Tags", JsonConvert.SerializeObject(Tags, serializerSettings));
 			command.Parameters.AddWithValue("@NotificationChannel", NotificationChannel);
@@ -240,8 +227,6 @@ namespace DiscordUrie_DSharpPlus
 		public bool ColorLocked {get; set;}
 		public BlackListModeEnum ColorBlacklistMode {get; set;}
 		public List<ulong> ColorBlacklist {get; set;}
-		public bool BansEnabled {get; set;}
-		public List<ulong> BannedIds {get; set;}
 		public List<ulong> Admins {get; set;}
 		public List<DiscordUrieTag> Tags {get; set;}
 		public ulong NotificationChannel {get; set;}

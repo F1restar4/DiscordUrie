@@ -116,15 +116,6 @@ namespace DiscordUrie_DSharpPlus
 				this.SocketStart = DateTime.Now;
 			};
 
-
-			this.Client.MessageCreated += async (client, e) =>
-			{
-				if (!e.Author.IsBot)
-				{
-					await this.ChatBansEventCall(e);
-				}
-			};
-
 			//Build dependancies for injection
 			var depend = new ServiceCollection()
 				.AddSingleton(this)
@@ -151,22 +142,6 @@ namespace DiscordUrie_DSharpPlus
 		public async Task StartAsync()
 		{
 			await this.Client.ConnectAsync();
-		}
-	
-		private async Task ChatBansEventCall(MessageCreateEventArgs e)
-		{
-			if (e.Channel.IsPrivate || e.Message.Author.IsBot)
-				return;
-
-			DiscordUrieGuild GuildSettings = await this.Config.FindGuildSettings(e.Guild);
-
-			if (GuildSettings.BansEnabled)
-			{
-				ulong id = e.Author.Id;
-
-				if (GuildSettings.BannedIds.Any(xr => xr == id))
-					await e.Message.DeleteAsync("Chat ban deletion");
-			}
 		}
 
 		private Task ErrorHandler(DiscordClient client, ClientErrorEventArgs e)
@@ -203,7 +178,7 @@ namespace DiscordUrie_DSharpPlus
 					Password = this.LavaPass
 			};
 			this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
-
+			
 			//Check if global config is empty, this shouldn't happen normally
 			if (await this.Config.IsEmpty())
 			{
