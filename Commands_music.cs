@@ -78,7 +78,10 @@ namespace DiscordUrie_DSharpPlus
 				if (e.Reason != TrackEndReason.Finished) return;
 				var MusicData = this.musicData.First(xr => xr.GuildId == conn.Guild.Id);
 				if (MusicData.Queue.Count == 0)
+				{
 					await this.Leave(e.Player.Guild);
+					return;
+				}
 
 				await this.Play(e.Player.Guild);
 			}
@@ -123,7 +126,7 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.RespondAsync("Response time elapsed.");
 					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
 						await this.Leave(ctx.Guild);
-					return;
+						return;
 				}
 
 				track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
@@ -159,7 +162,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task Stop(CommandContext ctx)
 			{
 				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
-				if (connection != null)
+				if (connection == null)
 					return;
 
 				await connection.StopAsync();
