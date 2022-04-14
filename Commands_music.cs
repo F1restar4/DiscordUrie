@@ -109,8 +109,19 @@ namespace DiscordUrie_DSharpPlus
 					connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
 				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				LavalinkTrack track;
-				var trackarray = tracks.Tracks.Take(5);
+				if (Uri.TryCreate(search, UriKind.Absolute, out var cum))
+				{
+					tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(cum);
+					track = tracks.Tracks.First();
+					MusicData.Enqueue(track);
+					await ctx.RespondAsync($"Queued {track.Title}");
+					if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
+						await this.Play(ctx.Guild);
+					return;
+				}
 
+				var trackarray = tracks.Tracks.Take(5);
+				
 				var embed = new DiscordEmbedBuilder
 				{
 					Title = "Track selection",
