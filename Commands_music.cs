@@ -94,6 +94,14 @@ namespace DiscordUrie_DSharpPlus
 			public async Task Leave(CommandContext ctx)
 			=> await this.Leave(ctx.Guild);
 
+			public async Task<LavalinkGuildConnection> GetOrCreateConnectionAsync(DiscordGuild Guild, DiscordChannel Channel, DiscordMember Member)
+			{
+					var connection = discordUrie.LavalinkNode.GetGuildConnection(Guild);
+					if (connection == null) 
+						connection = await this.Join(Guild, Channel, Member);
+					return connection;
+			}
+
 			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
 			public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
 			{
@@ -104,9 +112,7 @@ namespace DiscordUrie_DSharpPlus
 
 				if (Uri.TryCreate(search, UriKind.Absolute, out var cum))
 				{
-					connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
-					if (connection == null) 
-						connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
+					connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
 					MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 
 					tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(cum);
@@ -124,10 +130,8 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.RespondAsync("No matches found.");
 					return;
 				}
-
-				connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
-				if (connection == null) 
-					connection = await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
+				
+				connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
 				MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 
 				var trackarray = tracks.Tracks.Take(5);
