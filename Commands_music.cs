@@ -103,37 +103,31 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
+			public async Task Search(CommandContext ctx, [Description("The url to play")]Uri search)
+			{
+				var connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
+				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
+
+				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
+				var track = tracks.Tracks.First();
+				MusicData.Enqueue(track);
+				await ctx.RespondAsync($"Queued {track.Title}");
+				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
+					await this.Play(ctx.Guild);
+			}
+
+			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
 			public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
 			{
-				LavalinkLoadResult tracks;
-				GuildMusicData MusicData;
-				LavalinkGuildConnection connection;
-				LavalinkTrack track;
-
-				if (Uri.TryCreate(search, UriKind.Absolute, out var cum))
-				{
-					connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
-					MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
-
-					tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(cum);
-					track = tracks.Tracks.First();
-					MusicData.Enqueue(track);
-					await ctx.RespondAsync($"Queued {track.Title}");
-					if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
-						await this.Play(ctx.Guild);
-					return;
-				}
-				
-				tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
+				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
 				if (tracks.Tracks.Count() == 0)
 				{
 					await ctx.RespondAsync("No matches found.");
 					return;
 				}
-				
-				connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
-				MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 
+				var connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
+				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				var trackarray = tracks.Tracks.Take(5);
 
 				var embed = new DiscordEmbedBuilder
@@ -154,7 +148,7 @@ namespace DiscordUrie_DSharpPlus
 						return;
 				}
 
-				track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
+				var track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
 				MusicData.Enqueue(track);
 				await ctx.RespondAsync($"Queued {track.Title}");
 				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
