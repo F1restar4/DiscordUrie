@@ -114,105 +114,60 @@ namespace DiscordUrie_DSharpPlus
 			public DiscordUrie discordUrie;
 		}
 
-		//This command's code is almost entirely written by Emzi0767 and falls under the Apache License 2.0.
-		//Taken from: https://github.com/Emzi0767/Discord-Companion-Cube-Bot/
-		[Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
-		public async Task EvaluateAsync(CommandContext ctx, [RemainingText, Description("Code to evaluate.")] string code)
+		[Command("eval")]
+		public async Task Eval(CommandContext ctx, [RemainingText] string code)
 		{
-			var cs1 = code.IndexOf("```") + 3;
-			cs1 = code.IndexOf('\n', cs1) + 1;
-			var cs2 = code.LastIndexOf("```");
-
-			if (cs1 == -1 || cs2 == -1)
-				throw new ArgumentException("You need to wrap the code into a code block.", nameof(code));
-
-			code = code.Substring(cs1, cs2 - cs1);
-
-			var embed = new DiscordEmbedBuilder
+			var yes = code.IndexOf("```") + 3;
+			yes = code.IndexOf('\n', yes) + 1;
+			var alsoyes = code.LastIndexOf("```");
+			if (yes == -1 || alsoyes == -1)
 			{
-				Title = "Evaluating...",
-				Color = new DiscordColor(0xD091B2)
-			};
-			var msg = await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
+				await ctx.RespondAsync("You need to wrap the code in a code block");
+				return;
+			}
 
+			code = code.Substring(yes, alsoyes - yes);
+			var embedbuilder = new DiscordEmbedBuilder()
+			{
+				Title = "Evaluating.",
+				Color = new DiscordColor(0, 255, 255),
+			};
+			var response = await ctx.RespondAsync(embedbuilder.Build());
 			var globals = new globals
 			{
 				ctx = ctx,
-				settings = discordUrie.Config,
-				discordUrie = discordUrie
+				settings = this.discordUrie.Config,
+				discordUrie = this.discordUrie
 			};
-			var sopts = ScriptOptions.Default
-				.WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", "System.Reflection", "System.Text", 
-							 "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.CommandsNext", "DSharpPlus.Entities", "DSharpPlus.EventArgs", "DSharpPlus.Exceptions")
-				.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
-			
-			var sw1 = Stopwatch.StartNew();
-			var cs = CSharpScript.Create(code, sopts, typeof(globals));
-			var csc = cs.Compile();
-			sw1.Stop();
-			
-			if (csc.Any(xd => xd.Severity == DiagnosticSeverity.Error))
-			{
-				embed = new DiscordEmbedBuilder
-				{
-					Title = "Compilation failed",
-					Description = string.Concat("Compilation failed after ", sw1.ElapsedMilliseconds.ToString("#,##0"), "ms with ", csc.Length.ToString("#,##0"), " errors."),
-					Color = new DiscordColor(255,0,0)
-				};
-				foreach (var xd in csc.Take(3))
-				{
-					var ls = xd.Location.GetLineSpan();
-					embed.AddField(string.Concat("Error at ", ls.StartLinePosition.Line.ToString("#,##0"), ", ", ls.StartLinePosition.Character.ToString("#,##0")), Formatter.InlineCode(xd.GetMessage()), false);
-				}
-				if (csc.Length > 3)
-				{
-					embed.AddField("Some errors ommited", string.Concat((csc.Length - 3).ToString("#,##0"), " more errors not displayed"), false);
-				}
-				await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
-				return;
-			}
-
-			Exception rex = null;
-			ScriptState<object> css = null;
-			var sw2 = Stopwatch.StartNew();
+			var ScriptOpt = ScriptOptions.Default.WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", 
+				"System.Reflection", "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.CommandsNext", "DSharpPlus.Entities", "DSharpPlus.EventArgs", "DSharpPlus.Exceptions")
+				.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location))); // I have no idea what this does or why it fixes imports but /shrug
+			Object result;
 			try
 			{
-				css = await cs.RunAsync(globals).ConfigureAwait(false);
-				rex = css.Exception;
+				result = await CSharpScript.EvaluateAsync(code, ScriptOpt, globals, typeof(globals));
 			}
-			catch (Exception ex)
+			catch (CompilationErrorException ex)
 			{
-				rex = ex;
-			}
-			sw2.Stop();
-
-			if (rex != null)
-			{
-				embed = new DiscordEmbedBuilder
+				embedbuilder = new DiscordEmbedBuilder()
 				{
-					Title = "Execution failed",
-					Description = string.Concat("Execution failed after ", sw2.ElapsedMilliseconds.ToString("#,##0"), "ms with `", rex.GetType(), ": ", rex.Message, "`."),
-					Color = new DiscordColor(255,0,0),
+					Title = "An error occurred",
+					Color = new DiscordColor(255, 0, 0),
+					Description = string.Join('\n', ex.Diagnostics.Take(3))
 				};
-				await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
+				await response.ModifyAsync(embedbuilder.Build());
 				return;
 			}
 
-			embed = new DiscordEmbedBuilder
+			embedbuilder = new DiscordEmbedBuilder()
 			{
 				Title = "Evaluation successful",
-				Color = new DiscordColor(0,255,0),
+				Color = new DiscordColor(0, 255, 0),
 			};
-
-			embed.AddField("Result", css.ReturnValue != null ? css.ReturnValue.ToString() : "No value returned", false)
-				.AddField("Compilation time", string.Concat(sw1.ElapsedMilliseconds.ToString("#,##0"), "ms"), true)
-				.AddField("Execution time", string.Concat(sw2.ElapsedMilliseconds.ToString("#,##0"), "ms"), true);
-
-			if (css.ReturnValue != null)
-				embed.AddField("Return type", css.ReturnValue.GetType().ToString(), true);
-
-			await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
+			embedbuilder.AddField("Result", result != null ? result.ToString() : "Code didn't return a value");
+			if (result != null)
+				embedbuilder.AddField("Return type", result.GetType().ToString());
+			await response.ModifyAsync(embedbuilder.Build());
 		}
-
 	}
 }
