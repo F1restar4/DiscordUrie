@@ -25,7 +25,7 @@ namespace DiscordUrie_DSharpPlus
 			DiscordMessageBuilder MessageBuilder = new DiscordMessageBuilder();
 			try
 			{
-				var ServerList = await Rest.GetOwnServersAsync(discordUrie.SCPID, discordUrie.SCPKey, Players: true, Info: true, Version: true, Online: true);
+				var ServerList = await Rest.GetOwnServersAsync(discordUrie.BootConfig.ScpID, discordUrie.BootConfig.ScpKey, Players: true, Info: true, Version: true, Online: true);
 				discordUrie.CachedServerInfo = ServerList;
 				TargetServer = ServerList.First();
 			}

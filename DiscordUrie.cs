@@ -27,7 +27,7 @@ namespace DiscordUrie_DSharpPlus
 		public InteractivityExtension Interactivity { get; }
 		public LavalinkExtension Lavalink { get; }
 		public LavalinkNodeConnection LavalinkNode { get; set; }
-		public string LavaPass { get; }
+		public DiscordUrieBootConfig BootConfig { get; set; }
 		public List<GuildMusicData> MusicData { get; }
 		public DiscordUrieConfig Config { get; set; }
 		public DateTime StartTime { get; set; }
@@ -36,8 +36,6 @@ namespace DiscordUrie_DSharpPlus
 		public SQLiteConnection SQLConn { get; }
 		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
-		public int SCPID { get; set; }
-		public string SCPKey { get; set; }
 		public List<Firestar4.ScpListSharp.Entities.SCPServer> CachedServerInfo = new List<Firestar4.ScpListSharp.Entities.SCPServer>();
 
 		public DiscordUrie(DiscordUrieConfig cfg, SQLiteConnection connection, DiscordUrieSettings sett)
@@ -48,57 +46,12 @@ namespace DiscordUrie_DSharpPlus
 			this.Config = cfg;
 			this.MusicData = new List<GuildMusicData>();
 			this.LockedOutUsers = new List<DiscordMember>();
-			string token;
-
-			//Check for a saved token
-			if (!File.Exists("token.txt"))
-			{
-				Console.Write("Token file not found. Please input a Discord bot token: ");
-				token = Console.ReadLine();
-
-				File.WriteAllText("token.txt", token);
-				Console.Clear();
-			}
-			else
-			{
-				token = File.ReadAllText("token.txt");
-			}
-
-			//Check for a saved LavaLink server password
-			//Maybe I should consolidate this, the token and the scplist info to cleanup these files.
-			if (!File.Exists("lavapass.txt"))
-			{
-				Console.Write("Input the lavalink server password: ");
-				this.LavaPass = Console.ReadLine();
-				File.WriteAllText("lavapass.txt", this.LavaPass);
-				Console.Clear();
-			}
-			else
-			{
-				this.LavaPass = File.ReadAllText("lavapass.txt");
-			}
-
-			//Check for saved ScpList info
-			if (!File.Exists("ScpInfo.txt"))
-			{
-				Console.Write("Input your SCP account ID");
-				this.SCPID = Convert.ToInt32(Console.ReadLine());
-				Console.Write("Input your SCP server api key: ");
-				this.SCPKey = Console.ReadLine();
-				string[] data = {this.SCPID.ToString(), this.SCPKey};
-				File.WriteAllLines("ScpInfo.txt", data);
-			}
-			else
-			{
-				var data = File.ReadAllLines("ScpInfo.txt");
-				this.SCPID = Convert.ToInt32(data[0]);
-				this.SCPKey = data[1];
-			}
+			BootConfig = DiscordUrieBootSettings.GetBootConfig();
 			
 			//Initial client setup
 			this.Client = new DiscordClient(new DiscordConfiguration
 			{
-				Token = token,
+				Token = BootConfig.BotToken,
 				MinimumLogLevel = LogLevel.Information,
 				Intents = DiscordIntents.All,
 			});
@@ -175,9 +128,9 @@ namespace DiscordUrie_DSharpPlus
 			{
 					RestEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
 					SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
-					Password = this.LavaPass
+					Password = this.BootConfig.LavalinkPassword
 			};
-			this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
+			//this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
 			
 			//Check if global config is empty, this shouldn't happen normally
 			if (await this.Config.IsEmpty())
