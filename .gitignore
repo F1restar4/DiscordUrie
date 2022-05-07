@@ -2,6 +2,7 @@ bin/*
 .vscode/*
 obj/*
 *.db
-activity.json
+*.json
+*.dll
 .vs/*
-BootConfig.json
+*.key

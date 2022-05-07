@@ -20,8 +20,8 @@ namespace DiscordUrie_DSharpPlus
 		{
 			var Activity = new DiscordActivity(text, (ActivityType)type);
 			await ctx.Client.UpdateStatusAsync(Activity);
-			discordUrie.Config.StartupActivity = Activity;
-			await discordUrie.Config.SaveSettings(discordUrie.SQLConn);
+			discordUrie.BootConfig.StartupActivity = Activity;
+			await DiscordUrieBootSettings.SaveBootConfig(discordUrie.BootConfig);
 			await ctx.Message.DeleteAsync();
 		}
 

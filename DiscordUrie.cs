@@ -142,7 +142,7 @@ namespace DiscordUrie_DSharpPlus
 				await this.Config.SaveSettings(SQLConn);
 			}
 
-			await client.UpdateStatusAsync(this.Config.StartupActivity, UserStatus.Online);
+			await client.UpdateStatusAsync(this.BootConfig.StartupActivity, UserStatus.Online);
 			client.Logger.Log(LogLevel.Information, "Connected successfully");
 		}
 

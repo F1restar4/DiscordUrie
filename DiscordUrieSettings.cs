@@ -28,9 +28,6 @@ namespace DiscordUrie_DSharpPlus
 		{
 			DiscordUrieConfig OutputConfig = new DiscordUrieConfig(this, SQLConn)
 			{
-
-				StartupActivity = new DiscordActivity("the voices in my head", ActivityType.ListeningTo),
-
 				GuildSettings = await CreateGuildDefaultSettings(client.Guilds.Values)
 			};
 
@@ -56,16 +53,10 @@ namespace DiscordUrie_DSharpPlus
 		public async Task<DiscordUrieConfig> LoadSettings(SQLiteConnection conn)
 		{
 			await conn.OpenAsync();
-			JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-			{
-				NullValueHandling = NullValueHandling.Ignore
-			};
-
 			var command = new SQLiteCommand("SELECT * FROM config", conn);
 			var reader = await command.ExecuteReaderAsync();
 			DiscordUrieConfig OutSettings = new DiscordUrieConfig(this, conn)
 			{
-				StartupActivity = JsonConvert.DeserializeObject<DiscordActivity>(File.ReadAllText("activity.json")),
 				GuildSettings = new List<DiscordUrieGuild>()
 			};
 			while(await reader.ReadAsync())
@@ -89,17 +80,16 @@ namespace DiscordUrie_DSharpPlus
 
 	public class DiscordUrieConfig
 	{
-		public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn,  List<DiscordUrieGuild> Guilds = null, DiscordActivity Activity = null)
+		public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn,  List<DiscordUrieGuild> Guilds = null)
 		{
 			this.SettingsInstance = Settings;
 			this.SQLConn = SQLConn;
 			this.GuildSettings = Guilds;
-			this.StartupActivity = Activity;
 		}
 
 		public Task<bool> IsEmpty()
 		{
-			if (GuildSettings == null || StartupActivity == null)
+			if (GuildSettings == null)
 			{
 				return Task.FromResult(true);
 			}
@@ -108,7 +98,6 @@ namespace DiscordUrie_DSharpPlus
 
 		public async Task<int> SaveSettings(SQLiteConnection conn)
 		{
-			await File.WriteAllTextAsync("activity.json",JsonConvert.SerializeObject(this.StartupActivity));
 			int affected = 0;
 			foreach(DiscordUrieGuild cur in GuildSettings)
 			{
@@ -158,7 +147,6 @@ namespace DiscordUrie_DSharpPlus
 			return GuildSettings.Tags;
 		}
 
-		public DiscordActivity StartupActivity { get; set; }
 		public List<DiscordUrieGuild> GuildSettings { get; set; }
 		public DiscordUrieSettings SettingsInstance { get; }
 		public SQLiteConnection SQLConn { get; }
