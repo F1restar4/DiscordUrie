@@ -52,7 +52,7 @@ namespace DiscordUrie_DSharpPlus
 			this.Client = new DiscordClient(new DiscordConfiguration
 			{
 				Token = BootConfig.BotToken,
-				MinimumLogLevel = LogLevel.Information,
+				MinimumLogLevel = LogLevel.Error,
 				Intents = DiscordIntents.All,
 			});
 
@@ -130,7 +130,7 @@ namespace DiscordUrie_DSharpPlus
 					SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
 					Password = this.BootConfig.LavalinkPassword
 			};
-			//this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
+			this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
 			
 			//Check if global config is empty, this shouldn't happen normally
 			if (await this.Config.IsEmpty())
