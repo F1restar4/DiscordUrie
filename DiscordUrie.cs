@@ -17,6 +17,7 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Firestar4.ScpListSharp.Entities;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -36,7 +37,7 @@ namespace DiscordUrie_DSharpPlus
 		public SQLiteConnection SQLConn { get; }
 		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
-		public List<Firestar4.ScpListSharp.Entities.SCPServer> CachedServerInfo = new List<Firestar4.ScpListSharp.Entities.SCPServer>();
+		public List<SCPServer> CachedServerInfo = new List<SCPServer>();
 
 		public DiscordUrie(DiscordUrieConfig cfg, SQLiteConnection connection, DiscordUrieSettings sett)
 		{
@@ -52,7 +53,7 @@ namespace DiscordUrie_DSharpPlus
 			this.Client = new DiscordClient(new DiscordConfiguration
 			{
 				Token = BootConfig.BotToken,
-				MinimumLogLevel = LogLevel.Error,
+				MinimumLogLevel = LogLevel.Debug,
 				Intents = DiscordIntents.All,
 			});
 
