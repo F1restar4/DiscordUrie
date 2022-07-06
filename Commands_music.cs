@@ -116,7 +116,7 @@ namespace DiscordUrie_DSharpPlus
 					await this.Play(ctx.Guild);
 			}
 
-			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
+			[Command("search"), Aliases("play"), Description("Searches for any youtube video and queues it to be played.")]
 			public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
 			{
 				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
