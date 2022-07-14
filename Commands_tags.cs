@@ -6,20 +6,19 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using DSharpPlus;
+using DSharpPlus.SlashCommands;
 using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
-	public partial class Commands : BaseCommandModule
+	public partial class Commands : ApplicationCommandModule
 	{
 
-		[Group("tag"), Description("Allows a user to store a message for later recall")]
-		public class Tag : BaseCommandModule
+		[SlashCommandGroup("tag", "Allows a user to store a message for later recall")]
+		public class Tag : ApplicationCommandModule
 		{
 			private DiscordUrie discordUrie { get; set; }
 			public Tag(DiscordUrie du)
@@ -27,23 +26,25 @@ namespace DiscordUrie_DSharpPlus
 				discordUrie = du;
 			}
 
-			[GroupCommand(), Description("Recalls a tag using it's name.")]
-			public async Task GroupExecute(CommandContext ctx, [RemainingText] string tag)
+			[SlashCommand("get", "Recalls a tag using it's name.")]
+			public async Task GroupExecute(InteractionContext ctx, [Option("tag", "The name of the tag")] string tag)
 			{
+				await ctx.DeferAsync();
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
 				tag = Regex.Escape(tag).ToLower();
 
 				if (GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
 				{
-					await ctx.RespondAsync(Regex.Unescape(GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag).Output));
+					var builder = new DiscordWebhookBuilder().WithContent(Regex.Unescape(GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag).Output));
+					await ctx.EditResponseAsync(builder);
 					return;
 				}
 
 				List<DiscordUrieTag> Contained = GuildSettings.Tags.FindAll(xr => xr.Tag.ToLower().Contains(tag));
 				if (Contained.Count <= 0)
 				{
-					await ctx.RespondAsync("Tag not found.");
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Tag not found."));
 					return;
 				}
 
@@ -54,17 +55,21 @@ namespace DiscordUrie_DSharpPlus
 					Out += cur.Tag + "\n";
 				}
 
-				await ctx.RespondAsync(Out);
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(Out));
 			}
 
-			[Command("add"), Description("Add a tag"), Aliases("create")]
-			public async Task TagAdd(CommandContext ctx, string tag, [RemainingText] string Output)
+			[SlashCommand("Create", "Create a tag")]
+			public async Task TagCreate(InteractionContext ctx, [Option("tag", "The name of the tag")] string tag, [Option("output", "The output of the tag")] string Output)
+				=> await TagAdd(ctx, tag, Output);
+
+			[SlashCommand("add", "Add a tag")]
+			public async Task TagAdd(InteractionContext ctx, [Option("tag", "The name of the tag")] string tag, [Option("output", "The output of the tag")] string Output)
 			{
 				try
 				{
 					if (Output == null)
 					{
-						await ctx.RespondAsync("You're missing a parameter dingus.");
+						await ctx.CreateResponseAsync("You're missing a parameter dingus.");
 						return;
 					}
 
@@ -74,7 +79,7 @@ namespace DiscordUrie_DSharpPlus
 					Output = Regex.Escape(Output);
 					if (GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag.ToLower()))
 					{
-						await ctx.RespondAsync("This tag already exists!");
+						await ctx.CreateResponseAsync("This tag already exists!");
 						return;
 					}
 				
@@ -82,29 +87,29 @@ namespace DiscordUrie_DSharpPlus
 					GuildSettings.Tags.Add(new DiscordUrieTag(tag, Output, ctx.Member.Id));
 					discordUrie.Config.GuildSettings.Add(GuildSettings);
 					await GuildSettings.SaveGuild(discordUrie.SQLConn);
-					await ctx.RespondAsync("Tag created!");
+					await ctx.CreateResponseAsync("Tag created!");
 				}
 				catch(Exception ex)
 				{
-					await ctx.RespondAsync($"You did something wrong. {ex.GetType()} : {ex.Message}");
+					await ctx.CreateResponseAsync($"You did something wrong. {ex.GetType()} : {ex.Message}");
 				}
 			}
 
-			[Command("edit"), Description("Edit a tag")]
-			public async Task TagEdit(CommandContext ctx, string tag, [RemainingText] string output)
+			[SlashCommand("edit", "Edit a tag")]
+			public async Task TagEdit(InteractionContext ctx, [Option("tag", "The name of the tag")] string tag, [Option("output", "The output of the tag")] string output)
 			{
 				tag = Regex.Escape(tag).ToLower();
 				var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
 				if (!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
 				{
-					await ctx.RespondAsync("Tag doesn't exist!");
+					await ctx.CreateResponseAsync("Tag doesn't exist!");
 					return;
 				}
 				var Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
 				var util = new Util(this.discordUrie);
 				if (Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
 				{
-					await ctx.RespondAsync("You do not own this tag and do not have the permissions to edit this.");
+					await ctx.CreateResponseAsync("You do not own this tag and do not have the permissions to edit this.");
 					return;
 				}
 				this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
@@ -113,11 +118,11 @@ namespace DiscordUrie_DSharpPlus
 				GuildSettings.Tags.Add(Target);
 				this.discordUrie.Config.GuildSettings.Add(GuildSettings);
 				await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
-				await ctx.RespondAsync("Tag edited!");
+				await ctx.CreateResponseAsync("Tag edited!");
 			}
 
-			[Command("remove"), Description("Remove a tag")]
-			public async Task TagRemove(CommandContext ctx, [RemainingText] string tag)
+			[SlashCommand("remove", "Remove a tag")]
+			public async Task TagRemove(InteractionContext ctx, [Option("tag", "The tag to delete")] string tag)
 			{
 				try
 				{
@@ -127,30 +132,30 @@ namespace DiscordUrie_DSharpPlus
 
 					if(!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
 					{
-						await ctx.RespondAsync("Tag doesn't exist!");
+						await ctx.CreateResponseAsync("Tag doesn't exist!");
 						return;
 					}
 					DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
 					var util = new Util(discordUrie);
 					if(Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
 					{
-						await ctx.RespondAsync("You do not have the permissions to do this!");
+						await ctx.CreateResponseAsync("You do not have the permissions to do this!");
 						return;
 					}
 					discordUrie.Config.GuildSettings.Remove(GuildSettings);
 					GuildSettings.Tags.Remove(Target);
 					discordUrie.Config.GuildSettings.Add(GuildSettings);
 					await GuildSettings.SaveGuild(discordUrie.SQLConn);
-					await ctx.RespondAsync("Tag removed!");
+					await ctx.CreateResponseAsync("Tag removed!");
 				}
 				catch(Exception ex)
 				{
-					await ctx.RespondAsync($"You did something wrong. {ex.GetType()} : {ex.Message}");
+					await ctx.CreateResponseAsync($"You did something wrong. {ex.GetType()} : {ex.Message}");
 				}
 			}
 
-			[Command("list"), Description("List all tags")]
-			public async Task TagList(CommandContext ctx)
+			[SlashCommand("list", "List all tags")]
+			public async Task TagList(InteractionContext ctx)
 			{
 				InteractivityExtension intex = ctx.Client.GetInteractivity();
 				List<DiscordUrieTag> tags = await discordUrie.Config.GetTags(ctx.Guild);
@@ -158,13 +163,13 @@ namespace DiscordUrie_DSharpPlus
 				IEnumerable<string> TagKeys = tags.Select(xr => xr.Tag);
 
 				string EditedTags = String.Join("\n", TagKeys);
-
+				await ctx.CreateResponseAsync("Displaying list", ephemeral: true);
 
 				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line), timeoutoverride: TimeSpan.FromSeconds(12));
 			}
 
-			[Command("info"), Description("Gives information about a tag")]
-			public async Task TagInfo(CommandContext ctx, [RemainingText] string tag)
+			[SlashCommand("info", "Gives information about a tag")]
+			public async Task TagInfo(InteractionContext ctx, [Option("tag", "The name of the tag")] string tag)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 				tag = Regex.Escape(tag).ToLower();
@@ -172,7 +177,7 @@ namespace DiscordUrie_DSharpPlus
 
 				if (Tag == null)
 				{
-					await ctx.RespondAsync("Invalid tag");
+					await ctx.CreateResponseAsync("Invalid tag");
 					return;
 				}
 
@@ -181,47 +186,60 @@ namespace DiscordUrie_DSharpPlus
 				EBuilder.WithAuthor($"{TagOwner.Username}#{TagOwner.Discriminator}", iconUrl: TagOwner.GetAvatarUrl(ImageFormat.Png));
 				EBuilder.AddField("Tag Name", Tag.Tag);
 				EBuilder.AddField("Owner Id", Tag.Owner.ToString());
-				await ctx.RespondAsync(embed: EBuilder.Build());
+				await ctx.CreateResponseAsync(embed: EBuilder.Build());
 			}
 
-			[Command("import"), RequireAuth, Description("Imports tags from another guild")]
-			public async Task Import(CommandContext ctx, [Description("Target guild.")] DiscordGuild guild )
+			[SlashCommand("import", "Imports tags from another guild"), RequireAuth]
+			public async Task Import(InteractionContext ctx, [Option("guild", "Target guild.")] string guild) 
 			{
-				if (guild == ctx.Guild)
+				await ctx.DeferAsync();
+				var TargetGuild = await ctx.Client.GetGuildAsync(Convert.ToUInt64(guild));
+				if (TargetGuild == null)
 				{
-					await ctx.RespondAsync("Same guild, loser.");
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Invalid guild"));
+					return;
+				}
+				if (TargetGuild == ctx.Guild)
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Same guild, loser."));
+					return;
 				}
 
-				var MergingSettings = await discordUrie.Config.FindGuildSettings(guild);
+				var MergingSettings = await discordUrie.Config.FindGuildSettings(TargetGuild);
 				if (MergingSettings.Tags.Count <= 0)
 				{
-					await ctx.RespondAsync("Target guild has no tags.");
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Target guild has no tags."));
 					return;
 				}
 				var TargetSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
 				var DifferingTags = MergingSettings.Tags.FindAll(xr => !TargetSettings.Tags.Any(xa => xa.Tag == xr.Tag));
+				if (DifferingTags.Count == 0)
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("There's no new tags to add."));
+					return;
+				}
 				discordUrie.Config.GuildSettings.Remove(TargetSettings);
 				TargetSettings.Tags.AddRange(DifferingTags);
 				discordUrie.Config.GuildSettings.Add(TargetSettings);
 				await TargetSettings.SaveGuild(discordUrie.SQLConn);
-				await ctx.RespondAsync("Tags imported.");
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Tags imported."));
 			}
 
-			[Command("wipe"), RequireAuthHigh, Description("Wipes all of the current guild's tags.")]
-			public async Task Wipe(CommandContext ctx)
+			[SlashCommand("wipe", "Wipes all of the current guild's tags."), RequireAuthHigh]
+			public async Task Wipe(InteractionContext ctx)
 			{
 				var inter = ctx.Client.GetInteractivity();
-				await ctx.RespondAsync("Wipe all tags in this guild? This cannot be undone. (y/n)");
+				await ctx.CreateResponseAsync("Wipe all tags in this guild? This cannot be undone. (y/n)");
 				var result = await inter.WaitForMessageAsync(xr => xr.Author == ctx.User && xr.Content.ToLower() == "y" || xr.Content.ToLower() == "n");
 				if (result.TimedOut)
 				{
-					await ctx.RespondAsync("Timed out.");
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Timed out."));
 					return;
 				}
 				if (result.Result.Content.ToLower() != "y")
 				{
-					await ctx.RespondAsync("Aborted.");
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Aborted."));
 					return;
 				}
 
@@ -230,7 +248,7 @@ namespace DiscordUrie_DSharpPlus
 				GuildSettings.Tags = new List<DiscordUrieTag>();
 				discordUrie.Config.GuildSettings.Add(GuildSettings);
 				await GuildSettings.SaveGuild(discordUrie.SQLConn);
-				await ctx.RespondAsync("Tags wiped.");
+				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Tags wiped."));
 			}
 		}
 

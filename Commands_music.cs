@@ -3,9 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using DSharpPlus;
+using DSharpPlus.SlashCommands;
 using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using DSharpPlus.Interactivity;
@@ -13,10 +12,10 @@ using DSharpPlus.Interactivity.Extensions;
 
 namespace DiscordUrie_DSharpPlus
 {
-	public partial class Commands : BaseCommandModule
+	public partial class Commands : ApplicationCommandModule
 	{
-		[Group("music"), Aliases("m"), Description("Used to play music (or any youtube video).")]
-		public class Music : BaseCommandModule
+		[SlashCommandGroup("music", "Used to play music (or any youtube video).")]
+		public class Music : ApplicationCommandModule
 		{
 			public DiscordUrie discordUrie { get; set; }
 			public List<GuildMusicData> musicData => this.discordUrie.MusicData;
@@ -86,13 +85,19 @@ namespace DiscordUrie_DSharpPlus
 				await this.Play(e.Player.Guild);
 			}
 
-			[Command("join"), Description("Joins your voice channel.")]
-			public async Task Join(CommandContext ctx)
-			=> await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
+			[SlashCommand("join", "Joins your voice channel.")]
+			public async Task Join(InteractionContext ctx)
+			{
+				await this.Join(ctx.Guild, ctx.Channel, ctx.Member);
+				await ctx.CreateResponseAsync("Joined.");
+			}
 
-			[Command("leave"), Description("Leaves the voice channel and clears the queue.")]
-			public async Task Leave(CommandContext ctx)
-			=> await this.Leave(ctx.Guild);
+			[SlashCommand("leave", "Leaves the voice channel and clears the queue.")]
+			public async Task Leave(InteractionContext ctx)
+			{
+				await this.Leave(ctx.Guild);
+				await ctx.CreateResponseAsync("Left and cleared queue.");
+			}
 
 			public async Task<LavalinkGuildConnection> GetOrCreateConnectionAsync(DiscordGuild Guild, DiscordChannel Channel, DiscordMember Member)
 			{
@@ -102,29 +107,40 @@ namespace DiscordUrie_DSharpPlus
 					return connection;
 			}
 
-			[Command("search"), Description("Searches for any youtube video and queues it to be played.")]
-			public async Task Search(CommandContext ctx, [Description("The url to play")]Uri search)
+			[SlashCommand("searchurl", "Searches for a specific youtube video via link and queues it to be played.")]
+			public async Task SearchUrl(InteractionContext ctx, [Option("ulr", "The url to play")]string search)
 			{
+				var success = Uri.TryCreate(search, UriKind.RelativeOrAbsolute, out var url);
+				if (!success)
+				{
+					await ctx.CreateResponseAsync("Url invalid.");
+					return;
+				}
 				var connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
 				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 
-				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
+				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(url);
 				var track = tracks.Tracks.First();
 				MusicData.Enqueue(track);
-				await ctx.RespondAsync($"Queued {track.Title}");
+				await ctx.CreateResponseAsync($"Queued {track.Title}");
 				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
 					await this.Play(ctx.Guild);
 			}
 
-			[Command("search"), Aliases("play"), Description("Searches for any youtube video and queues it to be played.")]
-			public async Task Search(CommandContext ctx, [RemainingText, Description("The video to search for")]string search)
+			[SlashCommand("play", "Searches for any youtube video and queues it to be played.")]
+			public async Task SearchPlay(InteractionContext ctx, [Option("search", "The video to search for")]string search)
+			=> await Search(ctx, search);
+
+			[SlashCommand("search", "Searches for any youtube video and queues it to be played.")]
+			public async Task Search(InteractionContext ctx, [Option("search", "The video to search for")]string search)
 			{
 				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
 				if (tracks.Tracks.Count() == 0)
 				{
-					await ctx.RespondAsync("No matches found.");
+					await ctx.CreateResponseAsync("No matches found.");
 					return;
 				}
+				await ctx.DeferAsync();
 
 				var connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
 				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
@@ -137,12 +153,12 @@ namespace DiscordUrie_DSharpPlus
 				};
 				embed.AddField("Tracks", string.Join("\n", trackarray.Select((xr, index) => $"{index + 1}. {xr.Title}")));
 				var Int = ctx.Client.GetInteractivity();
-				await ctx.RespondAsync(embed: embed.Build());
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
 				var Message = await Int.WaitForMessageAsync(xr => xr.Author == ctx.User &&(Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5));
 				
 				if (Message.TimedOut)
 				{
-					await ctx.RespondAsync("Response time elapsed.");
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Response time elapsed."));
 					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
 						await this.Leave(ctx.Guild);
 						return;
@@ -150,21 +166,21 @@ namespace DiscordUrie_DSharpPlus
 
 				var track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
 				MusicData.Enqueue(track);
-				await ctx.RespondAsync($"Queued {track.Title}");
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Queued {track.Title}"));
 				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
 					await this.Play(ctx.Guild);
 
 			}
 
-			[Command("clear"), Description("Clear the queue.")]
-			public async Task Clear(CommandContext ctx)
+			[SlashCommand("clear", "Clear the queue.")]
+			public async Task Clear(InteractionContext ctx)
 			{
 				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				var MusicData = this.musicData.FirstOrDefault(xr => xr.GuildId == ctx.Guild.Id);
 				if (connection == null)
 				{
 					this.musicData.Remove(MusicData);
-					await ctx.RespondAsync("Cleared the queue.");
+					await ctx.CreateResponseAsync("Cleared the queue.");
 					return;
 				}
 
@@ -174,11 +190,11 @@ namespace DiscordUrie_DSharpPlus
 				
 				MusicData.ClearQueue();
 				MusicData.ClearNP();
-				await ctx.RespondAsync("Cleared the queue.");
+				await ctx.CreateResponseAsync("Cleared the queue.");
 			}
 
-			[Command("stop"), Description("Same as leave.")]
-			public async Task Stop(CommandContext ctx)
+			[SlashCommand("stop", "Same as leave.")]
+			public async Task Stop(InteractionContext ctx)
 			{
 				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				if (connection == null)
@@ -186,35 +202,35 @@ namespace DiscordUrie_DSharpPlus
 
 				await connection.StopAsync();
 				await this.Leave(ctx.Guild);
-				await ctx.RespondAsync("Stopped player.");
+				await ctx.CreateResponseAsync("Stopped player.");
 			}
 
-			[Command("skip"), Description("Skips the current song.")]
-			public async Task Skip(CommandContext ctx)
+			[SlashCommand("skip", "Skips the current song.")]
+			public async Task Skip(InteractionContext ctx)
 			{
 				var connection = discordUrie.LavalinkNode.GetGuildConnection(ctx.Guild);
 				await connection.SeekAsync(connection.CurrentState.CurrentTrack.Length);
-				await ctx.RespondAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
+				await ctx.CreateResponseAsync($"Skipped {connection.CurrentState.CurrentTrack.Title}");
 			}
 
-			[Command("nowplaying"), Aliases("np"), Description("Displays the currently playing track.")]
-			public async Task NowPlaying(CommandContext ctx)
+			[SlashCommand("nowplaying", "Displays the currently playing track.")]
+			public async Task NowPlaying(InteractionContext ctx)
 			{
 				var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				var NP = GuildMusicData.NowPlaying;
-				await ctx.RespondAsync($"Currently playing `{NP.Title}` at `{NP.Position}/{NP.Length}`");
+				await ctx.CreateResponseAsync($"Currently playing `{NP.Title}` at `{NP.Position}/{NP.Length}`");
 			}
 
-			[Command("remove"), Description("Removes the track at a specific position in the queue.")]
-			public async Task Remove(CommandContext ctx, int index)
+			[SlashCommand("remove", "Removes the track at a specific position in the queue.")]
+			public async Task Remove(InteractionContext ctx, [Option("index", "The index of the entry to remove")] long index)
 			{
 				var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
-				GuildMusicData.RemoveQueue(index);
-				await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+				GuildMusicData.RemoveQueue(Convert.ToInt32(index));
+				await ctx.CreateResponseAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
 			}
 
-			[Command("queue"), Description("Shows the queue.")]
-			public async Task ShowQueue(CommandContext ctx)
+			[SlashCommand("queue", "Shows the queue.")]
+			public async Task ShowQueue(InteractionContext ctx)
 			{
 				var Interactivity = ctx.Client.GetInteractivity();
 				var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
@@ -223,7 +239,7 @@ namespace DiscordUrie_DSharpPlus
 					.GroupBy(x => x.index / 10)
 					.Select(xr => new Page(embed: new DiscordEmbedBuilder().WithDescription($"Now playing: {GuildMusicData.NowPlaying.Title}\n\n{string.Join("\n", xr.Select(xg => $"`{xg.index}` {xg.track.Title}"))}").WithColor(new DiscordColor("#00ffff"))))
 					.ToArray();
-
+				await ctx.CreateResponseAsync("Displaying list", ephemeral: true);
 				await Interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, QueuePages, new DSharpPlus.Interactivity.EventHandling.PaginationButtons(), timeoutoverride: TimeSpan.FromSeconds(12));
 			}
 		}

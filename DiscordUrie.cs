@@ -10,11 +10,11 @@ using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
-using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Firestar4.ScpListSharp.Entities;
@@ -24,8 +24,8 @@ namespace DiscordUrie_DSharpPlus
 	public class DiscordUrie
 	{
 		public DiscordClient Client { get; }
-		public CommandsNextExtension CNext { get; }
 		public InteractivityExtension Interactivity { get; }
+		public SlashCommandsExtension SlashCommandsExtension { get; }
 		public LavalinkExtension Lavalink { get; }
 		public LavalinkNodeConnection LavalinkNode { get; set; }
 		public DiscordUrieBootConfig BootConfig { get; set; }
@@ -75,18 +75,13 @@ namespace DiscordUrie_DSharpPlus
 				.AddSingleton(this)
 				.BuildServiceProvider();
 
-			//Final client setup
-			this.CNext = Client.UseCommandsNext(new CommandsNextConfiguration
-			{
-				CaseSensitive = false,
-				StringPrefixes = CmdPrefix,
-				EnableDefaultHelp = true,
-				EnableDms = false,
-				Services = depend
-			});
-
 			this.Lavalink = Client.UseLavalink();
-			this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
+			this.SlashCommandsExtension = Client.UseSlashCommands(new SlashCommandsConfiguration
+			{
+				Services = depend,
+			});
+			this.SlashCommandsExtension.RegisterCommands<Commands>();
+			//this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
 			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration
 			{
 				AckPaginationButtons = true,

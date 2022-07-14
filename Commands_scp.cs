@@ -4,8 +4,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Linq;
 using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.SlashCommands;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Interactivity.EventHandling;
@@ -16,13 +15,13 @@ using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
-    public partial class Commands : BaseCommandModule
+    public partial class Commands : ApplicationCommandModule
     {
-        [Command("scp")]
-		public async Task Scp(CommandContext ctx)
+        [SlashCommand("scp", "Gets Packing Peanut's server info")]
+		public async Task Scp(InteractionContext ctx)
 		{
 			SCPServer TargetServer;
-			DiscordMessageBuilder MessageBuilder = new DiscordMessageBuilder();
+			DiscordInteractionResponseBuilder MessageBuilder = new DiscordInteractionResponseBuilder();
 			try
 			{
 				var ServerList = await Rest.GetOwnServersAsync(discordUrie.BootConfig.ScpID, discordUrie.BootConfig.ScpKey, Players: true, Info: true, Version: true, Online: true);
@@ -33,7 +32,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				if (discordUrie.CachedServerInfo.Count == 0)
 				{
-					await ctx.RespondAsync(ex.Message);
+					await ctx.CreateResponseAsync(ex.Message);
 					return;
 				}
 				TargetServer = discordUrie.CachedServerInfo.First();
@@ -50,28 +49,29 @@ namespace DiscordUrie_DSharpPlus
 			builder.AddField("Version", TargetServer.Version);
 			builder.AddField("Modded", TargetServer.Modded.ToString());
 			MessageBuilder.AddEmbed(builder.Build());
-			await ctx.RespondAsync(MessageBuilder);
+			await ctx.CreateResponseAsync(MessageBuilder);
 
 		}
 
-        [Group("scpbans"), Description("Search for a ban on the scp server"), RequireAuth]
-        public class Scpbans : BaseCommandModule
+        [SlashCommandGroup("scpbans", "Search for a ban on the scp server"), RequireAuth]
+        public class Scpbans : ApplicationCommandModule
         {
-            private DiscordUrie discordUrie { get; set; }
+            public DiscordUrie discordUrie { get; set; }
 			public Scpbans (DiscordUrie du)
 			{
 				discordUrie = du;
 			}
 
-            [GroupCommand(), Description("Search for a ban on the scp server")]
-		    public async Task ScpBans(CommandContext ctx, [Description("The string to search by. Searches for the name, id, or ban reason."), RemainingText]string search)
+            [SlashCommand("get", "Search for a ban on the scp server")]
+		    public async Task ScpBans(InteractionContext ctx, [Option("search", "The string to search by. Searches for the name, id, or ban reason.")] string search)
 		    {
+				await ctx.DeferAsync();
 			    var data = await ScpBanInfo.GetData();
 			    string lower = search.ToLower();
 			    var pop = data.FindAll(xr => lower == xr.Target.Name.ToLower() || search == xr.Target.ID.ToString() || lower == xr.Reason.ToLower());
 			    if (pop.Count == 0)
 			    {
-				    await ctx.RespondAsync("No matches found.");
+				    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No matches found."));
 				    return;
 			    }
 			    var peep = pop.First();
@@ -84,12 +84,11 @@ namespace DiscordUrie_DSharpPlus
 			    builder.AddField("Ban time", peep.BanTime.ToShortDateString());
 			    builder.AddField("Unban time", peep.UnbanTime.ToShortDateString());
 			    builder.AddField("Ban duration", (peep.BanTime - peep.UnbanTime).ToString("%d' day(s), '%h' hour(s), '%m' minutes, '%s' second(s)'"));
-			    await ctx.RespondAsync(builder);
-
+			    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(builder));
 		    }
 
-			[Command("list"), Description("List all bans")]
-			public async Task ListBans(CommandContext ctx)
+			[SlashCommand("list", "List all bans")]
+			public async Task ListBans(InteractionContext ctx)
 			{
 				var data = await ScpBanInfo.GetData();
 				InteractivityExtension intex = ctx.Client.GetInteractivity();
@@ -97,14 +96,10 @@ namespace DiscordUrie_DSharpPlus
 				IEnumerable<string> TagKeys = data.Select(xr => $"{xr.Target.Name} | {xr.Target.ID}");
 
 				string EditedTags = String.Join("\n", TagKeys);
+				await ctx.CreateResponseAsync("Displaying list", ephemeral: true);
 
-
-				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line), timeoutoverride: TimeSpan.FromSeconds(12));
+				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
 			}
-
         }
-
-        
-		
     }
 }

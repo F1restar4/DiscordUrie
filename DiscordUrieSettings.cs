@@ -37,7 +37,6 @@ namespace DiscordUrie_DSharpPlus
 		public Task<DiscordUrieGuild> CreateGuildDefaultSettings(DiscordGuild Guild)
 			=> Task.FromResult(new DiscordUrieGuild(Guild.Id));
 
-
 		public async Task<List<DiscordUrieGuild>> CreateGuildDefaultSettings(IEnumerable<DiscordGuild> GuildList)
 		{
 			List<DiscordUrieGuild> OutputGuildList = new List<DiscordUrieGuild>();

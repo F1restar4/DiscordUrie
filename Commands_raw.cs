@@ -1,31 +1,15 @@
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.SlashCommands;
+
 using Newtonsoft.Json;
 
 namespace DiscordUrie_DSharpPlus
 {
-	public partial class Commands : BaseCommandModule
+	public partial class Commands : ApplicationCommandModule
 	{
-		[Command("raw"), Description("Supplies information about a givin object")]
-		public async Task Raw(CommandContext ctx, DiscordMessage msg)
-			=> await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(msg, Formatting.Indented)}\n```");
-
-		[Command("raw")]
-		public async Task Raw (CommandContext ctx, DiscordMember member)
-			=> await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(member, Formatting.Indented)}\n```");
-
-		[Command("raw")]
-		public async Task Raw (CommandContext ctx, DiscordChannel channel)
-			=> await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(channel, Formatting.Indented)}\n```");
-
-		[Command("raw")]
-		public async Task Raw (CommandContext ctx, DiscordRole role) 
-			=> await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(role, Formatting.Indented)}\n```");
-
-		[Command("raw")]
-		public async Task Raw(CommandContext ctx, DiscordGuild guild)
-			=> await ctx.RespondAsync($"```\n{JsonConvert.SerializeObject(guild, Formatting.Indented)}\n```");
+		[SlashCommand("raw", "Supplies information about a givin object")]
+		public async Task Raw(InteractionContext ctx, [Option("Object", "The target object")]SnowflakeObject obj)
+			=> await ctx.CreateResponseAsync($"```\n{JsonConvert.SerializeObject(obj, Formatting.Indented)}\n```");
 	}
 }
