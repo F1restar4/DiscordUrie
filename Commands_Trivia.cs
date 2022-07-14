@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus;
+using DSharpPlus.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using Firestar4.OpenTDBWrapper;
 
 namespace DiscordUrie_DSharpPlus
 {
-	public partial class Commands : BaseCommandModule
+	public partial class Commands : ApplicationCommandModule
 	{
         List<String> Insults = new List<string>
         {
@@ -46,8 +46,8 @@ namespace DiscordUrie_DSharpPlus
             
 
         };
-        [Command("trivia")]
-        public async Task TriviaQuestion(CommandContext ctx)
+        [SlashCommand("trivia", "Gives a \"fun\" trivia question to answer")]
+        public async Task TriviaQuestion(InteractionContext ctx)
         {
             var question = await OpenTDBWrapper.GetQuestionAsync();
             List<string> AllAnswers = question.IncorrectAnswers;
@@ -61,16 +61,17 @@ namespace DiscordUrie_DSharpPlus
             builder.AddField("Difficulty", $"`{question.Difficulty}`", true);
             builder.AddField("Category", $"`{question.Category}`", true);
             builder.WithColor(new DiscordColor("00ffff"));
-            DiscordMessageBuilder messageBuilder = new DiscordMessageBuilder();
+            DiscordInteractionResponseBuilder messageBuilder = new DiscordInteractionResponseBuilder();
             var embed = builder.Build();
-            messageBuilder.WithEmbed(embed);
+            messageBuilder.AddEmbed(embed);
             List<DiscordComponent> Buttons = new List<DiscordComponent>();
             foreach (var cur in AllAnswers)
                 Buttons.Add(new DiscordButtonComponent(DSharpPlus.ButtonStyle.Secondary, cur, cur));
 
             messageBuilder.AddComponents(Buttons.ToArray());
 
-            var message = await ctx.RespondAsync(messageBuilder);
+            await ctx.CreateResponseAsync(messageBuilder);
+            var message = await ctx.GetOriginalResponseAsync();
             var Interaction = await message.WaitForButtonAsync(ctx.Member, TimeSpan.FromSeconds(12));
             if (Interaction.TimedOut)
             {
@@ -87,7 +88,7 @@ namespace DiscordUrie_DSharpPlus
                 }
                 messageBuilder.AddComponents(Buttons.ToArray());
                 messageBuilder.WithContent($"Looks like you ran out of time, {Insults.OrderBy(x => Guid.NewGuid()).First()}.");
-                await message.ModifyAsync(messageBuilder);
+                await ctx.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, messageBuilder);
                 return;
             }
 

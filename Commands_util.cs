@@ -3,9 +3,9 @@ using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using DiscordUrie_DSharpPlus.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Scripting;
@@ -13,27 +13,27 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace DiscordUrie_DSharpPlus
 {
-	public partial class Commands : BaseCommandModule
+	public partial class Commands : ApplicationCommandModule
 	{
-		[Command("setmsg"), RequireOwner]
-		public async Task SetMsg(CommandContext ctx, int type, [RemainingText] string text)
+		[SlashCommand("setmsg", "Sets the bot's activity"), SlashRequireOwner]
+		public async Task SetMsg(InteractionContext ctx, [Option("Type", "The activity type")]ActivityType type, [Option("text", "The text to set")] string text)
 		{
 			var Activity = new DiscordActivity(text, (ActivityType)type);
 			await ctx.Client.UpdateStatusAsync(Activity);
 			discordUrie.BootConfig.StartupActivity = Activity;
 			await DiscordUrieBootSettings.SaveBootConfig(discordUrie.BootConfig);
-			await ctx.Message.DeleteAsync();
+			await ctx.CreateResponseAsync("Done!", ephemeral: true);
 		}
 
-		[Command("uptime"), Description("Displays the bot's uptime.")]
-		public async Task UptimeAsync(CommandContext ctx)
+		[SlashCommand("uptime", "Displays the bot's uptime.")]
+		public async Task UptimeAsync(InteractionContext ctx)
 		{
-			await ctx.RespondAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n"+
+			await ctx.CreateResponseAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n"+
 			$"Socket uptime: {await DateTime.Now.Subtract(discordUrie.SocketStart).ToDuration()}");
 		}
 
-		[Command("lookup"), Description("Looks up info about a user")]
-		public async Task LookupUserAsync(CommandContext ctx, [Description("The user to lookup, can be an ID")]DiscordUser InputUser = null)
+		[SlashCommand("lookup", "Looks up info about a user")]
+		public async Task LookupUserAsync(InteractionContext ctx, [Option("InputUser", "The user to lookup, can be an ID")]DiscordUser InputUser = null)
 		{
 			if (InputUser == null)
 			{
@@ -66,25 +66,23 @@ namespace DiscordUrie_DSharpPlus
 				EBuilder.AddField("In current guild", "false");
 			}
 
-			await ctx.RespondAsync(embed: EBuilder.Build());
+			await ctx.CreateResponseAsync(embed: EBuilder.Build());
 
 		}
 	
-		[Command("shutdown"), Hidden, RequireOwner]
-		public async Task ShutdownAsync(CommandContext ctx)
+		[SlashCommand("shutdown", "Shuts down the bot"), SlashRequireOwner]
+		public async Task ShutdownAsync(InteractionContext ctx)
 		{
-			DiscordMessage HelpThanks = await ctx.RespondAsync("Shutting down...");
+			await ctx.CreateResponseAsync("Shutting down...");
 			await Task.Delay(3000);
-			await ctx.Message.DeleteAsync("Command auto deletion.");
-			await HelpThanks.DeleteAsync("Command auto deletion.");
 			await ctx.Client.DisconnectAsync();
 			Environment.Exit(0);
 		}
 
-		[Command("Reboot"), RequireOwner, Hidden]
-		public async Task RebootAsync(CommandContext ctx)
+		[SlashCommand("Reboot", "Restarts the bot"), SlashRequireOwner]
+		public async Task RebootAsync(InteractionContext ctx)
 		{
-			await ctx.RespondAsync("Rebooting...");
+			await ctx.CreateResponseAsync("Rebooting...");
 			await Task.Delay(3000);
 			await ctx.Client.DisconnectAsync();
 			try
@@ -109,30 +107,22 @@ namespace DiscordUrie_DSharpPlus
 
 		public class globals
 		{
-			public CommandContext ctx;
+			public InteractionContext ctx;
 			public DiscordUrieConfig settings;
 			public DiscordUrie discordUrie;
 		}
 
-		[Command("eval")]
-		public async Task Eval(CommandContext ctx, [RemainingText] string code)
+		[SlashCommand("eval", "Evaulates code"), SlashRequireOwner]
+		public async Task Eval(InteractionContext ctx, [Option("code", "the code to execute")]string code)
 		{
-			var yes = code.IndexOf("```") + 3;
-			yes = code.IndexOf('\n', yes) + 1;
-			var alsoyes = code.LastIndexOf("```");
-			if (yes == -1 || alsoyes == -1)
-			{
-				await ctx.RespondAsync("You need to wrap the code in a code block");
-				return;
-			}
 
-			code = code.Substring(yes, alsoyes - yes);
 			var embedbuilder = new DiscordEmbedBuilder()
 			{
 				Title = "Evaluating.",
 				Color = new DiscordColor(0, 255, 255),
 			};
-			var response = await ctx.RespondAsync(embedbuilder.Build());
+			await ctx.CreateResponseAsync(embedbuilder.Build());
+			var msg = await ctx.GetOriginalResponseAsync();
 			var globals = new globals
 			{
 				ctx = ctx,
@@ -155,7 +145,7 @@ namespace DiscordUrie_DSharpPlus
 					Color = new DiscordColor(255, 0, 0),
 					Description = string.Join('\n', ex.Diagnostics.Take(3))
 				};
-				await response.ModifyAsync(embedbuilder.Build());
+				await msg.ModifyAsync(embedbuilder.Build());
 				return;
 			}
 
@@ -167,7 +157,7 @@ namespace DiscordUrie_DSharpPlus
 			embedbuilder.AddField("Result", result != null ? result.ToString() : "Code didn't return a value");
 			if (result != null)
 				embedbuilder.AddField("Return type", result.GetType().ToString());
-			await response.ModifyAsync(embedbuilder.Build());
+			await msg.ModifyAsync(embedbuilder.Build());
 		}
 	}
 }

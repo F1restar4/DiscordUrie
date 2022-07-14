@@ -1,17 +1,16 @@
 using System.Threading.Tasks;
 using System.Linq;
 using DSharpPlus;
+using DSharpPlus.SlashCommands;
 using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
-    public partial class Commands : BaseCommandModule
+    public partial class Commands : ApplicationCommandModule
     {
-        [Group("Settings"), RequireAuth]
-        public class Settings : BaseCommandModule
+        [SlashCommandGroup("Settings", "Various bot settings"), RequireAuth]
+        public class Settings : ApplicationCommandModule
         {
             private DiscordUrie discordUrie {get; set;}
             public Settings(DiscordUrie du)
@@ -19,8 +18,8 @@ namespace DiscordUrie_DSharpPlus
                 this.discordUrie = du;
             }
 
-            [Command("NotificationChannel")]
-            public async Task NotificationChannel(CommandContext ctx)
+            [SlashCommand("GetNotificationChannel", "Gets the notification channel")]
+            public async Task GetNotificationChannel(InteractionContext ctx)
             {
                 var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
                 string Out;
@@ -36,11 +35,11 @@ namespace DiscordUrie_DSharpPlus
                         Out = $"set to {ctx.Guild.GetChannel(GuildSettings.NotificationChannel).Mention}";
                         break;
                 }
-                await ctx.RespondAsync($"Notifications currently {Out}");
+                await ctx.CreateResponseAsync($"Notifications currently {Out}");
             }
 
-            [Command("NotificationChannel")]
-            public async Task NotificationChannel(CommandContext ctx, DiscordChannel channel)
+            [SlashCommand("NotificationChannel", "Sets the notification channel")]
+            public async Task NotificationChannel(InteractionContext ctx, [Option("Channel", "The channel to send notifications to")]DiscordChannel channel)
             {
                 var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
                 if (GuildSettings.NotificationChannel == channel.Id)
@@ -49,42 +48,39 @@ namespace DiscordUrie_DSharpPlus
                 GuildSettings.NotificationChannel = channel.Id;
                 this.discordUrie.Config.GuildSettings.Add(GuildSettings);
                 await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
-                await ctx.RespondAsync($"Notification channel set to {channel.Mention}");
+                await ctx.CreateResponseAsync($"Notification channel set to {channel.Mention}");
             }
 
-            [Command("NotificationChannel")]
-            public async Task NotificationChannel(CommandContext ctx, string command)
+            [SlashCommand("DisableNotificationChannel", "Disables notifications")]
+            public async Task DisableNotificationChannel(InteractionContext ctx)
             {
-                if (command == "disable" || command == "off" || command == "false")
-                {
-                    var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
-                    if (GuildSettings.NotificationChannel == 0)
-                        return;
-                    this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
-                    GuildSettings.NotificationChannel = 0;
-                    this.discordUrie.Config.GuildSettings.Add(GuildSettings);
-                    await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
-                    await ctx.RespondAsync("Notifications disabled.");
-                }
+                var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
+                if (GuildSettings.NotificationChannel == 0)
+                    return;
+                this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
+                GuildSettings.NotificationChannel = 0;
+                this.discordUrie.Config.GuildSettings.Add(GuildSettings);
+                await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
+                await ctx.CreateResponseAsync("Notifications disabled.");
             }
        
-            [Command("Autorole")]
-            public async Task AutoRole(CommandContext ctx)
+            [SlashCommand("GetAutorole", "Gets the autorole setting")]
+            public async Task GetAutoRole(InteractionContext ctx)
             {
                 var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
                 if (GuildSettings.AutoRole == 0)
                 {
-                    await ctx.RespondAsync("Autorole is currently disabled.");
+                    await ctx.CreateResponseAsync("Autorole is currently disabled.");
                 }
                 else
                 {
                     var role = ctx.Guild.GetRole(GuildSettings.AutoRole);
-                    await ctx.RespondAsync($"Autorole is set to {role.Mention}");
+                    await ctx.CreateResponseAsync($"Autorole is set to {role.Mention}");
                 }
             }
 
-            [Command("Autorole")]
-            public async Task AutoRole(CommandContext ctx, DiscordRole role)
+            [SlashCommand("Autorole", "Sets the auto role")]
+            public async Task AutoRole(InteractionContext ctx, [Option("Role", "The role to give to users when they join")]DiscordRole role)
             {
                 var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
                 if (GuildSettings.AutoRole == role.Id)
@@ -93,23 +89,20 @@ namespace DiscordUrie_DSharpPlus
                 GuildSettings.AutoRole = role.Id;
                 this.discordUrie.Config.GuildSettings.Add(GuildSettings);
                 await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
-                await ctx.RespondAsync($"Autorole set to {role.Mention}");
+                await ctx.CreateResponseAsync($"Autorole set to {role.Mention}");
             }
 
-            [Command("Autorole")]
-            public async Task AutoRole(CommandContext ctx, string command)
+            [SlashCommand("DisableAutorole", "Disables autorole")]
+            public async Task DisableAutoRole(InteractionContext ctx)
             {
-                if (command == "disable" || command == "off" || command == "false")
-                {
-                    var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
-                    if (GuildSettings.AutoRole == 0)
-                        return;
-                    this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
-                    GuildSettings.AutoRole = 0;
-                    this.discordUrie.Config.GuildSettings.Add(GuildSettings);
-                    await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
-                    await ctx.RespondAsync("Autorole disabled");
-                }
+                var GuildSettings = await this.discordUrie.Config.FindGuildSettings(ctx.Guild);
+                if (GuildSettings.AutoRole == 0)
+                    return;
+                this.discordUrie.Config.GuildSettings.Remove(GuildSettings);
+                GuildSettings.AutoRole = 0;
+                this.discordUrie.Config.GuildSettings.Add(GuildSettings);
+                await GuildSettings.SaveGuild(this.discordUrie.SQLConn);
+                await ctx.CreateResponseAsync("Autorole disabled");
             }
 
         }

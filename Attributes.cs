@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordUrie_DSharpPlus
@@ -12,9 +12,9 @@ namespace DiscordUrie_DSharpPlus
 	{
 
 		[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-		class ColorCommand : CheckBaseAttribute
+		class ColorCommand : SlashCheckBaseAttribute
 		{
-			public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
+			public override async Task<bool> ExecuteChecksAsync(InteractionContext ctx)
 			{
 				var du = ctx.Services.GetService<DiscordUrie>();
 				var util = new Util(du);
@@ -24,7 +24,7 @@ namespace DiscordUrie_DSharpPlus
 				var GuildSettings = await du.Config.FindGuildSettings(ctx.Guild);
 				if (!GuildSettings.ColorEnabled)
 				{
-					await ctx.RespondAsync("This is disabled on this guild.");
+					await ctx.CreateResponseAsync("This is disabled on this guild.");
 					return false;
 				}
 
@@ -33,7 +33,7 @@ namespace DiscordUrie_DSharpPlus
 					case BlackListModeEnum.Blacklist:
 						if (GuildSettings.ColorBlacklist.Any(xr => xr == ctx.Member.Id))
 						{
-							await ctx.RespondAsync("You are blacklisted from this command and cannot use it.");
+							await ctx.CreateResponseAsync("You are blacklisted from this command and cannot use it.");
 							return false;
 						}
 						break;
@@ -41,7 +41,7 @@ namespace DiscordUrie_DSharpPlus
 					case BlackListModeEnum.Whitelist:
 						if (!GuildSettings.ColorBlacklist.Any(xr => xr == ctx.Member.Id))
 						{
-							await ctx.RespondAsync("You have not been whitelisted for this command and cannot use it.");
+							await ctx.CreateResponseAsync("You have not been whitelisted for this command and cannot use it.");
 							return false;
 						}
 						break;
@@ -55,9 +55,9 @@ namespace DiscordUrie_DSharpPlus
 		}
 		
 		[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-		class RequireAuth : CheckBaseAttribute
+		class RequireAuth : SlashCheckBaseAttribute
 		{
-			public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
+			public override async Task<bool> ExecuteChecksAsync(InteractionContext ctx)
 			{
 				var du = ctx.Services.GetService<DiscordUrie>();
 				var util = new Util(du);
@@ -67,9 +67,9 @@ namespace DiscordUrie_DSharpPlus
 		}
 
 		[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-		class RequireAuthHigh : CheckBaseAttribute
+		class RequireAuthHigh : SlashCheckBaseAttribute
 		{
-			public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
+			public override async Task<bool> ExecuteChecksAsync(InteractionContext ctx)
 			{
 				var du = ctx.Services.GetService<DiscordUrie>();
 				var util = new Util(du);
