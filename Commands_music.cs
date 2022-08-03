@@ -9,12 +9,13 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
+using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
 	public partial class Commands : ApplicationCommandModule
 	{
-		[SlashCommandGroup("music", "Used to play music (or any youtube video).")]
+		[SlashCommandGroup("music", "Used to play music (or any youtube video)."), MusicCommand]
 		public class Music : ApplicationCommandModule
 		{
 			public DiscordUrie discordUrie { get; set; }
@@ -218,7 +219,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				var NP = GuildMusicData.NowPlaying;
-				await ctx.CreateResponseAsync($"Currently playing `{NP.Title}` at `{NP.Position}/{NP.Length}`");
+				await ctx.CreateResponseAsync($"Currently playing `{NP.Title}` that is {NP.Length} long`");
 			}
 
 			[SlashCommand("remove", "Removes the track at a specific position in the queue.")]

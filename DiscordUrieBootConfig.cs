@@ -19,14 +19,17 @@ namespace DiscordUrie_DSharpPlus
         public string ScpKey { get; set; }
         [JsonProperty]
         public DiscordActivity StartupActivity { get; set; }
+        [JsonProperty]
+        public bool MusicEnabled { get; set; }
 
         [JsonConstructor]
-        public DiscordUrieBootConfig(string BotToken, string LavalinkPassword, int ScpID, string ScpKey, DiscordActivity StartupActivity)
+        public DiscordUrieBootConfig(string BotToken, string LavalinkPassword, int ScpID, string ScpKey, bool MusicEnabled, DiscordActivity StartupActivity)
         {
             this.BotToken = BotToken;
             this.LavalinkPassword = LavalinkPassword;
             this.ScpID = ScpID;
             this.ScpKey = ScpKey;
+            this.MusicEnabled = MusicEnabled;
             this.StartupActivity = StartupActivity;
         }
     }
@@ -37,7 +40,7 @@ namespace DiscordUrie_DSharpPlus
         {
             if (!File.Exists("BootConfig.json"))
             {
-                var Config = new DiscordUrieBootConfig("", "", 0, "", new DiscordActivity("you.", ActivityType.Watching));
+                var Config = new DiscordUrieBootConfig("", "", 0, "", true, new DiscordActivity("you.", ActivityType.Watching));
                 File.WriteAllText("BootConfig.json", JsonConvert.SerializeObject(Config, Formatting.Indented));
                 Console.WriteLine("Please fill out the BootConfig.json file.");
                 Environment.Exit(0);

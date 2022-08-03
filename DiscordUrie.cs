@@ -33,7 +33,6 @@ namespace DiscordUrie_DSharpPlus
 		public DiscordUrieConfig Config { get; set; }
 		public DateTime StartTime { get; set; }
 		public DateTime SocketStart { get; set; }
-		public string[] CmdPrefix = { "/" };
 		public SQLiteConnection SQLConn { get; }
 		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
@@ -126,7 +125,8 @@ namespace DiscordUrie_DSharpPlus
 					SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
 					Password = this.BootConfig.LavalinkPassword
 			};
-			this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
+			if (this.BootConfig.MusicEnabled)
+				this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
 			
 			//Check if global config is empty, this shouldn't happen normally
 			if (await this.Config.IsEmpty())

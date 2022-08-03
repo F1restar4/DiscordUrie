@@ -12,6 +12,21 @@ namespace DiscordUrie_DSharpPlus
 	{
 
 		[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+		class MusicCommand : SlashCheckBaseAttribute
+		{
+			public override async Task<bool> ExecuteChecksAsync(InteractionContext ctx)
+			{
+				var du = ctx.Services.GetService<DiscordUrie>();
+				if (!du.BootConfig.MusicEnabled)
+				{
+					await ctx.CreateResponseAsync("Music module is disabled by my developer. If you believe this is a mistake please contact her.", ephemeral: true);
+					return false;
+				}
+				return true;
+			}
+		}
+
+		[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 		class ColorCommand : SlashCheckBaseAttribute
 		{
 			public override async Task<bool> ExecuteChecksAsync(InteractionContext ctx)

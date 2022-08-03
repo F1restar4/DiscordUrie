@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using DSharpPlus;
 using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.Entities;
 using DiscordUrie_DSharpPlus.Attributes;
 
@@ -16,6 +17,14 @@ namespace DiscordUrie_DSharpPlus
             public Settings(DiscordUrie du)
             {
                 this.discordUrie = du;
+            }
+
+            [SlashCommand("ToggleMusic", "Globally toggles music functionality"), SlashRequireOwner]
+            public async Task ToggleMusic(InteractionContext ctx)
+            {
+                discordUrie.BootConfig.MusicEnabled = !discordUrie.BootConfig.MusicEnabled;
+                await DiscordUrieBootSettings.SaveBootConfig(discordUrie.BootConfig);
+                await ctx.CreateResponseAsync($"Music enabled set to {discordUrie.BootConfig.MusicEnabled}.", ephemeral: true);
             }
 
             [SlashCommand("GetNotificationChannel", "Gets the notification channel")]
