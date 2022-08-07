@@ -109,7 +109,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[SlashCommand("searchurl", "Searches for a specific youtube video via link and queues it to be played.")]
-			public async Task SearchUrl(InteractionContext ctx, [Option("ulr", "The url to play")]string search)
+			public async Task SearchUrl(InteractionContext ctx, [Option("url", "The url to play")]string search)
 			{
 				var success = Uri.TryCreate(search, UriKind.RelativeOrAbsolute, out var url);
 				if (!success)
