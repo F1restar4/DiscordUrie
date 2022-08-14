@@ -163,9 +163,7 @@ namespace DiscordUrie_DSharpPlus
 				IEnumerable<string> TagKeys = tags.Select(xr => xr.Tag);
 
 				string EditedTags = String.Join("\n", TagKeys);
-				await ctx.CreateResponseAsync("Displaying list", ephemeral: true);
-
-				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line), timeoutoverride: TimeSpan.FromSeconds(12));
+				await intex.SendPaginatedResponseAsync(ctx.Interaction, false, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
 			}
 
 			[SlashCommand("info", "Gives information about a tag")]

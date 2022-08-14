@@ -240,8 +240,7 @@ namespace DiscordUrie_DSharpPlus
 					.GroupBy(x => x.index / 10)
 					.Select(xr => new Page(embed: new DiscordEmbedBuilder().WithDescription($"Now playing: {GuildMusicData.NowPlaying.Title}\n\n{string.Join("\n", xr.Select(xg => $"`{xg.index}` {xg.track.Title}"))}").WithColor(new DiscordColor("#00ffff"))))
 					.ToArray();
-				await ctx.CreateResponseAsync("Displaying list", ephemeral: true);
-				await Interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, QueuePages, new DSharpPlus.Interactivity.EventHandling.PaginationButtons(), timeoutoverride: TimeSpan.FromSeconds(12));
+				await Interactivity.SendPaginatedResponseAsync(ctx.Interaction, false, ctx.User, QueuePages, new DSharpPlus.Interactivity.EventHandling.PaginationButtons());
 			}
 		}
 	}

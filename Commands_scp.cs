@@ -96,9 +96,7 @@ namespace DiscordUrie_DSharpPlus
 				IEnumerable<string> TagKeys = data.Select(xr => $"{xr.Target.Name} | {xr.Target.ID}");
 
 				string EditedTags = String.Join("\n", TagKeys);
-				await ctx.CreateResponseAsync("Displaying list", ephemeral: true);
-
-				await intex.SendPaginatedMessageAsync(ctx.Channel, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
+				await intex.SendPaginatedResponseAsync(ctx.Interaction, false, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
 			}
         }
     }
