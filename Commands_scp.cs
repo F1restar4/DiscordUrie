@@ -75,11 +75,15 @@ namespace DiscordUrie_DSharpPlus
 				    return;
 			    }
 			    var peep = pop.First();
+				var reason = peep.Reason;
+
+				if (String.IsNullOrEmpty(reason))
+					reason = "No ban reason givin.";
 
 			    DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
 			    builder.Title = $"Ban info for: {peep.Target.Name}";
 			    builder.Description = $"ID: {peep.Target.ID.ToString()}";
-			    builder.AddField("Reason", peep.Reason);
+			    builder.AddField("Reason", reason);
 			    builder.AddField("Admin name", peep.AdminName);
 			    builder.AddField("Ban time", peep.BanTime.ToShortDateString());
 			    builder.AddField("Unban time", peep.UnbanTime.ToShortDateString());
