@@ -63,7 +63,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
             [SlashCommand("get", "Search for a ban on the scp server")]
-		    public async Task ScpBans(InteractionContext ctx, [Option("search", "The string to search by. Searches for the name, id, or ban reason.")] string search)
+		    public async Task ScpBans(InteractionContext ctx, [Option("search", "The string to search by. Searches for the name, id, or ban reason.")] string search, [Option("DisplayAdminInfo", "Whether or not to display the admin's info.")] bool DisplayAdminInfo = true)
 		    {
 				await ctx.DeferAsync();
 			    var data = await ScpBanInfo.GetData();
@@ -84,7 +84,8 @@ namespace DiscordUrie_DSharpPlus
 			    builder.Title = $"Ban info for: {peep.Target.Name}";
 			    builder.Description = $"ID: {peep.Target.ID.ToString()}";
 			    builder.AddField("Reason", reason);
-			    builder.AddField("Admin name", peep.AdminName);
+				if (DisplayAdminInfo)
+			    	builder.AddField("Admin name", peep.AdminName);
 			    builder.AddField("Ban time", peep.BanTime.ToShortDateString());
 			    builder.AddField("Unban time", peep.UnbanTime.ToShortDateString());
 			    builder.AddField("Ban duration", (peep.BanTime - peep.UnbanTime).ToString("%d' day(s), '%h' hour(s), '%m' minutes, '%s' second(s)'"));
