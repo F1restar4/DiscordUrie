@@ -35,7 +35,7 @@ namespace DiscordUrie_DSharpPlus
 	public class Util
 	{
 		private DiscordUrie discordUrie { get; set; }
-		
+
 		public Util(DiscordUrie du)
 		{
 			this.discordUrie = du;

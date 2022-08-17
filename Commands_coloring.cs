@@ -71,7 +71,7 @@ namespace DiscordUrie_DSharpPlus
 				return Task.FromResult(roleList.First(xr => xr.Value.Name == UserId).Value.Color);
 			}
 
-			[SlashCommand("set", "Sets the target's color, you're allowed to set your own color usually"), ColorCommand]	
+			[SlashCommand("set", "Sets the target's color, you're allowed to set your own color usually"), ColorCommand]
 			public async Task ExecuteGroupAsync(InteractionContext ctx, [Option("TargetUser", "The ID or mention of the target user")] DiscordUser user, [Option("Color", "The color to set to, can be in hex, rgb or keyword format (Must be a single string)")] string Color)
 			{
 				try
@@ -146,7 +146,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[SlashCommand("me", "Sets your color"), ColorCommand]
-			public async Task SetSelfColor(InteractionContext ctx, [Option("color", "The color to set to, can be in hex, rgb or keyword format (Must be a single string)")]string Color)
+			public async Task SetSelfColor(InteractionContext ctx, [Option("color", "The color to set to, can be in hex, rgb or keyword format (Must be a single string)")] string Color)
 			{
 				try
 				{
@@ -188,9 +188,9 @@ namespace DiscordUrie_DSharpPlus
 					ctx.Client.Logger.Log(LogLevel.Error, $"Error getting user's color; {ex.Message}");
 				}
 			}
-		
+
 			[SlashCommand("block", "Adds a user to the color commmand black/whitelist"), RequireAuth]
-			public async Task BlockAdd(InteractionContext ctx, [Option("User", "The user to add to the black/whitelist")]DiscordUser Member)
+			public async Task BlockAdd(InteractionContext ctx, [Option("User", "The user to add to the black/whitelist")] DiscordUser Member)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 				if (GuildSettings.ColorBlacklist.Any(xr => xr == Member.Id))
@@ -204,7 +204,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[SlashCommand("unblock", "Removes a user from the color command black/whitelist"), RequireAuth]
-			public async Task BlockRemove(InteractionContext ctx, [Option("User", "The user to remove from the black/whitelist")]DiscordUser Member)
+			public async Task BlockRemove(InteractionContext ctx, [Option("User", "The user to remove from the black/whitelist")] DiscordUser Member)
 			{
 				var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 				if (!GuildSettings.ColorBlacklist.Any(xr => xr == Member.Id))

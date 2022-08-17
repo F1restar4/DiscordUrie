@@ -15,9 +15,9 @@ using DiscordUrie_DSharpPlus.Attributes;
 
 namespace DiscordUrie_DSharpPlus
 {
-    public partial class Commands : ApplicationCommandModule
-    {
-        [SlashCommand("scp", "Gets Packing Peanut's server info")]
+	public partial class Commands : ApplicationCommandModule
+	{
+		[SlashCommand("scp", "Gets Packing Peanut's server info")]
 		public async Task Scp(InteractionContext ctx)
 		{
 			SCPServer TargetServer;
@@ -53,44 +53,44 @@ namespace DiscordUrie_DSharpPlus
 
 		}
 
-        [SlashCommandGroup("scpbans", "Search for a ban on the scp server"), RequireAuth]
-        public class Scpbans : ApplicationCommandModule
-        {
-            public DiscordUrie discordUrie { get; set; }
-			public Scpbans (DiscordUrie du)
+		[SlashCommandGroup("scpbans", "Search for a ban on the scp server"), RequireAuth]
+		public class Scpbans : ApplicationCommandModule
+		{
+			public DiscordUrie discordUrie { get; set; }
+			public Scpbans(DiscordUrie du)
 			{
 				discordUrie = du;
 			}
 
-            [SlashCommand("get", "Search for a ban on the scp server")]
-		    public async Task ScpBans(InteractionContext ctx, [Option("search", "The string to search by. Searches for the name, id, or ban reason.")] string search, [Option("DisplayAdminInfo", "Whether or not to display the admin's info.")] bool DisplayAdminInfo = true)
-		    {
+			[SlashCommand("get", "Search for a ban on the scp server")]
+			public async Task ScpBans(InteractionContext ctx, [Option("search", "The string to search by. Searches for the name, id, or ban reason.")] string search, [Option("DisplayAdminInfo", "Whether or not to display the admin's info.")] bool DisplayAdminInfo = true)
+			{
 				await ctx.DeferAsync();
-			    var data = await ScpBanInfo.GetData();
-			    string lower = search.ToLower();
-			    var pop = data.FindAll(xr => lower == xr.Target.Name.ToLower() || search == xr.Target.ID.ToString() || lower == xr.Reason.ToLower());
-			    if (pop.Count == 0)
-			    {
-				    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No matches found."));
-				    return;
-			    }
-			    var peep = pop.First();
+				var data = await ScpBanInfo.GetData();
+				string lower = search.ToLower();
+				var pop = data.FindAll(xr => lower == xr.Target.Name.ToLower() || search == xr.Target.ID.ToString() || lower == xr.Reason.ToLower());
+				if (pop.Count == 0)
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No matches found."));
+					return;
+				}
+				var peep = pop.First();
 				var reason = peep.Reason;
 
 				if (String.IsNullOrEmpty(reason))
 					reason = "No ban reason givin.";
 
-			    DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
-			    builder.Title = $"Ban info for: {peep.Target.Name}";
-			    builder.Description = $"ID: {peep.Target.ID.ToString()}";
-			    builder.AddField("Reason", reason);
+				DiscordEmbedBuilder builder = new DiscordEmbedBuilder();
+				builder.Title = $"Ban info for: {peep.Target.Name}";
+				builder.Description = $"ID: {peep.Target.ID.ToString()}";
+				builder.AddField("Reason", reason);
 				if (DisplayAdminInfo)
-			    	builder.AddField("Admin name", peep.AdminName);
-			    builder.AddField("Ban time", peep.BanTime.ToShortDateString());
-			    builder.AddField("Unban time", peep.UnbanTime.ToShortDateString());
-			    builder.AddField("Ban duration", (peep.BanTime - peep.UnbanTime).ToString("%d' day(s), '%h' hour(s), '%m' minutes, '%s' second(s)'"));
-			    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(builder));
-		    }
+					builder.AddField("Admin name", peep.AdminName);
+				builder.AddField("Ban time", peep.BanTime.ToShortDateString());
+				builder.AddField("Unban time", peep.UnbanTime.ToShortDateString());
+				builder.AddField("Ban duration", (peep.BanTime - peep.UnbanTime).ToString("%d' day(s), '%h' hour(s), '%m' minutes, '%s' second(s)'"));
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(builder));
+			}
 
 			[SlashCommand("list", "List all bans")]
 			public async Task ListBans(InteractionContext ctx)
@@ -103,6 +103,6 @@ namespace DiscordUrie_DSharpPlus
 				string EditedTags = String.Join("\n", TagKeys);
 				await intex.SendPaginatedResponseAsync(ctx.Interaction, false, ctx.User, intex.GeneratePagesInEmbed(EditedTags, DSharpPlus.Interactivity.Enums.SplitType.Line));
 			}
-        }
-    }
+		}
+	}
 }

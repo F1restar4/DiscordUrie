@@ -68,7 +68,7 @@ namespace DiscordUrie_DSharpPlus
 
 			}
 		}
-		
+
 		[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 		class RequireAuth : SlashCheckBaseAttribute
 		{

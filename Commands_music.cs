@@ -29,7 +29,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				if (discordUrie.LavalinkNode.GetGuildConnection(guild) != null)
 				{
-					await channel.SendMessageAsync("Already connected."); 
+					await channel.SendMessageAsync("Already connected.");
 					return null;
 				}
 				if (member.VoiceState.Channel == null)
@@ -67,7 +67,7 @@ namespace DiscordUrie_DSharpPlus
 
 				if (MusicData.Queue.Count <= 0)
 					await Leave(guild);
-				
+
 				MusicData.StartNext();
 				await connection.PlayAsync(MusicData.NowPlaying);
 				await MusicData.UpdateChannel.SendMessageAsync($"Playing `{MusicData.NowPlaying.Title}`");
@@ -102,14 +102,14 @@ namespace DiscordUrie_DSharpPlus
 
 			public async Task<LavalinkGuildConnection> GetOrCreateConnectionAsync(DiscordGuild Guild, DiscordChannel Channel, DiscordMember Member)
 			{
-					var connection = discordUrie.LavalinkNode.GetGuildConnection(Guild);
-					if (connection == null) 
-						connection = await this.Join(Guild, Channel, Member);
-					return connection;
+				var connection = discordUrie.LavalinkNode.GetGuildConnection(Guild);
+				if (connection == null)
+					connection = await this.Join(Guild, Channel, Member);
+				return connection;
 			}
 
 			[SlashCommand("searchurl", "Searches for a specific youtube video via link and queues it to be played.")]
-			public async Task SearchUrl(InteractionContext ctx, [Option("url", "The url to play")]string search)
+			public async Task SearchUrl(InteractionContext ctx, [Option("url", "The url to play")] string search)
 			{
 				var success = Uri.TryCreate(search, UriKind.RelativeOrAbsolute, out var url);
 				if (!success)
@@ -129,11 +129,11 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[SlashCommand("play", "Searches for any youtube video and queues it to be played.")]
-			public async Task SearchPlay(InteractionContext ctx, [Option("search", "The video to search for")]string search)
+			public async Task SearchPlay(InteractionContext ctx, [Option("search", "The video to search for")] string search)
 			=> await Search(ctx, search);
 
 			[SlashCommand("search", "Searches for any youtube video and queues it to be played.")]
-			public async Task Search(InteractionContext ctx, [Option("search", "The video to search for")]string search)
+			public async Task Search(InteractionContext ctx, [Option("search", "The video to search for")] string search)
 			{
 				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(search);
 				if (tracks.Tracks.Count() == 0)
@@ -155,14 +155,14 @@ namespace DiscordUrie_DSharpPlus
 				embed.AddField("Tracks", string.Join("\n", trackarray.Select((xr, index) => $"{index + 1}. {xr.Title}")));
 				var Int = ctx.Client.GetInteractivity();
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
-				var Message = await Int.WaitForMessageAsync(xr => xr.Author == ctx.User &&(Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5));
-				
+				var Message = await Int.WaitForMessageAsync(xr => xr.Author == ctx.User && (Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5));
+
 				if (Message.TimedOut)
 				{
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Response time elapsed."));
 					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
 						await this.Leave(ctx.Guild);
-						return;
+					return;
 				}
 
 				var track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
@@ -188,7 +188,7 @@ namespace DiscordUrie_DSharpPlus
 				await connection.StopAsync();
 				if (MusicData == null)
 					return;
-				
+
 				MusicData.ClearQueue();
 				MusicData.ClearNP();
 				await ctx.CreateResponseAsync("Cleared the queue.");
@@ -236,7 +236,7 @@ namespace DiscordUrie_DSharpPlus
 				var Interactivity = ctx.Client.GetInteractivity();
 				var GuildMusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				var Queue = GuildMusicData.Queue;
-				var QueuePages = Queue.Select((s, i) => new {track = s, index = i})
+				var QueuePages = Queue.Select((s, i) => new { track = s, index = i })
 					.GroupBy(x => x.index / 10)
 					.Select(xr => new Page(embed: new DiscordEmbedBuilder().WithDescription($"Now playing: {GuildMusicData.NowPlaying.Title}\n\n{string.Join("\n", xr.Select(xg => $"`{xg.index}` {xg.track.Title}"))}").WithColor(new DiscordColor("#00ffff"))))
 					.ToArray();

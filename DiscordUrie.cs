@@ -47,7 +47,7 @@ namespace DiscordUrie_DSharpPlus
 			this.MusicData = new List<GuildMusicData>();
 			this.LockedOutUsers = new List<DiscordMember>();
 			BootConfig = DiscordUrieBootSettings.GetBootConfig();
-			
+
 			//Initial client setup
 			this.Client = new DiscordClient(new DiscordConfiguration
 			{
@@ -102,7 +102,7 @@ namespace DiscordUrie_DSharpPlus
 		private async Task GuildAvailable(DiscordClient client, GuildCreateEventArgs e)
 		{
 			if (!this.Config.GuildSettings.Any(xr => xr.Id == e.Guild.Id))
-				 await this.Config.AddGuild(e.Guild);
+				await this.Config.AddGuild(e.Guild);
 		}
 
 		//Remove configuration data from guilds the bot is no longer apart of
@@ -117,17 +117,17 @@ namespace DiscordUrie_DSharpPlus
 
 		//Finished downloading guild information
 		private async Task Client_Ready(DiscordClient client, ReadyEventArgs e)
-		{	
+		{
 			//Setup lavalink
 			var LavaConfig = new LavalinkConfiguration
 			{
-					RestEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
-					SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
-					Password = this.BootConfig.LavalinkPassword
+				RestEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
+				SocketEndpoint = new ConnectionEndpoint { Hostname = "localhost", Port = 2333 },
+				Password = this.BootConfig.LavalinkPassword
 			};
 			if (this.BootConfig.MusicEnabled)
 				this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
-			
+
 			//Check if global config is empty, this shouldn't happen normally
 			if (await this.Config.IsEmpty())
 			{
@@ -158,15 +158,15 @@ namespace DiscordUrie_DSharpPlus
 		private async Task UserLeaveGuild(DiscordClient client, GuildMemberRemoveEventArgs e)
 		{
 			if (e.Member.IsCurrent) return;
-			
+
 			var GuildSettings = await this.Config.FindGuildSettings(e.Guild);
 			DiscordChannel channel;
 			//Check notification settings
-			switch(GuildSettings.NotificationChannel)
+			switch (GuildSettings.NotificationChannel)
 			{
 				case 0:
 					return;
-				
+
 				case 1:
 					channel = e.Guild.GetDefaultChannel();
 					break;

@@ -58,11 +58,11 @@ namespace DiscordUrie_DSharpPlus
 			{
 				GuildSettings = new List<DiscordUrieGuild>()
 			};
-			while(await reader.ReadAsync())
+			while (await reader.ReadAsync())
 			{
 				OutSettings.GuildSettings.Add(new DiscordUrieGuild(Convert.ToUInt64(reader["id"]))
 				{
-					ColorEnabled  = Convert.ToBoolean(reader["ColorEnabled"]),
+					ColorEnabled = Convert.ToBoolean(reader["ColorEnabled"]),
 					ColorLocked = Convert.ToBoolean(reader["ColorLocked"]),
 					ColorBlacklistMode = (BlackListModeEnum)Convert.ToInt32(reader["ColorBlacklistMode"]),
 					ColorBlacklist = JsonConvert.DeserializeObject<List<ulong>>((string)reader["ColorBlacklist"]),
@@ -79,7 +79,7 @@ namespace DiscordUrie_DSharpPlus
 
 	public class DiscordUrieConfig
 	{
-		public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn,  List<DiscordUrieGuild> Guilds = null)
+		public DiscordUrieConfig(DiscordUrieSettings Settings, SQLiteConnection SQLConn, List<DiscordUrieGuild> Guilds = null)
 		{
 			this.SettingsInstance = Settings;
 			this.SQLConn = SQLConn;
@@ -98,7 +98,7 @@ namespace DiscordUrie_DSharpPlus
 		public async Task<int> SaveSettings(SQLiteConnection conn)
 		{
 			int affected = 0;
-			foreach(DiscordUrieGuild cur in GuildSettings)
+			foreach (DiscordUrieGuild cur in GuildSettings)
 			{
 				affected += await cur.SaveGuild(conn);
 			}
@@ -166,9 +166,9 @@ namespace DiscordUrie_DSharpPlus
 			this.Output = Output;
 			this.Owner = Owner;
 		}
-		public string Tag {get; set;}
-		public string Output {get; set;}
-		public ulong Owner {get; set;}
+		public string Tag { get; set; }
+		public string Output { get; set; }
+		public ulong Owner { get; set; }
 	}
 
 	public class DiscordUrieGuild
@@ -209,14 +209,14 @@ namespace DiscordUrie_DSharpPlus
 			conn.Close();
 			return peeagain;
 		}
-		public ulong Id {get; set;}
-		public bool ColorEnabled {get; set;}
-		public bool ColorLocked {get; set;}
-		public BlackListModeEnum ColorBlacklistMode {get; set;}
-		public List<ulong> ColorBlacklist {get; set;}
-		public List<ulong> Admins {get; set;}
-		public List<DiscordUrieTag> Tags {get; set;}
-		public ulong NotificationChannel {get; set;}
-		public ulong AutoRole {get; set;}
+		public ulong Id { get; set; }
+		public bool ColorEnabled { get; set; }
+		public bool ColorLocked { get; set; }
+		public BlackListModeEnum ColorBlacklistMode { get; set; }
+		public List<ulong> ColorBlacklist { get; set; }
+		public List<ulong> Admins { get; set; }
+		public List<DiscordUrieTag> Tags { get; set; }
+		public ulong NotificationChannel { get; set; }
+		public ulong AutoRole { get; set; }
 	}
 }

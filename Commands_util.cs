@@ -16,7 +16,7 @@ namespace DiscordUrie_DSharpPlus
 	public partial class Commands : ApplicationCommandModule
 	{
 		[SlashCommand("setmsg", "Sets the bot's activity"), SlashRequireOwner]
-		public async Task SetMsg(InteractionContext ctx, [Option("Type", "The activity type")]ActivityType type, [Option("text", "The text to set")] string text)
+		public async Task SetMsg(InteractionContext ctx, [Option("Type", "The activity type")] ActivityType type, [Option("text", "The text to set")] string text)
 		{
 			var Activity = new DiscordActivity(text, (ActivityType)type);
 			await ctx.Client.UpdateStatusAsync(Activity);
@@ -28,12 +28,12 @@ namespace DiscordUrie_DSharpPlus
 		[SlashCommand("uptime", "Displays the bot's uptime.")]
 		public async Task UptimeAsync(InteractionContext ctx)
 		{
-			await ctx.CreateResponseAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n"+
+			await ctx.CreateResponseAsync($"Program uptime: {await DateTime.Now.Subtract(discordUrie.StartTime).ToDuration()} \n" +
 			$"Socket uptime: {await DateTime.Now.Subtract(discordUrie.SocketStart).ToDuration()}");
 		}
 
 		[SlashCommand("lookup", "Looks up info about a user")]
-		public async Task LookupUserAsync(InteractionContext ctx, [Option("InputUser", "The user to lookup, can be an ID")]DiscordUser InputUser = null)
+		public async Task LookupUserAsync(InteractionContext ctx, [Option("InputUser", "The user to lookup, can be an ID")] DiscordUser InputUser = null)
 		{
 			if (InputUser == null)
 			{
@@ -69,7 +69,7 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.CreateResponseAsync(embed: EBuilder.Build());
 
 		}
-	
+
 		[SlashCommand("shutdown", "Shuts down the bot"), SlashRequireOwner]
 		public async Task ShutdownAsync(InteractionContext ctx)
 		{
@@ -113,7 +113,7 @@ namespace DiscordUrie_DSharpPlus
 		}
 
 		[SlashCommand("eval", "Evaulates code"), SlashRequireOwner]
-		public async Task Eval(InteractionContext ctx, [Option("code", "the code to execute")]string code)
+		public async Task Eval(InteractionContext ctx, [Option("code", "the code to execute")] string code)
 		{
 
 			var embedbuilder = new DiscordEmbedBuilder()
@@ -129,7 +129,7 @@ namespace DiscordUrie_DSharpPlus
 				settings = this.discordUrie.Config,
 				discordUrie = this.discordUrie
 			};
-			var ScriptOpt = ScriptOptions.Default.WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", 
+			var ScriptOpt = ScriptOptions.Default.WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers",
 				"System.Reflection", "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.SlashCommands", "DSharpPlus.Entities", "DSharpPlus.EventArgs", "DSharpPlus.Exceptions")
 				.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location))); // I have no idea what this does or why it fixes imports but /shrug
 			Object result;

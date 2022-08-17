@@ -50,7 +50,7 @@ namespace DiscordUrie_DSharpPlus
 
 				string Out = "Tag not found. Did you mean:\n";
 
-				foreach(var cur in Contained)
+				foreach (var cur in Contained)
 				{
 					Out += cur.Tag + "\n";
 				}
@@ -74,7 +74,7 @@ namespace DiscordUrie_DSharpPlus
 					}
 
 					var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
-				
+
 					tag = Regex.Escape(tag);
 					Output = Regex.Escape(Output);
 					if (GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag.ToLower()))
@@ -82,14 +82,14 @@ namespace DiscordUrie_DSharpPlus
 						await ctx.CreateResponseAsync("This tag already exists!");
 						return;
 					}
-				
+
 					discordUrie.Config.GuildSettings.Remove(GuildSettings);
 					GuildSettings.Tags.Add(new DiscordUrieTag(tag, Output, ctx.Member.Id));
 					discordUrie.Config.GuildSettings.Add(GuildSettings);
 					await GuildSettings.SaveGuild(discordUrie.SQLConn);
 					await ctx.CreateResponseAsync("Tag created!");
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					await ctx.CreateResponseAsync($"You did something wrong. {ex.GetType()} : {ex.Message}");
 				}
@@ -130,14 +130,14 @@ namespace DiscordUrie_DSharpPlus
 					var GuildSettings = await discordUrie.Config.FindGuildSettings(ctx.Guild);
 
 
-					if(!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
+					if (!GuildSettings.Tags.Any(xr => xr.Tag.ToLower() == tag))
 					{
 						await ctx.CreateResponseAsync("Tag doesn't exist!");
 						return;
 					}
 					DiscordUrieTag Target = GuildSettings.Tags.First(xr => xr.Tag.ToLower() == tag);
 					var util = new Util(discordUrie);
-					if(Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
+					if (Target.Owner != ctx.Member.Id && !await util.UserAuth(ctx.Member))
 					{
 						await ctx.CreateResponseAsync("You do not have the permissions to do this!");
 						return;
@@ -148,7 +148,7 @@ namespace DiscordUrie_DSharpPlus
 					await GuildSettings.SaveGuild(discordUrie.SQLConn);
 					await ctx.CreateResponseAsync("Tag removed!");
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					await ctx.CreateResponseAsync($"You did something wrong. {ex.GetType()} : {ex.Message}");
 				}
@@ -188,7 +188,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[SlashCommand("import", "Imports tags from another guild"), RequireAuth]
-			public async Task Import(InteractionContext ctx, [Option("guild", "Target guild.")] string guild) 
+			public async Task Import(InteractionContext ctx, [Option("guild", "Target guild.")] string guild)
 			{
 				await ctx.DeferAsync();
 				var TargetGuild = await ctx.Client.GetGuildAsync(Convert.ToUInt64(guild));

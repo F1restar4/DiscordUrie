@@ -28,11 +28,11 @@ namespace DiscordUrie_DSharpPlus
 			}
 
 			[SlashCommand("remove", "Mass remove the last x number of messages")]
-			public async Task SpamRemoveAsync(InteractionContext ctx, [Option("Amount", "Number of messages to remove")]long amount)
+			public async Task SpamRemoveAsync(InteractionContext ctx, [Option("Amount", "Number of messages to remove")] long amount)
 			{
 				await ctx.CreateResponseAsync(";)", ephemeral: true);
 				IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.InteractionId, Convert.ToInt32(amount));
-				await ctx.Channel.DeleteMessagesAsync(Messages, $"Spam remove command by '{ctx.Member.DisplayName}'");	
+				await ctx.Channel.DeleteMessagesAsync(Messages, $"Spam remove command by '{ctx.Member.DisplayName}'");
 			}
 
 			[SlashCommand("removeSearch", "Mass remove messages from a channel using the key as a search term")]
