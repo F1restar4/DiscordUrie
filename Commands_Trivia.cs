@@ -28,7 +28,8 @@ namespace DiscordUrie_DSharpPlus
 			"cracker",
 			"bonehead",
 			"neanderthal",
-			"cave man"
+			"cave man",
+			"ass face"
 		};
 
 		List<String> SmartyPantsWords = new List<string>
@@ -44,8 +45,8 @@ namespace DiscordUrie_DSharpPlus
 			"cheater",
 			"intellectual",
 
-
 		};
+
 		[SlashCommand("trivia", "Gives a \"fun\" trivia question to answer")]
 		public async Task TriviaQuestion(InteractionContext ctx)
 		{
@@ -75,7 +76,7 @@ namespace DiscordUrie_DSharpPlus
 			var Interaction = await message.WaitForButtonAsync(ctx.Member, TimeSpan.FromSeconds(12));
 			if (Interaction.TimedOut)
 			{
-				messageBuilder.ClearComponents();
+				var webhookbuilder = new DiscordWebhookBuilder().AddEmbed(embed);
 				Buttons.Clear();
 				foreach (var cur in AllAnswers)
 				{
@@ -86,9 +87,9 @@ namespace DiscordUrie_DSharpPlus
 					}
 					Buttons.Add(new DiscordButtonComponent(DSharpPlus.ButtonStyle.Secondary, cur, cur, true));
 				}
-				messageBuilder.AddComponents(Buttons.ToArray());
-				messageBuilder.WithContent($"Looks like you ran out of time, {Insults.OrderBy(x => Guid.NewGuid()).First()}.");
-				await ctx.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, messageBuilder);
+				webhookbuilder.AddComponents(Buttons.ToArray());
+				webhookbuilder.WithContent($"Looks like you ran out of time, {Insults.OrderBy(x => Guid.NewGuid()).First()}.");
+				await ctx.EditResponseAsync(webhookbuilder);
 				return;
 			}
 
