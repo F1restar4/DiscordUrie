@@ -155,7 +155,8 @@ namespace DiscordUrie_DSharpPlus
 				embed.AddField("Tracks", string.Join("\n", trackarray.Select((xr, index) => $"{index + 1}. {xr.Title}")));
 				var builder = new DiscordWebhookBuilder().AddEmbed(embed);
 				List<DiscordComponent> Buttons = new List<DiscordComponent>();
-				for (int i = 1; i <= trackarray.Count(); i++)
+				int trackcount = trackarray.Count();
+				for (int i = 1; i != trackcount; i++)
 				{
 					string num = i.ToString();
 					Buttons.Add(new DiscordButtonComponent(ButtonStyle.Secondary, num, num));
@@ -164,7 +165,6 @@ namespace DiscordUrie_DSharpPlus
 				builder.AddComponents(Buttons);
 				var message = await ctx.EditResponseAsync(builder);
 				var interaction = await message.WaitForButtonAsync(ctx.Member, TimeSpan.FromSeconds(20));
-			
 				if (interaction.TimedOut)
 				{
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Response time elapsed."));
