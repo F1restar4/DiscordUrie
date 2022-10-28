@@ -153,19 +153,34 @@ namespace DiscordUrie_DSharpPlus
 					Color = new DiscordColor("#00ffff")
 				};
 				embed.AddField("Tracks", string.Join("\n", trackarray.Select((xr, index) => $"{index + 1}. {xr.Title}")));
-				var Int = ctx.Client.GetInteractivity();
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
-				var Message = await Int.WaitForMessageAsync(xr => xr.Author == ctx.User && (Convert.ToInt32(xr.Content) >= 1 || Convert.ToInt32(xr.Content) <= 5));
-
-				if (Message.TimedOut)
+				var builder = new DiscordWebhookBuilder().AddEmbed(embed);
+				List<DiscordComponent> Buttons = new List<DiscordComponent>();
+				for (int i = 1; i <= trackarray.Count(); i++)
+				{
+					string num = i.ToString();
+					Buttons.Add(new DiscordButtonComponent(ButtonStyle.Secondary, num, num));
+				}
+				Buttons.Add(new DiscordButtonComponent(ButtonStyle.Danger, "cancel", "X"));
+				builder.AddComponents(Buttons);
+				var message = await ctx.EditResponseAsync(builder);
+				var interaction = await message.WaitForButtonAsync(ctx.Member, TimeSpan.FromSeconds(20));
+			
+				if (interaction.TimedOut)
 				{
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Response time elapsed."));
 					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
 						await this.Leave(ctx.Guild);
 					return;
 				}
+				if (interaction.Result.Id == "cancel")
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Search cancelled."));
+					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
+						await this.Leave(ctx.Guild);
+					return;
+				}
 
-				var track = trackarray.ElementAt(Convert.ToInt32(Message.Result.Content) - 1);
+				var track = trackarray.ElementAt(Convert.ToInt32(interaction.Result.Id) - 1);
 				MusicData.Enqueue(track);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Queued {track.Title}"));
 				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
