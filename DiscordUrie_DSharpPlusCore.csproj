@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.110.0" />
-    <PackageReference Include="ScpListSharp" Version="1.0.8" />
+    <PackageReference Include="ScpListSharp" Version="1.0.9" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
     <Reference Include="DiscordUrieScpSsh">
       <HintPath>DiscordUriesScpSsh.dll</HintPath>
