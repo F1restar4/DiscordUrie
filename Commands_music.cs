@@ -237,6 +237,22 @@ namespace DiscordUrie_DSharpPlus
 				await ctx.CreateResponseAsync($"Currently playing `{NP.Title}` that is {NP.Length} long`");
 			}
 
+			[SlashCommand("stats", "Displays stats about the music player")]
+			public async Task Stats(InteractionContext ctx)
+			{
+				var builder = new DiscordEmbedBuilder().WithTitle("Lavalink stats");
+				builder.WithColor(new DiscordColor("#00ffff"));
+				var stats = this.discordUrie.LavalinkNode.Statistics;
+				builder.AddField("Active Players/Total Players", $"{stats.ActivePlayers}/{stats.TotalPlayers}", true);
+				builder.AddField("Lavalink CPU Usage/System CPU Usage", $"{stats.CpuLavalinkLoad}/{stats.CpuSystemLoad}", true);
+				builder.AddField("Average Deficity Frames Per Minute", stats.AverageDeficitFramesPerMinute.ToString(), true);
+				builder.AddField("Average Null Frames Per Minute", stats.AverageNulledFramesPerMinute.ToString(), true);
+				builder.AddField("Average Frames Per Minute", stats.AverageSentFramesPerMinute.ToString(), true);
+				builder.AddField("Ram Used/Ram Free", $"{stats.RamUsed}/{stats.RamFree}", true);
+				builder.WithFooter($"Node uptime: {stats.Uptime.ToDuration()}");
+				await ctx.CreateResponseAsync(builder.Build());
+			}
+
 			[SlashCommand("remove", "Removes the track at a specific position in the queue.")]
 			public async Task Remove(InteractionContext ctx, [Option("index", "The index of the entry to remove")] long index)
 			{
