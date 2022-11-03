@@ -249,7 +249,7 @@ namespace DiscordUrie_DSharpPlus
 				builder.AddField("Average Null Frames Per Minute", stats.AverageNulledFramesPerMinute.ToString(), true);
 				builder.AddField("Average Frames Per Minute", stats.AverageSentFramesPerMinute.ToString(), true);
 				builder.AddField("Ram Used/Ram Free", $"{stats.RamUsed}/{stats.RamFree}", true);
-				builder.WithFooter($"Node uptime: {stats.Uptime.ToDuration()}");
+				builder.WithFooter($"Node uptime: {await stats.Uptime.ToDuration()}");
 				await ctx.CreateResponseAsync(builder.Build());
 			}
 

@@ -101,7 +101,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 			catch
 			{
-
+				Environment.Exit(0);
 			}
 		}
 
