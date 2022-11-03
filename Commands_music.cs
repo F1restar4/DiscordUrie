@@ -245,7 +245,7 @@ namespace DiscordUrie_DSharpPlus
 				var stats = this.discordUrie.LavalinkNode.Statistics;
 				builder.AddField("Active Players/Total Players", $"{stats.ActivePlayers}/{stats.TotalPlayers}", true);
 				builder.AddField("Lavalink CPU Usage/System CPU Usage", $"{stats.CpuLavalinkLoad}/{stats.CpuSystemLoad}", true);
-				builder.AddField("Average Deficity Frames Per Minute", stats.AverageDeficitFramesPerMinute.ToString(), true);
+				builder.AddField("Average Deficit Frames Per Minute", stats.AverageDeficitFramesPerMinute.ToString(), true);
 				builder.AddField("Average Null Frames Per Minute", stats.AverageNulledFramesPerMinute.ToString(), true);
 				builder.AddField("Average Frames Per Minute", stats.AverageSentFramesPerMinute.ToString(), true);
 				builder.AddField("Ram Used/Ram Free", $"{stats.RamUsed}/{stats.RamFree}", true);
