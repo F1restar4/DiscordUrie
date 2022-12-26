@@ -156,7 +156,7 @@ namespace DiscordUrie_DSharpPlus
 				var builder = new DiscordWebhookBuilder().AddEmbed(embed);
 				List<DiscordComponent> Buttons = new List<DiscordComponent>();
 				int trackcount = trackarray.Count();
-				for (int i = 1; i != trackcount; i++)
+				for (int i = 1; i != trackcount + 1; i++)
 				{
 					string num = i.ToString();
 					Buttons.Add(new DiscordButtonComponent(ButtonStyle.Secondary, num, num));
