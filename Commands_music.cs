@@ -145,7 +145,7 @@ namespace DiscordUrie_DSharpPlus
 
 				var connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
 				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
-				var trackarray = tracks.Tracks.Take(5);
+				var trackarray = tracks.Tracks.Take(4);
 
 				var embed = new DiscordEmbedBuilder
 				{
@@ -156,7 +156,7 @@ namespace DiscordUrie_DSharpPlus
 				var builder = new DiscordWebhookBuilder().AddEmbed(embed);
 				List<DiscordComponent> Buttons = new List<DiscordComponent>();
 				int trackcount = trackarray.Count();
-				for (int i = 1; i != 6; i++)
+				for (int i = 1; i != trackcount + 1; i++)
 				{
 					string num = i.ToString();
 					Buttons.Add(new DiscordButtonComponent(ButtonStyle.Secondary, num, num));
