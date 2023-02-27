@@ -54,8 +54,8 @@ namespace DiscordUrie_DSharpPlus
 					await MusicData.UpdateChannel.SendMessageAsync("Not connected.");
 					return;
 				}
-				await connection.DisconnectAsync();
 				this.musicData.Remove(MusicData);
+				await connection.DisconnectAsync();
 			}
 
 			async Task Play(DiscordGuild guild)

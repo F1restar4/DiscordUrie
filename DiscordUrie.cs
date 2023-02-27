@@ -13,6 +13,7 @@ using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
+using DSharpPlus.Lavalink.EventArgs;
 using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,6 +116,15 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
+		private Task LavalinkGuildConnectionRemoved(LavalinkGuildConnection con, GuildConnectionRemovedEventArgs args)
+		{
+			if (!this.MusicData.Any(xr => xr.GuildId == con.Guild.Id))
+				return Task.CompletedTask;
+			var musicData = this.MusicData.First(xr => xr.GuildId == con.Guild.Id);
+			this.MusicData.Remove(musicData);
+			return Task.CompletedTask;;
+		}
+
 		//Finished downloading guild information
 		private async Task Client_Ready(DiscordClient client, ReadyEventArgs e)
 		{
@@ -126,7 +136,10 @@ namespace DiscordUrie_DSharpPlus
 				Password = this.BootConfig.LavalinkPassword
 			};
 			if (this.BootConfig.MusicEnabled)
+			{
 				this.LavalinkNode = await this.Lavalink.ConnectAsync(LavaConfig);
+				this.LavalinkNode.GuildConnectionRemoved += LavalinkGuildConnectionRemoved;
+			}
 
 			//Check if global config is empty, this shouldn't happen normally
 			if (await this.Config.IsEmpty())
