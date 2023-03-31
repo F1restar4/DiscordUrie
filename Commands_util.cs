@@ -105,7 +105,7 @@ namespace DiscordUrie_DSharpPlus
 			}
 		}
 
-		public class globals
+		public class Globals
 		{
 			public InteractionContext ctx;
 			public DiscordUrieConfig settings;
@@ -123,7 +123,7 @@ namespace DiscordUrie_DSharpPlus
 			};
 			await ctx.CreateResponseAsync(embedbuilder.Build());
 			var msg = await ctx.GetOriginalResponseAsync();
-			var globals = new globals
+			var globals = new Globals
 			{
 				ctx = ctx,
 				settings = this.discordUrie.Config,
@@ -135,7 +135,7 @@ namespace DiscordUrie_DSharpPlus
 			Object result;
 			try
 			{
-				result = await CSharpScript.EvaluateAsync(code, ScriptOpt, globals, typeof(globals));
+				result = await CSharpScript.EvaluateAsync(code, ScriptOpt, globals, typeof(Globals));
 			}
 			catch (CompilationErrorException ex)
 			{

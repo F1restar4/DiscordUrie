@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordUrie_DSharpPlus
 {
-	public static class ext
+	public static class Extend
 	{
 		public static Task<string> Truncate(this string value, int maxLength)
 		{

@@ -82,10 +82,7 @@ namespace DiscordUrie_DSharpPlus
 			});
 			this.SlashCommandsExtension.RegisterCommands<Commands>();
 			//this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
-			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration
-			{
-				AckPaginationButtons = true,
-			});
+			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration());
 		}
 
 		public async Task StartAsync()
