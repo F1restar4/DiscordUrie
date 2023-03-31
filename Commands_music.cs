@@ -147,8 +147,6 @@ namespace DiscordUrie_DSharpPlus
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("The specified url isn't a valid playlist!"));
 					return;
 				}
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks"));
-
 				var builder = new DiscordWebhookBuilder().WithContent($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks. Is this correct?");
 				List<DiscordComponent> Buttons = new List<DiscordComponent>();
 				Buttons.Add(new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"));
@@ -176,7 +174,7 @@ namespace DiscordUrie_DSharpPlus
 					MusicData.Enqueue(track);
 				}
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Queued {tracks.PlaylistInfo.Name}"));
-				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
+				if (MusicData.NowPlaying == null && MusicData.Queue.Count >= 1)
 					await this.Play(ctx.Guild);
 			}
 
