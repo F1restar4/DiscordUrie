@@ -128,6 +128,58 @@ namespace DiscordUrie_DSharpPlus
 					await this.Play(ctx.Guild);
 			}
 
+			[SlashCommand("searchplaylist", "Search for a playlist on youtube.")]
+			public async Task SearchPlaylist(InteractionContext ctx, [Option("url", "The url of the playlist or a video as part of the playlist")] string search)
+			{
+				var success = Uri.TryCreate(search, UriKind.RelativeOrAbsolute, out var url);
+				if (!success)
+				{
+					await ctx.CreateResponseAsync("Url invalid.");
+					return;
+				}
+				await ctx.DeferAsync();
+				var connection = await this.GetOrCreateConnectionAsync(ctx.Guild, ctx.Channel, ctx.Member);
+				var MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
+
+				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(url);
+				if (tracks.LoadResultType != LavalinkLoadResultType.PlaylistLoaded)
+				{
+					await ctx.CreateResponseAsync("The specified url isn't a valid playlist!");
+					return;
+				}
+				await ctx.CreateResponseAsync($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks");
+
+				var builder = new DiscordWebhookBuilder().WithContent($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks. Is this correct?");
+				List<DiscordComponent> Buttons = new List<DiscordComponent>();
+				Buttons.Add(new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"));
+				Buttons.Add(new DiscordButtonComponent(ButtonStyle.Danger, "no", "No"));
+				builder.AddComponents(Buttons);
+				var message = await ctx.EditResponseAsync(builder);
+				var interaction = await message.WaitForButtonAsync(ctx.Member, TimeSpan.FromSeconds(20));
+				if (interaction.TimedOut)
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Response time elapsed."));
+					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
+						await this.Leave(ctx.Guild);
+					return;
+				}
+				if (interaction.Result.Id == "no")
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Search cancelled."));
+					if (MusicData.NowPlaying == null && MusicData.Queue.Count == 0)
+						await this.Leave(ctx.Guild);
+					return;
+				}
+
+				foreach (var track in tracks.Tracks)
+				{
+					MusicData.Enqueue(track);
+				}
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Queued {tracks.PlaylistInfo.Name}"));
+				if (MusicData.NowPlaying == null && MusicData.Queue.Count <= 1)
+					await this.Play(ctx.Guild);
+			}
+
 			[SlashCommand("play", "Searches for any youtube video and queues it to be played.")]
 			public async Task SearchPlay(InteractionContext ctx, [Option("search", "The video to search for")] string search)
 			=> await Search(ctx, search);
