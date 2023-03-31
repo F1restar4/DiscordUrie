@@ -144,10 +144,10 @@ namespace DiscordUrie_DSharpPlus
 				var tracks = await discordUrie.LavalinkNode.Rest.GetTracksAsync(url);
 				if (tracks.LoadResultType != LavalinkLoadResultType.PlaylistLoaded)
 				{
-					await ctx.CreateResponseAsync("The specified url isn't a valid playlist!");
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("The specified url isn't a valid playlist!"));
 					return;
 				}
-				await ctx.CreateResponseAsync($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks");
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks"));
 
 				var builder = new DiscordWebhookBuilder().WithContent($"Found a playlist titled {tracks.PlaylistInfo.Name} and loaded {tracks.Tracks.Count()} tracks. Is this correct?");
 				List<DiscordComponent> Buttons = new List<DiscordComponent>();
