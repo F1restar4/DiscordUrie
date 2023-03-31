@@ -108,6 +108,25 @@ namespace DiscordUrie_DSharpPlus
 				return connection;
 			}
 
+			[SlashCommand("shuffle", "Shuffles the queue")]
+			public async Task Shuffle(InteractionContext ctx)
+			{
+				GuildMusicData MusicData;
+				try 
+				{
+					MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
+				}
+				catch
+				{
+					await ctx.CreateResponseAsync("Invalid music data! Am I actually connected?");
+					return;
+				}
+
+				var NewQueue = MusicData.Queue.OrderBy(x => Guid.NewGuid()).ToList();
+				MusicData.Queue = NewQueue;
+				await ctx.CreateResponseAsync("Shuffled the queue.");
+			}
+
 			[SlashCommand("searchurl", "Searches for a specific youtube video via link and queues it to be played.")]
 			public async Task SearchUrl(InteractionContext ctx, [Option("url", "The url to play")] string search)
 			{
@@ -173,7 +192,7 @@ namespace DiscordUrie_DSharpPlus
 				{
 					MusicData.Enqueue(track);
 				}
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Queued {tracks.PlaylistInfo.Name}"));
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Queued playlist `{tracks.PlaylistInfo.Name}`"));
 				if (MusicData.NowPlaying == null && MusicData.Queue.Count >= 1)
 					await this.Play(ctx.Guild);
 			}

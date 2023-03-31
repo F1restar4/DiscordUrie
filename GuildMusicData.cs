@@ -9,7 +9,7 @@ namespace DiscordUrie_DSharpPlus
 	public class GuildMusicData
 	{
 		public ulong GuildId { get; }
-		public List<LavalinkTrack> Queue { get; }
+		public List<LavalinkTrack> Queue { get; internal set;}
 		public LavalinkTrack NowPlaying { get; internal set; }
 		public DiscordGuild Guild { get; }
 		public DiscordChannel Channel { get; }
