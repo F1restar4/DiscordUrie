@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Linq;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.Interactivity;
@@ -26,6 +27,7 @@ namespace DiscordUrie_DSharpPlus
 			{
 				var ServerList = await Rest.GetOwnServersAsync(discordUrie.BootConfig.ScpID, discordUrie.BootConfig.ScpKey, Players: true, Info: true, Version: true, Online: true);
 				discordUrie.CachedServerInfo = ServerList;
+				discordUrie.CacheTimestamp = DateTime.Now;
 				TargetServer = ServerList.First();
 			}
 			catch (Exception ex)
@@ -36,7 +38,7 @@ namespace DiscordUrie_DSharpPlus
 					return;
 				}
 				TargetServer = discordUrie.CachedServerInfo.First();
-				MessageBuilder.WithContent("Rate limited, displaying cached info.");
+				MessageBuilder.WithContent($"Rate limited, displaying cached info from {Formatter.Timestamp(discordUrie.CacheTimestamp)}");
 			}
 
 			var FixedInfo = Regex.Replace(TargetServer.Info, "<[^>]+>", "");

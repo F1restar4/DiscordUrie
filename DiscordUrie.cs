@@ -38,6 +38,7 @@ namespace DiscordUrie_DSharpPlus
 		public DiscordUrieSettings SettingsInstance { get; }
 		public List<DiscordMember> LockedOutUsers { get; set; }
 		public List<SCPServer> CachedServerInfo = new List<SCPServer>();
+		public DateTime CacheTimestamp = DateTime.Now;
 
 		public DiscordUrie(DiscordUrieConfig cfg, SQLiteConnection connection, DiscordUrieSettings sett)
 		{
