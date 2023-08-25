@@ -59,7 +59,7 @@ namespace DiscordUrie_DSharpPlus
 			});
 
 			//Client events setup
-			this.Client.Ready += this.Client_Ready;
+			this.Client.SessionCreated += this.Client_Ready;
 			this.Client.ClientErrored += this.ErrorHandler;
 			this.Client.GuildMemberRemoved += this.UserLeaveGuild;
 			this.Client.GuildMemberAdded += this.UserJoinGuild;
@@ -129,7 +129,7 @@ namespace DiscordUrie_DSharpPlus
 		}
 
 		//Finished downloading guild information
-		private async Task Client_Ready(DiscordClient client, ReadyEventArgs e)
+		private async Task Client_Ready(DiscordClient client, SessionReadyEventArgs e)
 		{
 			//Setup lavalink
 			var LavaConfig = new LavalinkConfiguration

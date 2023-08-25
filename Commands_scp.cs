@@ -8,7 +8,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Interactivity.EventHandling;
 using Firestar4.ScpListSharp;
 using Firestar4.ScpListSharp.Entities;
 using Firestar4.ScpBanInfo;

@@ -4,11 +4,11 @@
     <TargetFramework>netcoreapp7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01574" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01574" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01574" />
-    <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01574" />
-    <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01574" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01694" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01694" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01694" />
+    <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01694" />
+    <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01694" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
