@@ -19,6 +19,7 @@ using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Firestar4.ScpListSharp.Entities;
+using DSharpPlus.Entities.AuditLogs;
 
 namespace DiscordUrie_DSharpPlus
 {
@@ -209,8 +210,12 @@ namespace DiscordUrie_DSharpPlus
 
 			//Check if the user was kicked
 			//The only way to determine this is through the audit logs which can make this inconsistent
-			var L = await e.Guild.GetAuditLogsAsync(1, action_type: AuditLogActionType.Kick);
-			DiscordAuditLogKickEntry LastKick = (DiscordAuditLogKickEntry)L.FirstOrDefault();
+			List<DiscordAuditLogEntry> bruh = new List<DiscordAuditLogEntry>();
+			await foreach (var i in e.Guild.GetAuditLogsAsync(1, actionType: DiscordAuditLogActionType.Kick))
+			{
+				bruh.Add(i);
+			}
+			var LastKick = (DiscordAuditLogKickEntry)bruh.FirstOrDefault();
 			if (LastKick != null && LastKick.Target == e.Member)
 			{
 				await channel.SendMessageAsync($"{e.Member.Mention} ({e.Member.Username}#{e.Member.Discriminator}) was kicked from the guild with the reason `{LastKick.Reason}`");
