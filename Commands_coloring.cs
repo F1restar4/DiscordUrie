@@ -166,7 +166,7 @@ namespace DiscordUrie_DSharpPlus
 				catch (Exception ex)
 				{
 					await ctx.CreateResponseAsync($"Something went wrong! {ex.Message}");
-					ctx.Client.Logger.Log(LogLevel.Error, "Discord Urie", $"Error in setting color, {ex.Message}");
+					ctx.Client.Logger.Log(LogLevel.Error, $"[Discord Urie] Error in setting color, {ex.Message}");
 				}
 			}
 

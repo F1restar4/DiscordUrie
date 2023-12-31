@@ -31,7 +31,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task SpamRemoveAsync(InteractionContext ctx, [Option("Amount", "Number of messages to remove")] long amount)
 			{
 				await ctx.CreateResponseAsync(";)", ephemeral: true);
-				IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.InteractionId, Convert.ToInt32(amount));
+				var Messages = ctx.Channel.GetMessagesBeforeAsync(ctx.InteractionId, Convert.ToInt32(amount));
 				await ctx.Channel.DeleteMessagesAsync(Messages, $"Spam remove command by '{ctx.Member.DisplayName}'");
 			}
 
@@ -41,7 +41,7 @@ namespace DiscordUrie_DSharpPlus
 
 				try
 				{
-					IReadOnlyList<DiscordMessage> Messages = await ctx.Channel.GetMessagesAsync();
+					List<DiscordMessage> Messages = ctx.Channel.GetMessagesAsync().ToBlockingEnumerable().ToList();
 					key = key.ToLower();
 
 					bool ByUserInput = false;
@@ -58,7 +58,7 @@ namespace DiscordUrie_DSharpPlus
 					else
 						FilteredMessages = Messages.Where(xr => xr.Content.ToLower().Contains(key));
 
-					await ctx.Channel.DeleteMessagesAsync(FilteredMessages, "Spam Removal Command Deletion");
+					await ctx.Channel.DeleteMessagesAsync(FilteredMessages.ToList(), "Spam Removal Command Deletion");
 
 					ctx.Client.Logger.Log(Microsoft.Extensions.Logging.LogLevel.Information, $"Removed {FilteredMessages.Count()} matching messages.");
 
