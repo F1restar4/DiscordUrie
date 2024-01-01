@@ -112,7 +112,7 @@ namespace DiscordUrie_DSharpPlus
 			public async Task Shuffle(InteractionContext ctx)
 			{
 				GuildMusicData MusicData;
-				try 
+				try
 				{
 					MusicData = this.musicData.First(xr => xr.GuildId == ctx.Guild.Id);
 				}

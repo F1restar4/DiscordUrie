@@ -83,7 +83,6 @@ namespace DiscordUrie_DSharpPlus
 				Services = depend,
 			});
 			this.SlashCommandsExtension.RegisterCommands<Commands>();
-			//this.CNext.RegisterCommands(Assembly.GetExecutingAssembly());
 			this.Interactivity = Client.UseInteractivity(new InteractivityConfiguration());
 		}
 

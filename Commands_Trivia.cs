@@ -74,10 +74,10 @@ namespace DiscordUrie_DSharpPlus
 			await ctx.CreateResponseAsync(messageBuilder);
 			var message = await ctx.GetOriginalResponseAsync();
 			var Interaction = await message.WaitForButtonAsync(ctx.Member, TimeSpan.FromSeconds(12));
+			Buttons.Clear();
 			if (Interaction.TimedOut)
 			{
 				var webhookbuilder = new DiscordWebhookBuilder().AddEmbed(embed);
-				Buttons.Clear();
 				foreach (var cur in AllAnswers)
 				{
 					if (cur == question.CorrectAnswer)
@@ -96,7 +96,6 @@ namespace DiscordUrie_DSharpPlus
 			var Result = Interaction.Result;
 			if (Result.Id == question.CorrectAnswer)
 			{
-				Buttons.Clear();
 				foreach (var cur in AllAnswers)
 				{
 					if (cur == question.CorrectAnswer)
@@ -111,7 +110,6 @@ namespace DiscordUrie_DSharpPlus
 				return;
 			}
 
-			Buttons.Clear();
 			foreach (var cur in AllAnswers)
 			{
 				if (cur == question.CorrectAnswer)
